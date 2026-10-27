@@ -1,0 +1,38 @@
+{
+ "format": 1,
+ "updated": "2026-10-27",
+ "firmware": [
+  {
+   "product": "NS-5000X",
+   "version": "0.7.0",
+   "board": "ns4000-esp32",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X-v0.7.0.bin",
+   "size": 1309888,
+   "sha256": "ba4facc039686932b3a7629d931a634b2bb4e278a6179a1ddc94e88f01834005",
+   "license": "PolyForm Noncommercial",
+   "note": {
+    "ja": "段 14: ダウンローダー対応の版",
+    "en": "Downloader-ready build"
+   },
+   "status": "stable"
+  }
+ ],
+ "apps": [],
+ "data": [],
+ "news": [
+  {
+   "date": "2026-10-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "ダウンローダーの試験を始めました",
+    "en": "Downloader test started"
+   },
+   "body": {
+    "ja": "この目録は試験用です。",
+    "en": "This manifest is for testing."
+   }
+  }
+ ],
+ "astro": []
+}
