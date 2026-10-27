@@ -1,23 +1,35 @@
 {
  "format": 1,
  "updated": "2026-10-27",
- "firmware": [
+ "firmware": [],
+ "apps": [
   {
-   "product": "NS-5000X",
-   "version": "0.7.0",
-   "board": "ns4000-esp32",
-   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X-v0.7.0.bin",
-   "size": 1309888,
-   "sha256": "ba4facc039686932b3a7629d931a634b2bb4e278a6179a1ddc94e88f01834005",
-   "license": "PolyForm Noncommercial",
-   "note": {
-    "ja": "段 14: ダウンローダー対応の版",
-    "en": "Downloader-ready build"
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
+   "version": "0.9.1",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
+   "size": 91424,
+   "sha256": "c26919e62077ebb8a74430af39a0328a4995a79ed1539cd546e6eef3d7e23194",
+   "title": {
+    "ja": "星図(英語版)。starchart_en_data.js と一緒に入れる",
+    "en": "Star chart (English). Install with starchart_en_data.js"
    },
-   "status": "stable"
+   "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en_data.js",
+   "version": "0.9.1",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en_data.js",
+   "size": 90749,
+   "sha256": "31c7139e0a3dd1f0434b898a0ebcf8ce1e189dd205d0faba1c6c3c75c0530531",
+   "title": {
+    "ja": "星図のデータ(英語版)",
+    "en": "Star chart data (English)"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
   }
  ],
- "apps": [],
  "data": [],
  "news": [
   {
