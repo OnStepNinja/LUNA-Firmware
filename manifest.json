@@ -65,6 +65,26 @@
   {
    "product": "NS-4000",
    "name": "OnStepNinja NS-4000",
+   "version": "1.2.4",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.4.bin",
+   "size": 1336192,
+   "sha256": "153fd83d1513312dc12ff06541fd7472d1d41cd5cd9701d00312b9fe83bb6947",
+   "title": {
+    "ja": "テスト配信です。OnStep + AiBridge の赤道儀ファーム",
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。GOTO の直後(落ち着くまでの 5 秒)でも LUNA Base へ切り替えられる(NS-5000X と同じ)",
+    "en": "Test distribution. Switching to LUNA Base also works right after a GOTO (the same as NS-5000X)"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+  },
+  {
+   "product": "NS-4000",
+   "name": "OnStepNinja NS-4000",
    "version": "1.2.3",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
