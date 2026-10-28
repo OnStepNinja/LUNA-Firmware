@@ -1,6 +1,6 @@
 {
  "format": 1,
- "updated": "2026-10-27",
+ "updated": "2026-10-28",
  "firmware": [],
  "apps": [
   {
@@ -14,7 +14,11 @@
     "ja": "星図(英語版)。starchart_en_data.js と一緒に入れる",
     "en": "Star chart (English). Install with starchart_en_data.js"
    },
-   "license": "Freeware (apps/common/LICENSE)"
+   "license": "Freeware (apps/common/LICENSE)",
+   "category": {
+    "ja": "星図",
+    "en": "Star chart"
+   }
   },
   {
    "product": "NS-4000 / NS-5000X",
@@ -27,10 +31,120 @@
     "ja": "星図のデータ(英語版)",
     "en": "Star chart data (English)"
    },
+   "license": "Freeware (apps/common/LICENSE)",
+   "category": {
+    "ja": "星図",
+    "en": "Star chart"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "meteor_catch.html",
+   "version": "0.1",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/meteor_catch.html",
+   "size": 3039,
+   "sha256": "0059bd11fa6d6746f008771fe5b74a5254405a76dd1c3a14a5f62e646a8dda46",
+   "title": {
+    "ja": "流れ星キャッチ",
+    "en": "Meteor Catch"
+   },
+   "category": {
+    "ja": "ゲーム",
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "30 秒で流れ星をタップして集めるゲーム(試験用)",
+    "en": "Tap the meteors for 30 seconds (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "star_memory.html",
+   "version": "0.1",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/star_memory.html",
+   "size": 2529,
+   "sha256": "aa452c2227e80ea6dee7c7a0643c6b2a330a134a151d2ca4b71630190328c858",
+   "title": {
+    "ja": "星の神経衰弱",
+    "en": "Star Memory"
+   },
+   "category": {
+    "ja": "ゲーム",
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "同じ絵をそろえるカードゲーム(試験用)",
+    "en": "Match the pairs (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "luna_moon.svg",
+   "version": "0.1",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/luna_moon.svg",
+   "size": 1506,
+   "sha256": "15e6b2b18b786ecc4e1c5264fce3a2e36850f4590f0d7d2385ea9bac8835295e",
+   "title": {
+    "ja": "月と望遠鏡(絵)",
+    "en": "Moon and telescope (picture)"
+   },
+   "category": {
+    "ja": "画像",
+    "en": "Images"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "画像の試験。入れると http://基板の IP/luna_moon.svg で見られます",
+    "en": "Image test. After install: http://<board IP>/luna_moon.svg"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "npf_calc.html",
+   "version": "0.1",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/npf_calc.html",
+   "size": 1835,
+   "sha256": "e3e948c21d0b285dc4dec7cc11af2fe7f0b9a0a1f8d2bf5165828de70ee540fc",
+   "title": {
+    "ja": "露出時間の計算(NPF 則)",
+    "en": "Exposure calculator (NPF rule)"
+   },
+   "category": {
+    "ja": "ツール",
+    "en": "Tools"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "追尾しないで星を点に写せる秒数の目安(試験用)",
+    "en": "Longest untracked exposure (test)"
+   }
+  }
+ ],
+ "data": [
+  {
+   "group": "OnStep",
+   "name": "onstep_basic_commands.txt",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/onstep/onstep_basic_commands.txt",
+   "size": 1421,
+   "sha256": "eb639810da474e0c771bea68e6971d29f55e1be336c6952a3b4fb38aee394582",
+   "type": "text",
+   "title": {
+    "ja": "OnStep の基本コマンド",
+    "en": "OnStep basic commands"
+   },
+   "category": {
+    "ja": "文書",
+    "en": "Documents"
+   },
    "license": "Freeware (apps/common/LICENSE)"
   }
  ],
- "data": [],
  "news": [
   {
    "date": "2026-10-27",
