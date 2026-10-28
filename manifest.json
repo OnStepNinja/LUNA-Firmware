@@ -1,9 +1,13 @@
 {
  "format": 1,
  "updated": "2026-10-28",
+ "catalogs": {
+  "esp32-4mb-1": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/catalog/esp32-4mb-1.json"
+ },
  "firmware": [
   {
    "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
    "name": "DOG NS-5000X",
    "version": "0.7.6",
    "layout": "esp32-4mb-1",
@@ -24,6 +28,7 @@
   },
   {
    "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
    "name": "DOG NS-5000X",
    "version": "0.7.5",
    "layout": "esp32-4mb-1",
@@ -44,6 +49,7 @@
   },
   {
    "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
    "name": "DOG NS-5000X",
    "version": "0.7.4",
    "layout": "esp32-4mb-1",
@@ -64,6 +70,7 @@
   },
   {
    "product": "NS-4000",
+   "mark": "LUNA OnStepNinja NS-4000 v",
    "name": "OnStepNinja NS-4000",
    "version": "1.2.5",
    "layout": "esp32-4mb-1",

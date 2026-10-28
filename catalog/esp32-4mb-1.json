@@ -1,0 +1,380 @@
+{
+ "format": 1,
+ "updated": "2026-10-28",
+ "firmware": [
+  {
+   "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
+   "name": "DOG NS-5000X",
+   "version": "0.7.6",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X_v0.7.6.bin",
+   "size": 1312928,
+   "sha256": "aac92c8f583f0a5256f4990d9aaebb324767200a0691dddd2139304a560447bb",
+   "title": {
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。Console の上のリンクを整理し、ファイル一覧にアプリの説明を表示",
+    "en": "Test distribution. Console links tidied; the file list shows a description of each app"
+   },
+   "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
+   "name": "DOG NS-5000X",
+   "version": "0.7.5",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X_v0.7.5.bin",
+   "size": 1311312,
+   "sha256": "9b66863f1a83f8d8aa8eaf61ff84183c5ef676fe42566496197633a2a73f19bc",
+   "title": {
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。追尾中でも LUNA Base へ切り替えられる(GOTO 中だけ断る)",
+    "en": "Test distribution. Switching to LUNA Base works while tracking (only a GOTO refuses)"
+   },
+   "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-5000X",
+   "mark": "NS-5000X Ver",
+   "name": "DOG NS-5000X",
+   "version": "0.7.4",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X_v0.7.4.bin",
+   "size": 1311296,
+   "sha256": "544de02e34775139489226cd6f1a1ae327508450fe7d2ce87ff86bad5ce31804",
+   "title": {
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。LUNA Base の確定版の区画に対応。Console に「LUNA Base へ」のボタン",
+    "en": "Test distribution. For the fixed LUNA Base layout. \"LUNA Base\" button in the Console"
+   },
+   "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-4000",
+   "mark": "LUNA OnStepNinja NS-4000 v",
+   "name": "OnStepNinja NS-4000",
+   "version": "1.2.5",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.5.bin",
+   "size": 1336144,
+   "sha256": "c3250f96928f9f911ffeb35723e05851dc40f9dd4fe34b526b70a8c7987126a6",
+   "title": {
+    "ja": "テスト配信です。OnStep + AiBridge の赤道儀ファーム",
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。Console の「LUNA Base へ」が追尾中でも使える(NS-5000X と同じ)。GOTO 中だけ断る",
+    "en": "Test distribution. The Console \"LUNA Base\" button works while tracking (the same as NS-5000X); only a GOTO refuses"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+  }
+ ],
+ "apps": [
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
+   "version": "0.9.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
+   "size": 91591,
+   "sha256": "8aac2b4f39eb8593fb0a31a358a71cd62d43e09886d8ba188801f20544e1a3d8",
+   "title": {
+    "en": "Star chart (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en_data.js",
+   "version": "0.9.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en_data.js",
+   "size": 90749,
+   "sha256": "31c7139e0a3dd1f0434b898a0ebcf8ce1e189dd205d0faba1c6c3c75c0530531",
+   "title": {
+    "en": "Star chart data (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "The star data of the Star chart. Download it together with \"Star chart (English)\""
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "meteor_catch_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/meteor_catch_en.html",
+   "size": 3072,
+   "sha256": "855035bd73771430dac0c65b8614ec01900fea33c9c23ab7ef21980720c7b66c",
+   "title": {
+    "en": "Meteor Catch"
+   },
+   "category": {
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Tap the meteors for 30 seconds (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "star_memory_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/star_memory_en.html",
+   "size": 2578,
+   "sha256": "708842ef2fb6ae3a93d985db6416f09150c4dbb3a9f22caa2338641a6aba9b51",
+   "title": {
+    "en": "Star Memory"
+   },
+   "category": {
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Match the pairs (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "luna_moon_en.svg",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/luna_moon_en.svg",
+   "size": 1584,
+   "sha256": "1398b97a85b2ae46adf8de913c46e0d55236825f8a3722d540b53cb67137ce81",
+   "title": {
+    "en": "Moon and telescope (picture)"
+   },
+   "category": {
+    "en": "Images"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Image test. After download: http://<board IP>/luna_moon_en.svg"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "npf_calc_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/npf_calc_en.html",
+   "size": 1895,
+   "sha256": "70194c0aaad3178eec7369e0b35d843e541a6719c68a7ba25f94894a669b118b",
+   "title": {
+    "en": "Exposure calculator (NPF rule)"
+   },
+   "category": {
+    "en": "Tools"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Longest untracked exposure (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "meteor_catch.html",
+   "version": "0.1",
+   "lang": "ja",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/ja/meteor_catch.html",
+   "size": 3130,
+   "sha256": "264641688319555b389a13aca1cb514c0c1def3b083073ee488575b124822d63",
+   "title": {
+    "ja": "流れ星キャッチ"
+   },
+   "category": {
+    "ja": "ゲーム"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "30 秒で流れ星をタップして集めるゲーム(試験用)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "star_memory.html",
+   "version": "0.1",
+   "lang": "ja",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/ja/star_memory.html",
+   "size": 2614,
+   "sha256": "ad2d764b6d5faf0503e1fcaf6d7bc19c7eb9acd490f167d72a53a301674fa2ee",
+   "title": {
+    "ja": "星の神経衰弱"
+   },
+   "category": {
+    "ja": "ゲーム"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "同じ絵をそろえるカードゲーム(試験用)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "luna_moon.svg",
+   "version": "0.1",
+   "lang": "ja",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/ja/luna_moon.svg",
+   "size": 1571,
+   "sha256": "4ef6fa84d03b74eb9f6aa42c2e918db50dcaac4d454f26ea0a1706fd024c5e4c",
+   "title": {
+    "ja": "月と望遠鏡(絵)"
+   },
+   "category": {
+    "ja": "画像"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "画像の試験。ダウンロードすると http://基板の IP/luna_moon.svg で見られます"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "npf_calc.html",
+   "version": "0.1",
+   "lang": "ja",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/ja/npf_calc.html",
+   "size": 1938,
+   "sha256": "6941c216bd3246f3488dfa72444dead4d1950c25053c452f1ba5d10f4bbb2056",
+   "title": {
+    "ja": "露出時間の計算(NPF 則)"
+   },
+   "category": {
+    "ja": "ツール"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "ja": "追尾しないで星を点に写せる秒数の目安(試験用)"
+   }
+  }
+ ],
+ "data": [
+  {
+   "group": "OnStep",
+   "name": "onstep_basic_commands_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/onstep_basic_commands_en.txt",
+   "size": 1236,
+   "sha256": "52c48b39abf4338720dd106b05f180d8661dcaafdeded212ccf1239cbbad53cb",
+   "type": "text",
+   "title": {
+    "en": "OnStep basic commands"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "group": "OnStep",
+   "name": "onstep_basic_commands.txt",
+   "lang": "ja",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/ja/onstep_basic_commands.txt",
+   "size": 1420,
+   "sha256": "d278213cc467ef938c5e65416fe44ad0895494a67e4b012472f16e2d47cf71b0",
+   "type": "text",
+   "title": {
+    "ja": "OnStep の基本コマンド"
+   },
+   "category": {
+    "ja": "文書"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
+  }
+ ],
+ "news": [
+  {
+   "date": "2026-10-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "ダウンローダーの試験を始めました",
+    "en": "Downloader test started"
+   },
+   "body": {
+    "ja": "この目録は試験用です。",
+    "en": "This manifest is for testing."
+   }
+  }
+ ],
+ "astro": [
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "11 月の月: 新月 9 日・満月 24 日",
+    "en": "November Moon: New on the 9th, Full on the 24th"
+   },
+   "body": {
+    "ja": "新月は 11/9 の 16 時ごろ、満月は 11/24 の 23 時 50 分ごろ(日本時間、計算値で数分の誤差)。月の出ない新月の前後が、暗い夜空を狙う好機です。(試験配信)",
+    "en": "New Moon on Nov 9 at about 16:00 JST (07:00 UT) and Full Moon on Nov 24 at about 23:50 JST (14:50 UT). Computed values, a few minutes of error. The days around New Moon give the darkest skies. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "しし座流星群 11/17〜18 ごろが見ごろ",
+    "en": "Leonids: best around Nov 17-18"
+   },
+   "body": {
+    "ja": "例年の極大は 11/17〜18 ごろで、条件がよいと 1 時間に 15 個ほど。今年は 17 日の月が上弦ごろで、真夜中すぎに沈むため、明け方は月明かりがなく見やすい年です。放射点のしし座は夜半すぎに昇ります。(試験配信)",
+    "en": "The Leonids usually peak around Nov 17-18, about 15 meteors per hour under good conditions. This year the Moon is near first quarter on the 17th and sets after midnight, so the pre-dawn sky is dark. The radiant in Leo rises after midnight. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "おうし座流星群: 11/5 ごろ(南群)と 11/12 ごろ(北群)",
+    "en": "Taurids: about Nov 5 (south) and Nov 12 (north)"
+   },
+   "body": {
+    "ja": "数は少ない(1 時間に数個)ものの、ゆっくり流れる明るい火球が混じるのが特徴です。11/5 は明け方に細い月が昇るだけ、11/12 の月は細く宵のうちに沈むので、どちらも夜は暗く見やすい年です。(試験配信)",
+    "en": "Only a few meteors per hour, but slow, bright fireballs are a feature. On Nov 5 only a thin crescent rises before dawn, and on Nov 12 the thin Moon sets early in the evening, so both nights are dark. (Test notice)"
+   }
+  }
+ ]
+}
