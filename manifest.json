@@ -4,6 +4,27 @@
  "firmware": [
   {
    "product": "NS-5000X",
+   "name": "DOG NS-5000X",
+   "version": "0.7.5",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X_v0.7.5.bin",
+   "size": 1311312,
+   "sha256": "9b66863f1a83f8d8aa8eaf61ff84183c5ef676fe42566496197633a2a73f19bc",
+   "title": {
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。追尾中でも LUNA Base へ切り替えられる(GOTO 中だけ断る)",
+    "en": "Test distribution. Switching to LUNA Base works while tracking (only a GOTO refuses)"
+   },
+   "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-5000X",
+   "name": "DOG NS-5000X",
    "version": "0.7.4",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
@@ -20,6 +41,26 @@
     "en": "Test distribution. For the fixed LUNA Base layout. \"LUNA Base\" button in the Console"
    },
    "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-4000",
+   "name": "OnStepNinja NS-4000",
+   "version": "1.2.2",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.2.bin",
+   "size": 1334688,
+   "sha256": "edce51d00017597773af3485fd6c7b776de9f5a7fb005ce2a96df2eb4bce9ebd",
+   "title": {
+    "ja": "テスト配信です。OnStep + AiBridge の赤道儀ファーム",
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。LUNA Base の確定版の区画に対応。Console の「LUNA Base へ」は追尾中でも使える",
+    "en": "Test distribution. For the fixed LUNA Base layout. The Console \"LUNA Base\" button works while tracking"
+   },
+   "license": "GPL v3"
   }
  ],
  "apps": [
