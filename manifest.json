@@ -5,6 +5,26 @@
   {
    "product": "NS-5000X",
    "name": "DOG NS-5000X",
+   "version": "0.7.6",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS5000X_v0.7.6.bin",
+   "size": 1312928,
+   "sha256": "aac92c8f583f0a5256f4990d9aaebb324767200a0691dddd2139304a560447bb",
+   "title": {
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。Console の上のリンクを整理し、ファイル一覧にアプリの説明を表示",
+    "en": "Test distribution. Console links tidied; the file list shows a description of each app"
+   },
+   "license": "PolyForm Noncommercial"
+  },
+  {
+   "product": "NS-5000X",
+   "name": "DOG NS-5000X",
    "version": "0.7.5",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
@@ -45,6 +65,26 @@
   {
    "product": "NS-4000",
    "name": "OnStepNinja NS-4000",
+   "version": "1.2.3",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.3.bin",
+   "size": 1336192,
+   "sha256": "c6cb227797bcd08a4e11c0ac6f65fd8967b29afc8695b02f6a90b181d66dcd28",
+   "title": {
+    "ja": "テスト配信です。OnStep + AiBridge の赤道儀ファーム",
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "ja": "テスト配信です。Console の上のリンクを整理し、ファイル一覧にアプリの説明を表示",
+    "en": "Test distribution. Console links tidied; the file list shows a description of each app"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+  },
+  {
+   "product": "NS-4000",
+   "name": "OnStepNinja NS-4000",
    "version": "1.2.2",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
@@ -69,8 +109,8 @@
    "name": "starchart_en.html",
    "version": "0.9.1",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
-   "size": 91424,
-   "sha256": "c26919e62077ebb8a74430af39a0328a4995a79ed1539cd546e6eef3d7e23194",
+   "size": 91574,
+   "sha256": "dffe9de8805879b10e4276fbcf6c25247f920343429bd6738bcb2e8364cc9fb2",
    "title": {
     "ja": "星図(英語版)。starchart_en_data.js と一緒に入れる",
     "en": "Star chart (English). Install with starchart_en_data.js"
@@ -104,8 +144,8 @@
    "version": "0.1",
    "device": "none",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/meteor_catch.html",
-   "size": 3039,
-   "sha256": "0059bd11fa6d6746f008771fe5b74a5254405a76dd1c3a14a5f62e646a8dda46",
+   "size": 3130,
+   "sha256": "264641688319555b389a13aca1cb514c0c1def3b083073ee488575b124822d63",
    "title": {
     "ja": "流れ星キャッチ",
     "en": "Meteor Catch"
@@ -126,8 +166,8 @@
    "version": "0.1",
    "device": "none",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/star_memory.html",
-   "size": 2529,
-   "sha256": "aa452c2227e80ea6dee7c7a0643c6b2a330a134a151d2ca4b71630190328c858",
+   "size": 2614,
+   "sha256": "ad2d764b6d5faf0503e1fcaf6d7bc19c7eb9acd490f167d72a53a301674fa2ee",
    "title": {
     "ja": "星の神経衰弱",
     "en": "Star Memory"
@@ -148,8 +188,8 @@
    "version": "0.1",
    "device": "none",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/luna_moon.svg",
-   "size": 1506,
-   "sha256": "15e6b2b18b786ecc4e1c5264fce3a2e36850f4590f0d7d2385ea9bac8835295e",
+   "size": 1571,
+   "sha256": "4ef6fa84d03b74eb9f6aa42c2e918db50dcaac4d454f26ea0a1706fd024c5e4c",
    "title": {
     "ja": "月と望遠鏡(絵)",
     "en": "Moon and telescope (picture)"
@@ -170,8 +210,8 @@
    "version": "0.1",
    "device": "none",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/npf_calc.html",
-   "size": 1835,
-   "sha256": "e3e948c21d0b285dc4dec7cc11af2fe7f0b9a0a1f8d2bf5165828de70ee540fc",
+   "size": 1938,
+   "sha256": "6941c216bd3246f3488dfa72444dead4d1950c25053c452f1ba5d10f4bbb2056",
    "title": {
     "ja": "露出時間の計算(NPF 則)",
     "en": "Exposure calculator (NPF rule)"
