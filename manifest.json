@@ -60,7 +60,7 @@
     "ja": "テスト配信です。LUNA Base の確定版の区画に対応。Console の「LUNA Base へ」は追尾中でも使える",
     "en": "Test distribution. For the fixed LUNA Base layout. The Console \"LUNA Base\" button works while tracking"
    },
-   "license": "GPL v3"
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
   }
  ],
  "apps": [
