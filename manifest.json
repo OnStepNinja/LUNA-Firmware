@@ -87,11 +87,11 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "starchart_en.html",
-   "version": "0.9.2",
+   "version": "0.9.1",
    "lang": "en",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
-   "size": 182316,
-   "sha256": "a32c180888b79ab03686d8598b770fc2b22514b5b40dd1719daea20b075118d8",
+   "size": 91591,
+   "sha256": "8aac2b4f39eb8593fb0a31a358a71cd62d43e09886d8ba188801f20544e1a3d8",
    "title": {
     "en": "Star chart (English)"
    },
@@ -100,13 +100,31 @@
    },
    "license": "Freeware (apps/common/LICENSE)",
    "changes": {
-    "en": "Single file (the star data is included). Pick an object and send the mount to it (GOTO)"
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en_data.js",
+   "version": "0.9.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en_data.js",
+   "size": 90749,
+   "sha256": "31c7139e0a3dd1f0434b898a0ebcf8ce1e189dd205d0faba1c6c3c75c0530531",
+   "title": {
+    "en": "Star chart data (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "The star data of the Star chart. Download it together with \"Star chart (English)\""
    }
   },
   {
    "product": "NS-4000 / NS-5000X",
    "name": "meteor_catch_en.html",
-   "id": "meteor_catch",
    "version": "0.1",
    "lang": "en",
    "device": "none",
@@ -127,7 +145,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "star_memory_en.html",
-   "id": "star_memory",
    "version": "0.1",
    "lang": "en",
    "device": "none",
@@ -148,7 +165,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "luna_moon_en.svg",
-   "id": "luna_moon",
    "version": "0.1",
    "lang": "en",
    "device": "none",
@@ -169,7 +185,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "npf_calc_en.html",
-   "id": "npf_calc",
    "version": "0.1",
    "lang": "en",
    "device": "none",
@@ -190,7 +205,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "meteor_catch.html",
-   "id": "meteor_catch",
    "version": "0.1",
    "lang": "ja",
    "device": "none",
@@ -211,7 +225,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "star_memory.html",
-   "id": "star_memory",
    "version": "0.1",
    "lang": "ja",
    "device": "none",
@@ -232,7 +245,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "luna_moon.svg",
-   "id": "luna_moon",
    "version": "0.1",
    "lang": "ja",
    "device": "none",
@@ -253,7 +265,6 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "npf_calc.html",
-   "id": "npf_calc",
    "version": "0.1",
    "lang": "ja",
    "device": "none",
@@ -276,7 +287,6 @@
   {
    "group": "OnStep",
    "name": "onstep_basic_commands_en.txt",
-   "id": "onstep_commands",
    "lang": "en",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/onstep_basic_commands_en.txt",
    "size": 1236,
@@ -293,7 +303,6 @@
   {
    "group": "OnStep",
    "name": "onstep_basic_commands.txt",
-   "id": "onstep_commands",
    "lang": "ja",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/ja/onstep_basic_commands.txt",
    "size": 1420,
