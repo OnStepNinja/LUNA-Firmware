@@ -12,14 +12,14 @@
    "size": 1311296,
    "sha256": "544de02e34775139489226cd6f1a1ae327508450fe7d2ce87ff86bad5ce31804",
    "title": {
-    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム(フリーウェア)",
-    "en": "Test distribution. NS-5000 compatible mount firmware (Freeware)"
+    "ja": "テスト配信です。NS-5000 互換の赤道儀ファーム",
+    "en": "Test distribution. NS-5000 compatible mount firmware"
    },
    "changes": {
     "ja": "テスト配信です。LUNA Base の確定版の区画に対応。Console に「LUNA Base へ」のボタン",
     "en": "Test distribution. For the fixed LUNA Base layout. \"LUNA Base\" button in the Console"
    },
-   "license": "Freeware"
+   "license": "PolyForm Noncommercial"
   }
  ],
  "apps": [
