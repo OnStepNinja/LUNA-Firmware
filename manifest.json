@@ -93,12 +93,18 @@
    "size": 91574,
    "sha256": "dffe9de8805879b10e4276fbcf6c25247f920343429bd6738bcb2e8364cc9fb2",
    "title": {
-    "en": "Star chart (English). Install with starchart_en_data.js"
+    "en": "Star chart (English)"
    },
    "category": {
     "en": "Star chart"
    },
-   "license": "Freeware (apps/common/LICENSE)"
+   "license": "Freeware (apps/common/LICENSE)",
+   "requires": [
+    "starchart_en_data.js"
+   ],
+   "changes": {
+    "en": "Needs the star chart data. It is downloaded together automatically"
+   }
   },
   {
    "product": "NS-4000 / NS-5000X",
@@ -109,7 +115,7 @@
    "size": 90749,
    "sha256": "31c7139e0a3dd1f0434b898a0ebcf8ce1e189dd205d0faba1c6c3c75c0530531",
    "title": {
-    "en": "Star chart data (English)"
+    "en": "Star chart data (needed by the star chart)"
    },
    "category": {
     "en": "Star chart"
