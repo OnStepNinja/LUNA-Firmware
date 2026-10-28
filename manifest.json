@@ -332,5 +332,45 @@
    }
   }
  ],
- "astro": []
+ "astro": [
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "11 月の月: 新月 9 日・満月 24 日",
+    "en": "November Moon: New on the 9th, Full on the 24th"
+   },
+   "body": {
+    "ja": "新月は 11/9 の 16 時ごろ、満月は 11/24 の 23 時 50 分ごろ(日本時間、計算値で数分の誤差)。月の出ない新月の前後が、暗い夜空を狙う好機です。(試験配信)",
+    "en": "New Moon on Nov 9 at about 16:00 JST (07:00 UT) and Full Moon on Nov 24 at about 23:50 JST (14:50 UT). Computed values, a few minutes of error. The days around New Moon give the darkest skies. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "しし座流星群 11/17〜18 ごろが見ごろ",
+    "en": "Leonids: best around Nov 17-18"
+   },
+   "body": {
+    "ja": "例年の極大は 11/17〜18 ごろで、条件がよいと 1 時間に 15 個ほど。今年は 17 日の月が上弦ごろで、真夜中すぎに沈むため、明け方は月明かりがなく見やすい年です。放射点のしし座は夜半すぎに昇ります。(試験配信)",
+    "en": "The Leonids usually peak around Nov 17-18, about 15 meteors per hour under good conditions. This year the Moon is near first quarter on the 17th and sets after midnight, so the pre-dawn sky is dark. The radiant in Leo rises after midnight. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "ja": "おうし座流星群: 11/5 ごろ(南群)と 11/12 ごろ(北群)",
+    "en": "Taurids: about Nov 5 (south) and Nov 12 (north)"
+   },
+   "body": {
+    "ja": "数は少ない(1 時間に数個)ものの、ゆっくり流れる明るい火球が混じるのが特徴です。11/5 は明け方に細い月が昇るだけ、11/12 の月は細く宵のうちに沈むので、どちらも夜は暗く見やすい年です。(試験配信)",
+    "en": "Only a few meteors per hour, but slow, bright fireballs are a feature. On Nov 5 only a thin crescent rises before dawn, and on Nov 12 the thin Moon sets early in the evening, so both nights are dark. (Test notice)"
+   }
+  }
+ ]
 }
