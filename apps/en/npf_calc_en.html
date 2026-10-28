@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exposure calculator (NPF rule)</title>
+<meta name="description" content="Longest untracked exposure that keeps stars as points (NPF rule)">
+<style>
+body{margin:0;background:#0b0f17;color:#eef2f8;font:16px/1.6 system-ui,sans-serif}
+main{max-width:440px;margin:0 auto;padding:14px 16px}h1{font-size:19px;margin:6px 0 12px}
+label{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin:8px 0}
+input{background:#0e1420;color:#eef2f8;border:1px solid #263044;border-radius:6px;padding:7px 8px;font:inherit;width:100%}
+#out{margin-top:16px;padding:14px;border:1px solid #2d7a50;background:#13281e;border-radius:12px;font-size:20px;text-align:center}
+small{color:#9aa6b8}
+</style></head><body><main>
+<h1>Exposure calculator (NPF rule)</h1>
+<label>Focal length (mm)<input id="f" type="number" value="24" min="1"></label>
+<label>Aperture (f-number)<input id="n" type="number" value="2.8" step="0.1" min="0.7"></label>
+<label>Pixel pitch (µm)<input id="p" type="number" value="4.3" step="0.1" min="0.5"></label>
+<label>Declination (deg)<input id="d" type="number" value="0" min="-90" max="90"></label>
+<div id="out"></div>
+<p><small>A guide for the longest exposure without tracking in which stars stay points. Formula: (16.856 × f-number + 0.0997 × focal length + 2.0833 × pixel pitch) ÷ (focal length × cos declination).</small></p>
+</main><script>
+const $=id=>document.getElementById(id);
+function calc(){const f=+$("f").value,n=+$("n").value,p=+$("p").value,d=+$("d").value*Math.PI/180;
+  const c=Math.max(Math.cos(d),0.05),t=(16.856*n+0.0997*f+2.0833*p)/(f*c);
+  $("out").textContent=isFinite(t)&&t>0?"About "+t.toFixed(1)+" s at most":"Enter numbers";}
+for(const i of ["f","n","p","d"])$(i).oninput=calc;calc();
+</script></body></html>

@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meteor Catch</title>
+<meta name="description" content="Tap the meteors for 30 seconds and collect as many as you can">
+<style>
+html,body{margin:0;height:100%;background:#05070d;color:#eef2f8;font:16px system-ui,sans-serif;touch-action:manipulation;user-select:none}
+#w{max-width:480px;margin:0 auto;padding:8px 12px}#hud{display:flex;justify-content:space-between;padding:4px 2px}
+canvas{width:100%;aspect-ratio:3/4;background:linear-gradient(#070b18,#101a33);border:1px solid #263044;border-radius:12px;display:block}
+button{margin-top:10px;width:100%;padding:10px;font:inherit;background:#17452e;color:#eef2f8;border:1px solid #2d7a50;border-radius:10px}
+small{color:#9aa6b8}
+</style></head><body><div id="w">
+<div id="hud"><span>Score <b id="sc">0</b></span><span>Time <b id="tm">30</b> s</span><span>Best <b id="hi">0</b></span></div>
+<canvas id="c" width="360" height="480"></canvas>
+<button id="go">Start</button>
+<p><small>Tap the meteors to collect them (30 seconds). Faster meteors score more; missing one costs nothing.</small></p>
+</div>
+<script>
+const c=document.getElementById("c"),g=c.getContext("2d"),$=id=>document.getElementById(id);
+let st=[],score=0,end=0,run=false,hi=0,bg=[];
+try{hi=+localStorage.getItem("mc_hi")||0;}catch(e){}$("hi").textContent=hi;
+for(let i=0;i<60;i++)bg.push([Math.random()*360,Math.random()*480,Math.random()*1.5+.3]);
+function spawn(){const v=2+Math.random()*4;st.push({x:Math.random()*400-40,y:-10,vx:-v*.5,vy:v,r:10+Math.random()*6,v});}
+function draw(){
+  g.clearRect(0,0,360,480);g.fillStyle="#fff";for(const b of bg)g.fillRect(b[0],b[1],b[2],b[2]);
+  for(const s of st){g.strokeStyle="rgba(255,240,180,.5)";g.lineWidth=s.r/3;g.beginPath();g.moveTo(s.x,s.y);g.lineTo(s.x-s.vx*8,s.y-s.vy*8);g.stroke();
+    g.fillStyle="#ffe9a8";g.beginPath();g.arc(s.x,s.y,s.r/2.5,0,7);g.fill();}
+}
+function tick(){
+  if(!run)return;
+  if(Math.random()<.05)spawn();
+  for(const s of st){s.x+=s.vx;s.y+=s.vy;}st=st.filter(s=>s.y<500&&s.x>-60);
+  const left=Math.max(0,Math.ceil((end-Date.now())/1000));$("tm").textContent=left;draw();
+  if(left<=0){run=false;$("go").textContent="Again";$("go").disabled=false;
+    if(score>hi){hi=score;try{localStorage.setItem("mc_hi",hi);}catch(e){}$("hi").textContent=hi;}
+    g.fillStyle="rgba(0,0,0,.6)";g.fillRect(0,0,360,480);g.fillStyle="#fff";g.font="28px system-ui";g.textAlign="center";g.fillText("Score "+score,180,240);return;}
+  requestAnimationFrame(tick);
+}
+c.addEventListener("pointerdown",e=>{if(!run)return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)*360/r.width,y=(e.clientY-r.top)*480/r.height;
+  for(let i=st.length-1;i>=0;i--){const s=st[i];if(Math.hypot(s.x-x,s.y-y)<s.r+14){score+=Math.round(s.v*10);st.splice(i,1);$("sc").textContent=score;break;}}});
+$("go").onclick=()=>{st=[];score=0;$("sc").textContent=0;end=Date.now()+30000;run=true;$("go").disabled=true;$("go").textContent="Playing…";tick();};
+draw();
+</script></body></html>

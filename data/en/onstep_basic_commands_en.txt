@@ -1,0 +1,28 @@
+Basic OnStep (LX200-compatible) commands - a test document for LUNA Base
+=========================================================================
+A command starts with : and ends with #. Send it over serial (9600 bps) or TCP port 9999.
+
+[Read]
+  :GVP#   product name              :GVN#   firmware version
+  :GR#    right ascension (now)     :GD#    declination (now)
+  :GU#    status string (tracking, slewing, parked ...)
+
+[Move]
+  :Sr<RA># :Sd<Dec>#   set the target
+  :MS#    go to the target (GOTO)    0# means started
+  :CM#    sync: tell the mount it is at the target
+  :Q#     stop everything            :Qe# :Qw# :Qn# :Qs#  stop one direction
+  :Me# :Mw# :Mn# :Ms#                move only while held (stop with :Q#)
+
+[Tracking]
+  :Te#    tracking on               :Td#    tracking off
+  :TQ#    sidereal rate             :TL# lunar   :TS# solar
+
+[Home and park]
+  :hC#    go home                   :hF#    set home here
+  :hP#    park                      :hR#    restore from park
+
+[LUNA only (NS-4000 and NS-5000X)]
+  :&XDL#  restart into LUNA Base. Refused only during a GOTO; tracking is stopped. 1# = restarting, 0# = refused
+
+Before moving, make sure nothing and nobody is near the mount and that the cables have slack.

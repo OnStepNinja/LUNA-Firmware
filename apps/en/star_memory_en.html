@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Star Memory</title>
+<meta name="description" content="A card game: match the pairs of pictures">
+<style>
+html,body{margin:0;background:#05070d;color:#eef2f8;font:16px system-ui,sans-serif;user-select:none}
+#w{max-width:420px;margin:0 auto;padding:10px 12px}#hud{display:flex;justify-content:space-between;padding:4px 2px}
+#bd{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.cd{aspect-ratio:1;border-radius:12px;border:1px solid #33456a;background:#203050;font-size:34px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cd.up{background:#142036;cursor:default}.cd.ok{background:#153b27;border-color:#2d7a50}.cd:not(.up):not(.ok)::before{content:"\2605";color:#6cb4ff}
+button{margin-top:12px;width:100%;padding:10px;font:inherit;background:#17452e;color:#eef2f8;border:1px solid #2d7a50;border-radius:10px}
+small{color:#9aa6b8}
+</style></head><body><div id="w">
+<div id="hud"><span>Moves <b id="mv">0</b></span><span id="msg"></span><span>Best <b id="bs">-</b></span></div>
+<div id="bd"></div><button id="re">Restart</button>
+<p><small>Find the two cards with the same picture. Fewer moves is better.</small></p></div>
+<script>
+const E=["\u{1F319}","☀️","⭐","\u{1FA90}","\u{1F30D}","☄️","\u{1F52D}","\u{1F680}"],$=id=>document.getElementById(id);
+let a=[],open=[],mv=0,done=0,lock=false,best=0;
+try{best=+localStorage.getItem("sm_best")||0;}catch(e){}if(best)$("bs").textContent=best;
+function start(){
+  a=[...E,...E].map((v,i)=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);open=[];mv=0;done=0;lock=false;$("mv").textContent=0;$("msg").textContent="";
+  const b=$("bd");b.textContent="";
+  a.forEach((v,i)=>{const d=document.createElement("div");d.className="cd";d.onclick=()=>flip(i,d);b.append(d);});
+}
+function flip(i,d){
+  if(lock||d.classList.contains("up")||d.classList.contains("ok"))return;
+  d.classList.add("up");d.textContent=a[i];open.push([i,d]);
+  if(open.length<2)return;
+  mv++;$("mv").textContent=mv;const [p,q]=open;open=[];
+  if(a[p[0]]===a[q[0]]){p[1].classList.replace("up","ok");q[1].classList.replace("up","ok");
+    if(++done===8){$("msg").textContent="Cleared!";if(!best||mv<best){best=mv;try{localStorage.setItem("sm_best",best);}catch(e){}$("bs").textContent=best;}}}
+  else{lock=true;setTimeout(()=>{for(const x of [p,q]){x[1].classList.remove("up");x[1].textContent="";}lock=false;},800);}
+}
+$("re").onclick=start;start();
+</script></body></html>
