@@ -1,17 +1,15 @@
 {
  "format": 1,
- "updated": "2026-10-28",
+ "updated": "2026-10-29",
  "news": [
   {
    "date": "2026-10-29",
    "level": "info",
    "for": [],
    "title": {
-    "ja": "案内の目録の試験を始めました",
     "en": "Info catalog test started"
    },
    "body": {
-    "ja": "お知らせ・製品の案内・ダウンロードを、LUNA Base 以外のアプリからも読めるようにする試験です。(試験配信)",
     "en": "A test so that apps other than LUNA Base can also read news, product guides and downloads. (Test notice)"
    }
   }
@@ -21,24 +19,10 @@
    "id": "luna-base",
    "name": "LUNA Base",
    "status": "testing",
-   "latest": "0.7.0",
+   "latest": "0.7.1",
    "for": [],
    "summary": {
-    "ja": "ESP32 の基板にファーム・アプリを Wi-Fi で入れる小さなストア",
     "en": "A small store that puts firmware and apps on an ESP32 board over Wi-Fi"
-   }
-  },
-  {
-   "id": "ns5000x",
-   "name": "DOG NS-5000X",
-   "status": "testing",
-   "latest": "0.7.6",
-   "for": [
-    "board"
-   ],
-   "summary": {
-    "ja": "NS-5000 互換の赤道儀ファーム",
-    "en": "NS-5000 compatible mount firmware"
    }
   },
   {
@@ -50,7 +34,6 @@
     "board"
    ],
    "summary": {
-    "ja": "OnStep と AiBridge をひとつにした赤道儀ファーム",
     "en": "Mount firmware that combines OnStep and AiBridge"
    }
   }

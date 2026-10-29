@@ -1,6 +1,6 @@
 {
  "format": 1,
- "updated": "2026-10-28",
+ "updated": "2026-10-29",
  "catalogs": {
   "esp32-4mb-1": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/catalog/esp32-4mb-1.json",
   "info": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/catalog/info.json"
