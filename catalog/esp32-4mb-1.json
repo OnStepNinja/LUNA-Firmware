@@ -20,7 +20,15 @@
    "changes": {
     "en": "Test distribution. The Console \"LUNA Base\" button works while tracking (the same as NS-5000X); only a GOTO refuses"
    },
-   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/starchart_ns4000.jpg",
+     "caption": {
+      "en": "Example of the star chart (connected to the NS-4000)"
+     }
+    }
+   ]
   }
  ],
  "apps": [
