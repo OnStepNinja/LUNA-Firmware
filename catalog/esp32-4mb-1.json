@@ -171,6 +171,17 @@
  ],
  "news": [
   {
+   "date": "2026-11-03",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Store now shows icons, photos and links"
+   },
+   "body": {
+    "en": "The new LUNA Base (coming soon) shows icons, photos and links in LUNA Store. Links in the news can be opened or copied."
+   }
+  },
+  {
    "date": "2026-10-27",
    "level": "info",
    "product": "*",
