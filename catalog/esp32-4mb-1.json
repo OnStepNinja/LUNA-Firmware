@@ -29,6 +29,48 @@
      }
     }
    ]
+  },
+  {
+   "product": "NS-4000-FORK",
+   "mark": "LUNA OnStepNinja NS-4000 Fork v",
+   "name": "OnStepNinja NS-4000 Fork",
+   "version": "1.2.6",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.6_en_fork.bin",
+   "size": 1334864,
+   "sha256": "f707dbd84cf6b7fe8bca16d8ee6b996a8d04d9c716270e01dfd2c91855297691",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for a fork equatorial mount"
+   },
+   "changes": {
+    "en": "Test distribution. The same functions as the German equatorial version (1.2.5); only the mount type is fork"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+  },
+  {
+   "product": "NS-4000-ALTAZ",
+   "mark": "LUNA OnStepNinja NS-4000 AltAz v",
+   "name": "OnStepNinja NS-4000 Alt-Az",
+   "version": "1.2.7",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.7_en_altazm.bin",
+   "size": 1334672,
+   "sha256": "c9335b892681aa6d63e70a9c77f30435587133c31c4b25a26c0034b739b61670",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for an alt-azimuth mount"
+   },
+   "changes": {
+    "en": "Test distribution. The same functions as the German equatorial version (1.2.5); only the mount type is alt-azimuth (azimuth -360 to +360 degrees)"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
   }
  ],
  "apps": [
