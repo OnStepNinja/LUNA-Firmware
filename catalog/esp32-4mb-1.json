@@ -77,6 +77,25 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "starchart_en.html",
+   "version": "0.9.2",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/0.9.2/starchart_en.html",
+   "size": 91474,
+   "sha256": "04d3383d67b4dd21e55294cba07320d3d3aa8294cbbfaabdc0dbecf0f6d6a0b9",
+   "title": {
+    "en": "Star chart (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both. Fixed: the Mount control dialog stayed on \"Reading the mount...\" while the mount reported an error (for example the overhead limit)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
    "version": "0.9.1",
    "lang": "en",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
