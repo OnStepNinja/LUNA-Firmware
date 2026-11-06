@@ -71,6 +71,27 @@
     "en": "Test distribution. The same functions as the German equatorial version (1.2.5); only the mount type is alt-azimuth (azimuth -360 to +360 degrees)"
    },
    "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
+  },
+  {
+   "product": "BLE Handbox",
+   "mark": "LUNA BLE Handbox v",
+   "name": "Wireless BLE Handbox",
+   "version": "2.0.0",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/BleHandbox_v2.0.0.bin",
+   "size": 587792,
+   "sha256": "7b21f7ec7cc0ed5a45ef1b52fa27b096b3f1ef7e1bed2df5e1940ac2ac9d0222",
+   "title": {
+    "en": "A 5-button wireless handbox for the NS-4000 (ESP32)"
+   },
+   "changes": {
+    "en": "Version 2 (2.0.0). Distributed only in LUNA Store; it may be improved in the future. See the text below for the operation and the pins. The circuit diagram will be published in LUNA Store later"
+   },
+   "license": "Freeware (see the text below). Includes Apache 2.0 and LGPL 2.1 parts",
+   "readme": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/docs/handbox/ble_handbox_v2_en.txt"
   }
  ],
  "apps": [
@@ -231,6 +252,17 @@
   }
  ],
  "news": [
+  {
+   "date": "2026-11-06",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Wireless BLE Handbox ver2 released (LUNA Store only)"
+   },
+   "body": {
+    "en": "The firmware list of LUNA Store now has the \"Wireless BLE Handbox\" (ver2, 2.0.0): a 5-button handbox with the same pin numbers as the NS-4000 board. It is distributed only in LUNA Store and may be improved in the future. The operation and the pins are in the description of the firmware. The circuit diagram will be published in LUNA Store later."
+   }
+  },
   {
    "date": "2026-11-03",
    "level": "info",

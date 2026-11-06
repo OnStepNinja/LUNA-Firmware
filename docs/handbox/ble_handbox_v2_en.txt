@@ -1,0 +1,48 @@
+Wireless BLE Handbox ver2 (firmware 2.0.0)
+
+A 5-button wireless (BLE) handbox for the NS-4000 (OnStepNinja). It runs on an ESP32 board.
+It is distributed only in LUNA Store and may be improved in the future.
+
+== Operation
+- North / South / East / West ... the mount moves only while the button is pressed; it stops when you release it
+- Stop ... press the two opposite buttons together (North + South, or East + West)
+- SEL, a short press (under 1 s) ... changes the speed (slew -> move -> center -> guide; the NS-4000 signals it with sound and LED)
+- Back to LUNA Base ... hold SEL for 5 s (or East + West for 5 s). The LED blinks fast from 3 s and it returns at 5 s
+- Sleep ... deep sleep after 7 minutes connected without a button press, or 2 minutes without finding the NS-4000. Press SEL to wake it
+
+== Registration (first time only)
+1. Turn the NS-4000 on
+2. Within 30 minutes, turn the handbox on. It pairs and is registered by itself
+3. Only one handbox can be registered. To change to another one, press "Remove Registration" in the File Manager of the NS-4000 (within 30 minutes after the NS-4000 was turned on), then turn the new handbox on
+- LED: a short blink once a second while searching; on while connected
+
+== Pins (ESP32; the same numbers as the ST4 / handbox terminals of the NS-4000 board)
+| Button / part | GPIO |
+|---|---|
+| North (Dec +, DE+) | 33 |
+| South (Dec -, DE-) | 32 |
+| East (RA +, RA+) | 35 |
+| West (RA -, RA-) | 34 |
+| SEL (speed, wake-up, back to Base) | 39 |
+| LED (lit when LOW) | 25 |
+| Battery voltage | 14 |
+
+== Wiring
+- A button connects the pin to GND when pressed
+- GPIO 34, 35 and 39 are input only and have no internal pull-up. **These three need a 10k pull-up resistor (to 3.3V)** (the NS-4000 board has them). Without them the handbox sees buttons that are not pressed, the mount can move by itself and it can return to LUNA Base
+- GPIO 32 and 33 use the internal pull-up
+- LED: 3.3V -> resistor (about 1k) -> LED -> GPIO25 (lit when LOW)
+- Battery voltage: battery + -> 1M -> GPIO14 -> 1M -> GND, and 0.1uF from GPIO14 to GND. The voltage is shown in the Console of the NS-4000
+- Tested with a CR123A battery (about 3V)
+
+== Notes
+- This is for prototypes that you build yourself. It was checked on real hardware (ESP32, CR123A): connection, every button, stop, wake-up from deep sleep and the return to LUNA Base
+- First test without the motors of the mount connected. The NS-4000 stops the mount by itself when the link is silent for 1 s while it moves
+- The circuit diagram and other drawings will be published in LUNA Store later
+
+== License and parts
+- Freeware: personal use is free; copies to friends at cost are allowed; no sales, no commercial use, no re-hosting
+- Included parts: NimBLE-Arduino 1.4.3 (Apache License 2.0), arduino-esp32 2.0.17 (LGPL 2.1), ESP-IDF (Apache License 2.0)
+- Because of the LGPL 2.1, the relink kit is distributed in the Releases of LUNA-Firmware on GitHub (ble-handbox-v2.0.0). The source of the handbox program (the sketch) is not published
+
+LUNA Project: https://github.com/OnStepNinja
