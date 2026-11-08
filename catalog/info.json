@@ -1,6 +1,6 @@
 {
  "format": 1,
- "updated": "2026-10-29",
+ "updated": "2026-11-08",
  "news": [
   {
    "date": "2026-10-29",
@@ -19,7 +19,7 @@
    "id": "luna-base",
    "name": "LUNA Base",
    "status": "testing",
-   "latest": "0.7.1",
+   "latest": "0.8.4",
    "for": [],
    "summary": {
     "en": "A small store that puts firmware and apps on an ESP32 board over Wi-Fi"
@@ -29,7 +29,7 @@
    "id": "ns4000",
    "name": "OnStepNinja NS-4000",
    "status": "testing",
-   "latest": "1.2.5",
+   "latest": "1.2.8",
    "for": [
     "board"
    ],
