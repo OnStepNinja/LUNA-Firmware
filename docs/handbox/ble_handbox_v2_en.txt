@@ -30,15 +30,32 @@ It is distributed only in LUNA Store and may be improved in the future.
 == Wiring
 - A button connects the pin to GND when pressed
 - GPIO 34, 35 and 39 are input only and have no internal pull-up. **These three need a 10k pull-up resistor (to 3.3V)** (the NS-4000 board has them). Without them the handbox sees buttons that are not pressed, the mount can move by itself and it can return to LUNA Base
-- GPIO 32 and 33 use the internal pull-up
-- LED: 3.3V -> resistor (about 1k) -> LED -> GPIO25 (lit when LOW)
-- Battery voltage: battery + -> 1M -> GPIO14 -> 1M -> GND, and 0.1uF from GPIO14 to GND. The voltage is shown in the Console of the NS-4000
+- GPIO 32 and 33 can use the internal pull-up. The circuit diagram below has an external 10k pull-up on all five buttons (R3 to R7)
+- LED: 3.3V -> resistor (4.7k in the circuit diagram) -> LED -> GPIO25 (lit when LOW)
+- Battery voltage: battery + -> 1M -> GPIO14 -> 1M -> GND, and 0.1uF from GPIO14 to GND (as in the circuit diagram). The voltage is shown in the Console of the NS-4000
 - Tested with a CR123A battery (about 3V)
+
+== Circuit (the diagram is shown above this text)
+- Module: ESP32-WROOM-32E (U1). Power: one CR123A battery (3 V) with a 1000uF capacitor; 47uF (C2) and C1 at the 3.3V pin
+- Buttons: SEL = GPIO39, RR = GPIO34 (West), RL = GPIO35 (East), DD = GPIO32 (South), DU = GPIO33 (North). Each button connects its pin to GND. Each pin has a 10k pull-up to 3.3V (R3 to R7)
+- LED: 3.3V -> R1 4.7k -> LED -> GPIO25 (lit when LOW)
+- Battery voltage: two 1M resistors in series from the battery (the +3V3 line) to GND. Their middle point goes to GPIO14, with a capacitor (0.1uF) from GPIO14 to GND. GPIO14 sees half of the battery voltage
+- RESET: the EN pin has a 30k pull-up (R2), a 1uF capacitor (C3) and the RESET button (SW1)
+- BOOT: the BOOT button (SW2) connects GPIO0 to GND
+- Serial0 header (3 pins) for writing and logs: 1 = GND, 2 = TX (TXD0), 3 = RX (RXD0). It fits the pins of the "LUNA Prog & Comm Adapter v2" (Data in LUNA Store) pin to pin. The header has no power pin: the battery must be connected while you write
+
+== Build and set up (with LUNA Base)
+1. Build the circuit and connect the battery
+2. Write LUNA Base to the handbox board once over USB (adapter, BOOT and RESET, and the command: see "LUNA Base - writing and using" in Data)
+3. Join the Wi-Fi "LUNA-BASE-xxxx" of the handbox, open http://192.168.4.1 and set your home Wi-Fi (2.4 GHz) in "Wi-Fi settings"
+4. In LUNA Store open Firmware, choose "Wireless BLE Handbox", press "Download", then "Start"
+5. Register it with the NS-4000 (see "Registration" above)
+6. To update or change the firmware, hold SEL for 5 seconds to go back to LUNA Base
 
 == Notes
 - This is for prototypes that you build yourself. It was checked on real hardware (ESP32, CR123A): connection, every button, stop, wake-up from deep sleep and the return to LUNA Base
 - First test without the motors of the mount connected. The NS-4000 stops the mount by itself when the link is silent for 1 s while it moves
-- The circuit diagram and other drawings will be published in LUNA Store later
+- The circuit diagram is shown above this text (see "Circuit" and "Build and set up" above)
 
 == License and parts
 - Freeware: personal use is free; copies to friends at cost are allowed; no sales, no commercial use, no re-hosting

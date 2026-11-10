@@ -1,6 +1,6 @@
 {
  "format": 1,
- "updated": "2026-11-08",
+ "updated": "2026-11-10",
  "firmware": [
   {
    "product": "NS-4000",
@@ -158,10 +158,18 @@
     "en": "A 5-button wireless handbox for the NS-4000 (ESP32)"
    },
    "changes": {
-    "en": "Version 2 (2.0.0). Distributed only in LUNA Store; it may be improved in the future. See the text below for the operation and the pins. The circuit diagram will be published in LUNA Store later"
+    "en": "Version 2 (2.0.0). Distributed only in LUNA Store; it may be improved in the future. See the text below for the operation, the pins, the circuit and how to build and set it up with LUNA Base. The circuit diagram is shown below"
    },
    "license": "Freeware (see the text below). Includes Apache 2.0 and LGPL 2.1 parts",
-   "readme": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/docs/handbox/ble_handbox_v2_en.txt"
+   "readme": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/docs/handbox/ble_handbox_v2_en.txt",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/ble_handbox_v2_circuit.png",
+     "caption": {
+      "en": "Circuit of the Wireless BLE Handbox v2"
+     }
+    }
+   ]
   }
  ],
  "apps": [
@@ -319,9 +327,60 @@
     "en": "Documents"
    },
    "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "group": "LUNA Base",
+   "name": "luna_base_guide_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/luna_base_guide_en.txt",
+   "size": 5503,
+   "sha256": "08c594e564361f5484bb80423c69d7df5cd6eb783162c240c5723963c417f926",
+   "type": "text",
+   "title": {
+    "en": "LUNA Base - writing and using"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "group": "LUNA Base",
+   "name": "luna_prog_comm_adapter_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/luna_prog_comm_adapter_en.txt",
+   "size": 2827,
+   "sha256": "719fac7615c361af02341101a85a63771465f3beacf540a5d280d127b8d94eb9",
+   "type": "text",
+   "title": {
+    "en": "LUNA Prog & Comm Adapter v2 (USB-serial adapter, circuit)"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/luna_prog_comm_adapter_v2_circuit.png",
+     "caption": {
+      "en": "Circuit of the LUNA Prog & Comm Adapter v2"
+     }
+    }
+   ]
   }
  ],
  "news": [
+  {
+   "date": "2026-11-10",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Circuits and the LUNA Base guide are in LUNA Store"
+   },
+   "body": {
+    "en": "LUNA Store (Data) now has \"LUNA Base - writing and using\" and the circuit of the \"LUNA Prog & Comm Adapter v2\", a USB-serial adapter for writing, talking to the board and reading logs. The circuit and the build steps of the Wireless BLE Handbox are in the description of its firmware."
+   }
+  },
   {
    "date": "2026-11-08",
    "level": "info",

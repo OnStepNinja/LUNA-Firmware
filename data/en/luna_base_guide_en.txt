@@ -1,0 +1,70 @@
+LUNA Base - writing and using (LUNA Base v0.8.4)
+
+LUNA Base is a small store that lives on an ESP32 board. You write it once over USB.
+After that you choose firmware and apps in LUNA Store and install them over Wi-Fi: no USB for each update.
+
+== What you need
+- An ESP32 board with 4 MB of flash (for example the NS-4000 board, or the BLE handbox board described in LUNA Store)
+- A USB-serial adapter for the board's serial pins: "LUNA Prog & Comm Adapter v2" (its circuit is in LUNA Store, Data) or any 3.3 V USB-serial adapter
+- A PC with Python and esptool (pip install esptool)
+- The file LUNA_Base_install_en.bin from the Releases of OnStepNinja-NS4000 on GitHub (the English edition; LUNA_Base_install.bin is the Japanese edition)
+- A 2.4 GHz home Wi-Fi with internet. The ESP32 cannot join 5 GHz
+
+== 1. Write LUNA Base (first time)
+1. Connect the adapter to the board: GND - GND, adapter TXD - board RX, adapter RXD - board TX. The adapter does not power the board: power the board from its own supply or battery
+2. Put the board in download mode: hold the BOOT button, press and release RESET (EN), then release BOOT. (The adapter has no automatic reset lines, so do this by hand)
+3. Write the file once (change COM6 to your port):
+
+  python -m esptool --chip esp32 --port COM6 --baud 115200 --before no_reset write_flash 0x0 LUNA_Base_install_en.bin
+
+   esptool 5 also accepts the spellings no-reset and write-flash
+4. When it finishes, press RESET (EN) once. LUNA Base starts (a board with a buzzer beeps 3 times)
+- To see the start-up log, open the serial port at 115200 bps. It shows the line "LUNA Base 0.8.4  AP LUNA-BASE-xxxx  system: ..."
+
+If the board already has firmware
+- Kept: the firmware, the apps, the Wi-Fi settings and the PIN
+- Erased: the settings kept in the NVS area (for example the mount settings of the NS-4000 and the BLE handbox registration). Register the handbox again after the firmware starts
+- LUNA Base starts first. Press "Start" to start the firmware again
+
+== 2. First setup
+1. With a phone or PC, join the board's Wi-Fi "LUNA-BASE-xxxx" (xxxx = the last 4 digits of the board's address; no password) and open http://192.168.4.1
+2. Open "Wi-Fi settings", enter your home Wi-Fi name (2.4 GHz) and password. You can also set a board name and a 4-digit PIN. Press "Save". The board joins your Wi-Fi
+3. "Network Information" shows AP SSID, AP Address and STA Address. From a device on the same Wi-Fi, you can open the STA Address too
+- The Wi-Fi settings are shared with the firmware: set them once
+
+== 3. The screen (from the top)
+- News: notices from the LUNA Project
+- Firmware: the firmware that is installed, and the "Start" button. "Update x.y.z available" appears here
+- Apps (downloaded): files you downloaded to the board, the free space, and "Delete"
+- LUNA Store: tabs Firmware / Apps / Data. Choose an item, read the description, press "Download" (or "View" for documents). "Refresh" reads the catalog again. The board downloads from GitHub through your home Wi-Fi
+- PC file: choose a firmware (.bin) on your PC or phone and upload it. The product mark and the CPU type are checked first
+- Network Information, and Wi-Fi settings
+- Pictures and README texts are loaded by your phone or PC, so they appear only while it has internet
+
+== 4. Install firmware
+1. In LUNA Store open the Firmware tab, choose one and press "Download". It replaces the installed firmware (settings, Wi-Fi and apps are kept)
+2. Wait until it says "Done". Do not turn the power off while it downloads. If a download fails or the power goes off, LUNA Base starts again by itself and you can try again, without USB
+3. Press "Start" (or answer OK to "Start it now?"). The page switches to the firmware's page by itself
+4. To update later, open LUNA Base again, press "Download" on the new version and "Start"
+- The firmware must fit in 1.875 MB. Items that do not fit are shown dimmed
+
+== 5. Back to LUNA Base
+- The "LUNA Base" button in the Console of the firmware (NS-4000, NS-5000X)
+- The serial command :&XDL# (9600 bps for the NS-4000). It works while the mount is stopped or tracking, and refuses during a GOTO
+- On the BLE handbox: hold SEL for 5 seconds
+
+== 6. If something goes wrong
+- The board's Wi-Fi cannot be joined after a wrong home Wi-Fi setting: with LUNA Base 0.8.4 or newer and NS-4000 1.2.8 or newer the board's Wi-Fi stays available, so join it and fix the setting. Older firmware keeps searching for your home Wi-Fi and the board's Wi-Fi hardly appears. Send :&XDL# over the serial port (the adapter) to go back to LUNA Base, fix the Wi-Fi settings there, then update the firmware
+- LUNA Store is empty: check your home Wi-Fi and the internet, then press Refresh
+- A SSID with 5 GHz does not work. Use the 2.4 GHz SSID of your router
+- The firmware does not start: LUNA Base comes back by itself and says so
+- LUNA Base does not start after writing: press RESET (EN) once, and check the log at 115200 bps. Write it again if there is no log
+
+== 7. Update LUNA Base itself
+LUNA Base cannot update itself. Write the newer LUNA_Base_install_en.bin again with the same command (see 1). The firmware, the apps, the Wi-Fi settings and the PIN are kept; the NVS settings are erased
+
+== Notes
+- LUNA Base is a development version (pre-release). Freeware: see LICENSE.txt in the release file. It is separate from the NS-4000 firmware source (GPL v3)
+- Releases: https://github.com/OnStepNinja/OnStepNinja-NS4000/releases
+
+LUNA Project: https://github.com/OnStepNinja

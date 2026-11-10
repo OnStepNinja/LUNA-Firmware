@@ -1,0 +1,47 @@
+LUNA Prog & Comm Adapter v2 (USB-serial adapter)
+
+A small USB-serial adapter for 3.3 V ESP32 boards. One adapter does three jobs:
+- Writing: LUNA Base and firmware with esptool
+- Talking: LX200 commands and other serial commands to the board (for example :&XDL# to go back to LUNA Base)
+- Logs: reading the log that a board prints on its serial port
+It was checked on real hardware with the NS-4000 and LUNA boards. The circuit diagram is shown above this text.
+
+== How the circuit works
+- USB: a micro USB connector. USB 5 V powers the adapter only
+- CH340N: the USB-serial chip. D+ and D- go to the USB connector
+- Power indicator: USB 5 V -> 4.7k -> LED. A 47uF capacitor smooths the 5 V. The CH340N also has capacitors on its V3 and VCC pins (their values are not marked in the diagram; see the CH340N data sheet)
+- TXD (adapter to board): the CH340N output is 5 V. A divider, 200 ohm in series and 330 ohm to GND, brings it down to about 3.3 V
+- RXD (board to adapter): goes straight to the CH340N RXD pin. The 3.3 V signal of the board is read as HIGH
+- Header (3 pins): 1 = GND, 2 = RXD, 3 = TXD
+- There are no DTR and RTS lines: the adapter cannot reset the board or select download mode by itself
+
+== Connect to a board
+| Adapter header | Board |
+|---|---|
+| 1 GND | GND |
+| 2 RXD | TX of the board (TXD0) |
+| 3 TXD | RX of the board (RXD0) |
+- The BLE handbox circuit in LUNA Store has a header with the same pin numbers (1 GND, 2 TX, 3 RX): connect it pin to pin
+- The adapter does not give 3.3 V or 5 V to the board. Power the board by itself (its supply or battery). The grounds must be common
+- Use 3.3 V boards only. Do not connect a 5 V signal to RXD
+
+== Write firmware or LUNA Base
+1. Connect the adapter to the board, and power the board
+2. Download mode by hand: hold BOOT, press and release RESET (EN), then release BOOT
+3. Write (change COM6 to your port; see the "LUNA Base - writing and using" document for the files and addresses):
+
+  python -m esptool --chip esp32 --port COM6 --baud 115200 --before no_reset write_flash 0x0 LUNA_Base_install_en.bin
+
+4. Press RESET (EN) once to start. 115200 bps is used for writing
+- The COM port number is in the Windows Device Manager. If it does not appear, install the CH340 driver
+
+== Talk to the board and read logs
+- Use any serial terminal (Tera Term, PuTTY, Arduino serial monitor...). No local echo
+- LUNA Base and the boot messages: 115200 bps
+- NS-4000 serial commands (LX200 type): 9600 bps. Commands end with #, and need no line ending. Example: :&XDL# restarts the board into LUNA Base (not during a GOTO)
+- Close the terminal before you start esptool: only one program can use the COM port
+
+== License
+Circuit drawing: Copyright (c) 2026 Nishioka Sadahiko. All rights reserved (as printed on the drawing)
+
+LUNA Project: https://github.com/OnStepNinja
