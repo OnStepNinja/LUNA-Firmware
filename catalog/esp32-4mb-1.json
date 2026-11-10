@@ -73,34 +73,6 @@
    "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)"
   },
   {
-   "product": "NS-4000",
-   "mark": "LUNA OnStepNinja NS-4000 v",
-   "name": "OnStepNinja NS-4000",
-   "version": "1.2.5",
-   "lang": "en",
-   "layout": "esp32-4mb-1",
-   "chip": "esp32",
-   "status": "test",
-   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.5_en.bin",
-   "size": 1335744,
-   "sha256": "8700136cee8ea870c20ff0da765fa8cc680c6d06dad624732ae987497026b72a",
-   "title": {
-    "en": "Test distribution. OnStep + AiBridge mount firmware"
-   },
-   "changes": {
-    "en": "Test distribution. The Console \"LUNA Base\" button works while tracking (the same as NS-5000X); only a GOTO refuses"
-   },
-   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
-   "images": [
-    {
-     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/starchart_ns4000.jpg",
-     "caption": {
-      "en": "Example of the star chart (connected to the NS-4000)"
-     }
-    }
-   ]
-  },
-  {
    "product": "NS-4000-FORK",
    "mark": "LUNA OnStepNinja NS-4000 Fork v",
    "name": "OnStepNinja NS-4000 Fork",
