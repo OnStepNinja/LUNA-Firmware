@@ -5,6 +5,7 @@
 @media (prefers-color-scheme: light){:root{--bg:#f4f6fa;--card:#fff;--fg:#1b2333;--mut:#5b6578;--acc:#1f6fd1;--ok:#1f8a4c;--warn:#a86400;--line:#dde2ec}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif}
 main{max-width:720px;margin:0 auto;padding:28px 16px 48px}
+.top{margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);font-weight:600}.top a{text-decoration:none}
 h1{font-size:1.6rem;margin:0 0 6px}.ver{color:var(--mut);font-size:.9rem;margin:0 0 14px}
 h2{font-size:1.1rem;margin:26px 0 8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
@@ -19,6 +20,7 @@ footer{margin-top:28px;font-size:.85rem;color:var(--mut)}
 </style>
 <script type="module" src="https://unpkg.com/esp-web-tools@10.4.0/dist/web/install-button.js?module"></script></head>
 <body><main>
+<p class="top"><a href="https://github.com/OnStepNinja/LUNA">LUNA Project</a></p>
 <h1>Install LUNA Base over USB</h1><p class="ver">LUNA Base v0.9.0</p>
 <p>No Python or esptool needed. Install LUNA Base on your board (ESP32) right from your PC's web browser. After this one time, firmware and LUNA Base updates come over Wi-Fi from LUNA Store.</p>
 <h2>What you need</h2><div class="card"><ul><li><b>Chrome</b> or <b>Edge</b> on a PC (Windows, Mac or Linux). Phones, Safari and Firefox do not work</li><li>A USB cable that carries data (a charge-only cable shows no port)</li><li>An ESP32 board (such as the NS-4000 board, 4MB)</li></ul></div>
@@ -31,5 +33,5 @@ footer{margin-top:28px;font-size:.85rem;color:var(--mut)}
 <div class="card keep"><b>Your settings are kept</b><br>Nothing on the board is erased, so your home Wi-Fi, PIN and mount settings stay. The firmware you had is replaced, so install it again from LUNA Store in LUNA Base.</div>
 <h2>If it does not work</h2><div class="card"><ul><li><b>No port in the list</b>: try another cable. If there is still none, install the driver for the USB chip on your board (look at the chip next to the USB connector): <a href="https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers">CP210x (Silicon Labs)</a>, <a href="https://www.wch-ic.com/downloads/CH341SER_EXE.html">CH340 (WCH)</a></li><li><b>It does not connect or start writing</b> (such as "Failed to initialize"): hold BOOT on the board, press and release EN, release BOOT, then press "Install" again</li><li><b>It stopped part way</b>: just install again. Stopping while writing does not damage the board</li><li>Another app using the port (such as the Arduino IDE serial monitor) blocks the connection. Close it and try again</li></ul></div>
 <h2>What is written</h2><div class="card"><table><tr><td>0x1000</td><td>bootloader.bin</td><td>17,568</td></tr><tr><td>0x8000</td><td>partitions_luna4mb.bin</td><td>3,072</td></tr><tr><td>0xE000</td><td>otadata_blank.bin</td><td>8,192</td></tr><tr><td>0x10000</td><td>LUNABase_v0.9.0_en.bin</td><td>1,047,408</td></tr></table></div>
-<footer>LUNA Base is freeware. Installing uses <a href="https://github.com/esphome/esp-web-tools">ESP Web Tools</a> (Apache 2.0).</footer>
+<footer>LUNA Base is freeware. Installing uses <a href="https://github.com/esphome/esp-web-tools">ESP Web Tools</a> (Apache 2.0).<br>Copyright &copy; 2026 Nishioka Sadahiko. All rights reserved.</footer>
 </main></body></html>
