@@ -432,6 +432,17 @@
    "level": "info",
    "product": "*",
    "title": {
+    "en": "Install LUNA Base over USB from your web browser"
+   },
+   "body": {
+    "en": "You no longer need Python or esptool to put LUNA Base on a new board (ESP32). Open the install page in Chrome or Edge on a PC, connect the board with USB and press \"Install\" (2 to 3 minutes). The page also explains the Wi-Fi setup after installing. Nothing on the board is erased, so your settings are kept. Install page: https://onstepninja.github.io/LUNA-Firmware/install/ (to open it from here, press this link, then the link on that page: https://github.com/OnStepNinja/LUNA-Firmware/tree/main/install )"
+   }
+  },
+  {
+   "date": "2026-11-11",
+   "level": "info",
+   "product": "*",
+   "title": {
     "en": "LUNA Base v0.9.0 released (upgrade without USB)"
    },
    "body": {
