@@ -1,0 +1,532 @@
+{
+ "format": 1,
+ "updated": "2026-11-10",
+ "firmware": [
+  {
+   "product": "LUNA-BASE-UPDATER",
+   "mark": "LUNA Base Updater v",
+   "name": "LUNA Base (Store) upgrade",
+   "version": "0.9.0",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.0_en.bin",
+   "size": 1322704,
+   "sha256": "9ba5c6c29313f9cfe3a4f9c91d971654c41cfd33e9befa3dcbb013ce9f884c57",
+   "title": {
+    "en": "Upgrades LUNA Base to v0.9.0. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
+   },
+   "changes": {
+    "en": "New in LUNA Base v0.9.0: reads large catalogs; firmware listed by board. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
+   },
+   "license": "Freeware",
+   "hw": "base",
+   "color": "gray"
+  },
+  {
+   "product": "NS-4000",
+   "mark": "LUNA OnStepNinja NS-4000 v",
+   "name": "OnStepNinja NS-4000",
+   "version": "1.2.8",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.8_en.bin",
+   "size": 1335872,
+   "sha256": "ddb89876be594cbdf8bd003cd285efa678df1586f726b4ef1310fa40c66ed81f",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "en": "Test distribution. Fixed: with a wrong home Wi-Fi setting (SSID or password), the board's Wi-Fi \"OnStepNinja-xxxx\" could hardly be found or joined, so the setting could not be fixed (while it could not connect, the board kept searching for the home Wi-Fi without a pause). It now waits between tries (every 30 seconds for the first 2 minutes, then every 5 minutes) and does not search while someone is connected to the board's Wi-Fi. If the setting is wrong, fix it at http://192.168.4.1. The other functions are the same as 1.2.5"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/starchart_ns4000.jpg",
+     "caption": {
+      "en": "Example of the star chart (connected to the NS-4000)"
+     }
+    }
+   ],
+   "hw": "ns4000",
+   "color": "blue",
+   "variant": {
+    "en": "German equatorial"
+   }
+  },
+  {
+   "product": "NS-4000-FORK",
+   "mark": "LUNA OnStepNinja NS-4000 Fork v",
+   "name": "OnStepNinja NS-4000 Fork",
+   "version": "1.2.8",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.8_en_fork.bin",
+   "size": 1334992,
+   "sha256": "5fc1a4ef9016ce58258fa6ea8e9bf9874096f22f33cb7618f492d5a1dfc72859",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for a fork equatorial mount"
+   },
+   "changes": {
+    "en": "Test distribution. Fixed: with a wrong home Wi-Fi setting (SSID or password), the board's Wi-Fi \"OnStepNinja-xxxx\" could hardly be found or joined, so the setting could not be fixed (while it could not connect, the board kept searching for the home Wi-Fi without a pause). It now waits between tries (every 30 seconds for the first 2 minutes, then every 5 minutes) and does not search while someone is connected to the board's Wi-Fi. If the setting is wrong, fix it at http://192.168.4.1. The other functions are the same as 1.2.6; the mount type is fork"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "green",
+   "variant": {
+    "en": "Fork"
+   }
+  },
+  {
+   "product": "NS-4000-ALTAZ",
+   "mark": "LUNA OnStepNinja NS-4000 AltAz v",
+   "name": "OnStepNinja NS-4000 Alt-Az",
+   "version": "1.2.8",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.8_en_altazm.bin",
+   "size": 1334816,
+   "sha256": "bedd9c54b089a9df7cd335ad719233aba7785de18a9342ba8ef894d229f578bb",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for an alt-azimuth mount"
+   },
+   "changes": {
+    "en": "Test distribution. Fixed: with a wrong home Wi-Fi setting (SSID or password), the board's Wi-Fi \"OnStepNinja-xxxx\" could hardly be found or joined, so the setting could not be fixed (while it could not connect, the board kept searching for the home Wi-Fi without a pause). It now waits between tries (every 30 seconds for the first 2 minutes, then every 5 minutes) and does not search while someone is connected to the board's Wi-Fi. If the setting is wrong, fix it at http://192.168.4.1. The other functions are the same as 1.2.7; the mount type is alt-azimuth (azimuth -360 to +360 degrees)"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "orange",
+   "variant": {
+    "en": "Alt-Az"
+   }
+  },
+  {
+   "product": "NS-4000-FORK",
+   "mark": "LUNA OnStepNinja NS-4000 Fork v",
+   "name": "OnStepNinja NS-4000 Fork",
+   "version": "1.2.6",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.6_en_fork.bin",
+   "size": 1334864,
+   "sha256": "f707dbd84cf6b7fe8bca16d8ee6b996a8d04d9c716270e01dfd2c91855297691",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for a fork equatorial mount"
+   },
+   "changes": {
+    "en": "Test distribution. The same functions as the German equatorial version (1.2.5); only the mount type is fork"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "green",
+   "variant": {
+    "en": "Fork"
+   }
+  },
+  {
+   "product": "NS-4000-ALTAZ",
+   "mark": "LUNA OnStepNinja NS-4000 AltAz v",
+   "name": "OnStepNinja NS-4000 Alt-Az",
+   "version": "1.2.7",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.7_en_altazm.bin",
+   "size": 1334672,
+   "sha256": "c9335b892681aa6d63e70a9c77f30435587133c31c4b25a26c0034b739b61670",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for an alt-azimuth mount"
+   },
+   "changes": {
+    "en": "Test distribution. The same functions as the German equatorial version (1.2.5); only the mount type is alt-azimuth (azimuth -360 to +360 degrees)"
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "orange",
+   "variant": {
+    "en": "Alt-Az"
+   }
+  },
+  {
+   "product": "BLE Handbox",
+   "mark": "LUNA BLE Handbox v",
+   "name": "Wireless BLE Handbox",
+   "version": "2.0.0",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/BleHandbox_v2.0.0.bin",
+   "size": 587792,
+   "sha256": "7b21f7ec7cc0ed5a45ef1b52fa27b096b3f1ef7e1bed2df5e1940ac2ac9d0222",
+   "title": {
+    "en": "A 5-button wireless handbox for the NS-4000 (ESP32)"
+   },
+   "changes": {
+    "en": "Version 2 (2.0.0). Distributed only in LUNA Store; it may be improved in the future. See the text below for the operation, the pins, the circuit and how to build and set it up with LUNA Base. The circuit diagram is shown below"
+   },
+   "license": "Freeware (see the text below). Includes Apache 2.0 and LGPL 2.1 parts",
+   "readme": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/docs/handbox/ble_handbox_v2_en.txt",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/ble_handbox_v2_circuit.png",
+     "caption": {
+      "en": "Circuit of the Wireless BLE Handbox v2"
+     }
+    }
+   ],
+   "hw": "handbox",
+   "color": "teal"
+  }
+ ],
+ "hardware": {
+  "ns4000": {
+   "name": {
+    "en": "NS-4000 board (NS-5000X, NS-4000)"
+   },
+   "note": {
+    "en": "Choose the one that matches your mount (German equatorial, fork or alt-azimuth)"
+   }
+  },
+  "handbox": {
+   "name": {
+    "en": "BLE handbox board"
+   },
+   "note": {
+    "en": "For the handbox board only. Do not install it on an NS-4000 board"
+   },
+   "warn": true
+  },
+  "luna": {
+   "name": {
+    "en": "LUNA board"
+   },
+   "note": {
+    "en": "For the LUNA board only. Do not install it on an NS-4000 or NS-5000X board"
+   },
+   "warn": true
+  },
+  "base": {
+   "name": {
+    "en": "Upgrade LUNA Base (Store) itself (no USB)"
+   },
+   "note": {
+    "en": "Runs a program that upgrades LUNA Base (Store) for a short time (about 20 seconds, do not switch off). After the upgrade, please download your firmware again"
+   }
+  }
+ },
+ "apps": [
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
+   "version": "0.9.2",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/0.9.2/starchart_en.html",
+   "size": 91474,
+   "sha256": "04d3383d67b4dd21e55294cba07320d3d3aa8294cbbfaabdc0dbecf0f6d6a0b9",
+   "title": {
+    "en": "Star chart (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both. Fixed: the Mount control dialog stayed on \"Reading the mount...\" while the mount reported an error (for example the overhead limit)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
+   "version": "0.9.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
+   "size": 91591,
+   "sha256": "8aac2b4f39eb8593fb0a31a358a71cd62d43e09886d8ba188801f20544e1a3d8",
+   "title": {
+    "en": "Star chart (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en_data.js",
+   "version": "0.9.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en_data.js",
+   "size": 90749,
+   "sha256": "31c7139e0a3dd1f0434b898a0ebcf8ce1e189dd205d0faba1c6c3c75c0530531",
+   "title": {
+    "en": "Star chart data (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "The star data of the Star chart. Download it together with \"Star chart (English)\""
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "meteor_catch_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/meteor_catch_en.html",
+   "size": 3072,
+   "sha256": "855035bd73771430dac0c65b8614ec01900fea33c9c23ab7ef21980720c7b66c",
+   "title": {
+    "en": "Meteor Catch"
+   },
+   "category": {
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Tap the meteors for 30 seconds (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "star_memory_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/star_memory_en.html",
+   "size": 2578,
+   "sha256": "708842ef2fb6ae3a93d985db6416f09150c4dbb3a9f22caa2338641a6aba9b51",
+   "title": {
+    "en": "Star Memory"
+   },
+   "category": {
+    "en": "Games"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Match the pairs (test)"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "luna_moon_en.svg",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/luna_moon_en.svg",
+   "size": 1584,
+   "sha256": "1398b97a85b2ae46adf8de913c46e0d55236825f8a3722d540b53cb67137ce81",
+   "title": {
+    "en": "Moon and telescope (picture)"
+   },
+   "category": {
+    "en": "Images"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Image test. After download: http://<board IP>/luna_moon_en.svg"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "npf_calc_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "device": "none",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/npf_calc_en.html",
+   "size": 1895,
+   "sha256": "70194c0aaad3178eec7369e0b35d843e541a6719c68a7ba25f94894a669b118b",
+   "title": {
+    "en": "Exposure calculator (NPF rule)"
+   },
+   "category": {
+    "en": "Tools"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Longest untracked exposure (test)"
+   }
+  }
+ ],
+ "data": [
+  {
+   "group": "OnStep",
+   "name": "onstep_basic_commands_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/onstep_basic_commands_en.txt",
+   "size": 1236,
+   "sha256": "52c48b39abf4338720dd106b05f180d8661dcaafdeded212ccf1239cbbad53cb",
+   "type": "text",
+   "title": {
+    "en": "OnStep basic commands"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "group": "LUNA Base",
+   "name": "luna_base_guide_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/luna_base_guide_en.txt",
+   "size": 5503,
+   "sha256": "08c594e564361f5484bb80423c69d7df5cd6eb783162c240c5723963c417f926",
+   "type": "text",
+   "title": {
+    "en": "LUNA Base - writing and using"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)"
+  },
+  {
+   "group": "LUNA Base",
+   "name": "luna_prog_comm_adapter_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/luna_prog_comm_adapter_en.txt",
+   "size": 2827,
+   "sha256": "719fac7615c361af02341101a85a63771465f3beacf540a5d280d127b8d94eb9",
+   "type": "text",
+   "title": {
+    "en": "LUNA Prog & Comm Adapter v2 (USB-serial adapter, circuit)"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/luna_prog_comm_adapter_v2_circuit.png",
+     "caption": {
+      "en": "Circuit of the LUNA Prog & Comm Adapter v2"
+     }
+    }
+   ]
+  }
+ ],
+ "news": [
+  {
+   "date": "2026-11-11",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base v0.9.0 released (upgrade without USB)"
+   },
+   "body": {
+    "en": "Download and start \"LUNA Base (Store) upgrade\" at the top of the Firmware list: LUNA Base becomes v0.9.0 without USB (about 20 seconds). Your settings are kept. After that, please download your firmware again. v0.9.0 reads large catalogs and lists firmware by board."
+   }
+  },
+  {
+   "date": "2026-11-10",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Circuits and the LUNA Base guide are in LUNA Store"
+   },
+   "body": {
+    "en": "LUNA Store (Data) now has \"LUNA Base - writing and using\" and the circuit of the \"LUNA Prog & Comm Adapter v2\", a USB-serial adapter for writing, talking to the board and reading logs. The circuit and the build steps of the Wireless BLE Handbox are in the description of its firmware."
+   }
+  },
+  {
+   "date": "2026-11-08",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base v0.8.4 and NS-4000 1.2.8 released (Wi-Fi fix)"
+   },
+   "body": {
+    "en": "Fixed: with a wrong home Wi-Fi setting (SSID or password), you could lose access to the board's own Wi-Fi and could not fix the setting. While it could not connect, the board kept searching for the home Wi-Fi without a pause. It now waits between tries and does not search while someone is connected to the board's Wi-Fi. For the NS-4000 (German equatorial, fork and alt-azimuth), install 1.2.8 from LUNA Store. LUNA Base cannot update itself, so please write the new LUNA Base v0.8.4 over USB.\nhttps://github.com/OnStepNinja/OnStepNinja-NS4000/releases"
+   }
+  },
+  {
+   "date": "2026-11-06",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Wireless BLE Handbox ver2 released (LUNA Store only)"
+   },
+   "body": {
+    "en": "The firmware list of LUNA Store now has the \"Wireless BLE Handbox\" (ver2, 2.0.0): a 5-button handbox with the same pin numbers as the NS-4000 board. It is distributed only in LUNA Store and may be improved in the future. The operation and the pins are in the description of the firmware. The circuit diagram will be published in LUNA Store later."
+   }
+  },
+  {
+   "date": "2026-11-03",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Store now shows icons, photos and links"
+   },
+   "body": {
+    "en": "The new LUNA Base (coming soon) shows icons, photos and links in LUNA Store. Links in the news can be opened or copied."
+   }
+  },
+  {
+   "date": "2026-10-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Downloader test started"
+   },
+   "body": {
+    "en": "This manifest is for testing."
+   }
+  }
+ ],
+ "astro": [
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "November Moon: New on the 9th, Full on the 24th"
+   },
+   "body": {
+    "en": "New Moon on Nov 9 at about 16:00 JST (07:00 UT) and Full Moon on Nov 24 at about 23:50 JST (14:50 UT). Computed values, a few minutes of error. The days around New Moon give the darkest skies. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Leonids: best around Nov 17-18"
+   },
+   "body": {
+    "en": "The Leonids usually peak around Nov 17-18, about 15 meteors per hour under good conditions. This year the Moon is near first quarter on the 17th and sets after midnight, so the pre-dawn sky is dark. The radiant in Leo rises after midnight. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Taurids: about Nov 5 (south) and Nov 12 (north)"
+   },
+   "body": {
+    "en": "Only a few meteors per hour, but slow, bright fireballs are a feature. On Nov 5 only a thin crescent rises before dawn, and on Nov 12 the thin Moon sets early in the evening, so both nights are dark. (Test notice)"
+   }
+  }
+ ]
+}

@@ -3,6 +3,26 @@
  "updated": "2026-11-10",
  "firmware": [
   {
+   "product": "LUNA-BASE-UPDATER",
+   "mark": "LUNA Base Updater v",
+   "name": "LUNA Base (Store) upgrade",
+   "version": "0.9.0",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.0_en.bin",
+   "size": 1322704,
+   "sha256": "9ba5c6c29313f9cfe3a4f9c91d971654c41cfd33e9befa3dcbb013ce9f884c57",
+   "title": {
+    "en": "Upgrades LUNA Base to v0.9.0. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
+   },
+   "changes": {
+    "en": "New in LUNA Base v0.9.0: reads large catalogs; firmware listed by board. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
+   },
+   "license": "Freeware"
+  },
+  {
    "product": "NS-4000",
    "mark": "LUNA OnStepNinja NS-4000 v",
    "name": "OnStepNinja NS-4000",
@@ -342,6 +362,17 @@
   }
  ],
  "news": [
+  {
+   "date": "2026-11-11",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base v0.9.0 released (upgrade without USB)"
+   },
+   "body": {
+    "en": "Download and start \"LUNA Base (Store) upgrade\" at the top of the Firmware list: LUNA Base becomes v0.9.0 without USB (about 20 seconds). Your settings are kept. After that, please download your firmware again. v0.9.0 reads large catalogs and lists firmware by board."
+   }
+  },
   {
    "date": "2026-11-10",
    "level": "info",
