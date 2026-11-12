@@ -1,6 +1,6 @@
 {
  "name": "LUNA Base",
- "version": "0.9.0",
+ "version": "0.9.1",
  "new_install_prompt_erase": false,
  "new_install_improv_wait_time": 0,
  "builds": [
@@ -20,7 +20,7 @@
      "offset": 57344
     },
     {
-     "path": "LUNABase_v0.9.0_en.bin",
+     "path": "LUNABase_v0.9.1_en.bin",
      "offset": 65536
     }
    ]
