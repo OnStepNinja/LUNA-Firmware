@@ -162,6 +162,26 @@
      }
     }
    ]
+  },
+  {
+   "product": "LUNA-Observatory",
+   "mark": "AiBridgeMCP LUNA Observatory v",
+   "name": "LUNA Observatory Edition (ESP32)",
+   "version": "5.9.10",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Observatory_v5.9.10_ESP32.bin",
+   "size": 1363968,
+   "sha256": "8c7e2a7cbac929aa4aaea22851018c45c72284a642d85ff24546632592ee5a76",
+   "title": {
+    "en": "A powerful astronomy system that works with AI. Firmware for the LUNA board"
+   },
+   "changes": {
+    "en": "[Note] This firmware is for the dedicated LUNA board and circuit. It is not NS-4000 firmware, and not part of it. Do not install it on an NS-4000 board. LUNA is an MCP server that runs on an ESP32. It connects directly to AI such as Claude over Wi-Fi, so you can control your mount (LX200 compatible) and other astronomy equipment over serial just by talking to the AI. You can add your own behavior with Lua scripts, and it works with NINA, PHD2, SkySafari, Stellarium and Vixen equipment. It uses the same Wi-Fi settings as LUNA Base, and the \"LUNA Base\" button on its page takes you back to the Store. The circuit is the same as the one published before. More: https://github.com/OnStepNinja/LUNA"
+   },
+   "license": "MIT"
   }
  ],
  "apps": [
