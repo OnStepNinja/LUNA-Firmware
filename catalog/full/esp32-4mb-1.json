@@ -6,19 +6,19 @@
    "product": "LUNA-BASE-UPDATER",
    "mark": "LUNA Base Updater v",
    "name": "LUNA Base (Store) upgrade",
-   "version": "0.9.1",
+   "version": "0.9.2",
    "lang": "en",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
    "minBase": "0.7.0",
-   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.1_en.bin",
-   "size": 1322768,
-   "sha256": "890bc3b55f9e95ff0b83394e60a551d3e054609611094d2294ae3a1697c6bc5d",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.2_en.bin",
+   "size": 1323088,
+   "sha256": "13f0ed164b87597807644a8aec27073bae1f78731562ecb29b679351632ccdc0",
    "title": {
-    "en": "Upgrades LUNA Base to v0.9.1. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
+    "en": "Upgrades LUNA Base to v0.9.2. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
    },
    "changes": {
-    "en": "New in LUNA Base v0.9.1: the \"Update available\" tag on the firmware card is only for firmware; install page links in the news can be opened; reads large catalogs; firmware listed by board. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
+    "en": "New in LUNA Base v0.9.2: a \"Q&A\" button next to the LUNA Store title (opens the LUNA Store discussion board in a new tab); links in descriptions and news are now in a brighter, easier-to-read color. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
    },
    "license": "Freeware",
    "hw": "base",
@@ -449,6 +449,17 @@
   }
  ],
  "news": [
+  {
+   "date": "2026-11-13",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base v0.9.2 released (Q&A button)"
+   },
+   "body": {
+    "en": "Download and start \"LUNA Base (Store) upgrade\" at the top of the Firmware list: LUNA Base becomes v0.9.2 without USB (about 20 seconds). Your settings are kept. After that, please download your firmware again. In v0.9.2, the \"Q&A\" button next to the LUNA Store title opens our board for questions and feedback. You can also open it here: https://github.com/OnStepNinja/LUNA-Store/discussions"
+   }
+  },
   {
    "date": "2026-11-11",
    "level": "info",
