@@ -402,6 +402,17 @@
  ],
  "news": [
   {
+   "date": "2026-11-14",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "New app: Alpaca device panel"
+   },
+   "body": {
+    "en": "Added to \"Tools\" in LUNA Store. Control Alpaca focusers, filter wheels and telescopes on your LAN from the board's page. It moves real equipment, so check for collisions first."
+   }
+  },
+  {
    "date": "2026-11-13",
    "level": "info",
    "product": "*",
