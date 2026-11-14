@@ -406,6 +406,17 @@
    "level": "info",
    "product": "*",
    "title": {
+    "en": "Fixed: \"Wrong firmware mark\" in the Japanese Store"
+   },
+   "body": {
+    "en": "In the Japanese LUNA Store, the LUNA Base upgrade and the BLE Handbox could not be installed (\"Wrong firmware mark\", the names were too long). The catalog is fixed. The English Store was not affected."
+   }
+  },
+  {
+   "date": "2026-11-14",
+   "level": "info",
+   "product": "*",
+   "title": {
     "en": "New app: Alpaca device panel"
    },
    "body": {
