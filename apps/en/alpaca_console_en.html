@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<!--
+  LUNA AiBridge Alpaca Console v0.1.0
+  Copyright (c) 2026 Nishioka Sadahiko. All rights reserved. Freeware: see LICENSE.
+  Controls ASCOM Alpaca devices (telescope, focuser, filter wheel) through the host's /api/external/alpaca relay
+  (AiBridge firmware or AiBridge Host). Single file, under 150KB.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpaca Devices</title>
+<meta name="author" content="Nishioka Sadahiko">
+<meta name="copyright" content="Copyright (c) 2026 Nishioka Sadahiko. Freeware.">
+<style>
+  :root{
+    --bg:#04060d;--glass:rgba(16,24,42,.72);--line:rgba(120,160,230,.22);--txt:#e8eefc;--sub:#8e9bb8;
+    --tele:#4da3ff;--foc:#ffab40;--wheel:#b388ff;--ok:#34d399;--bad:#ff6b6b;--warn:#fbbf24;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;min-height:100%}
+  #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+    radial-gradient(900px 500px at 15% -10%,rgba(77,163,255,.20),transparent 60%),
+    radial-gradient(800px 500px at 100% 10%,rgba(179,136,255,.16),transparent 60%),
+    radial-gradient(700px 500px at 50% 120%,rgba(255,171,64,.10),transparent 60%)}
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:12px 14px 70px}
+  a{color:#9fd6ff;text-decoration:none;font-weight:700} a:hover{text-decoration:underline}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
+  h1{margin:0;font-size:clamp(22px,4vw,34px);letter-spacing:.02em;font-weight:800;
+    background:linear-gradient(90deg,#9fd6ff,#b388ff 45%,#ffab40);-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 14px rgba(120,160,255,.35))}
+  .tag{font-size:12px;color:var(--sub)}
+  .spacer{flex:1}
+  button{font:inherit;color:var(--txt);cursor:pointer;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:12px;padding:9px 14px;font-weight:600;transition:.18s}
+  button:hover{background:rgba(255,255,255,.1)} button:active{transform:scale(.96)} button:disabled{opacity:.35;pointer-events:none}
+  button.pri{background:linear-gradient(135deg,#3b82f6,#6d4fd6);border-color:transparent;color:#fff;box-shadow:0 4px 18px rgba(77,120,255,.35)}
+  button.stop{background:linear-gradient(135deg,#ef4444,#b91c1c);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(239,68,68,.35)}
+  button.sm{padding:5px 10px;font-size:12px;border-radius:9px}
+  input,select{font:inherit;color:var(--txt);background:rgba(8,12,24,.7);border:1px solid var(--line);border-radius:11px;padding:9px 11px;width:100%}
+  input:focus,select:focus{outline:none;border-color:#6aa8ff;box-shadow:0 0 0 3px rgba(106,168,255,.18)}
+  .panel{background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin-top:14px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+  .panel h2{margin:0 0 8px;font-size:13px;letter-spacing:.09em;color:#a9c4ff;text-transform:uppercase}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end} .row>*{flex:1 1 130px}
+  .row .fix{flex:0 0 auto}
+  label{display:block;font-size:11px;color:var(--sub);margin:0 0 4px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{max-width:100%;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:13px;cursor:pointer;transition:.18s}
+  .chip:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+  .chip.dis{opacity:.4;cursor:default;pointer-events:none}
+  .dev-t{font-size:11px;padding:1px 8px;border-radius:999px;font-weight:700}
+  .t-telescope{background:rgba(77,163,255,.18);color:var(--tele)} .t-focuser{background:rgba(255,171,64,.18);color:var(--foc)} .t-filterwheel{background:rgba(179,136,255,.18);color:var(--wheel)} .t-other{background:rgba(255,255,255,.1);color:var(--sub)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:14px;margin-top:14px}
+  .card{min-width:0;position:relative;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 12px 44px rgba(0,0,0,.4);overflow:hidden;animation:rise .5s ease both}
+  .card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--acc,var(--tele));box-shadow:0 0 18px var(--acc,var(--tele))}
+  .card.telescope{--acc:var(--tele)} .card.focuser{--acc:var(--foc)} .card.filterwheel{--acc:var(--wheel)}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .ch{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .ico{font-size:26px;filter:drop-shadow(0 0 8px var(--acc))}
+  .ch .nm{font-weight:800;font-size:16px;line-height:1.2} .ch .ad{font-size:11px;color:var(--sub)}
+  .led{width:11px;height:11px;border-radius:50%;background:#556;flex:none;box-shadow:0 0 0 #0000}
+  .led.on{background:var(--ok);box-shadow:0 0 10px var(--ok)} .led.err{background:var(--bad);box-shadow:0 0 10px var(--bad)}
+  .x{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .big{font-variant-numeric:tabular-nums;font-weight:800;letter-spacing:.02em}
+  .lcd{font-family:ui-monospace,Consolas,"SF Mono",monospace;font-size:clamp(24px,5vw,34px);color:#bfe0ff;text-shadow:0 0 14px rgba(77,163,255,.6)}
+  .lab{font-size:11px;color:var(--sub);letter-spacing:.08em;margin-top:2px}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .bd{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--sub)}
+  .bd.on{color:#052e1d;background:var(--ok);border-color:transparent;box-shadow:0 0 12px rgba(52,211,153,.5)} .bd.warn{color:#3a2a00;background:var(--warn);border-color:transparent} .bd.pulse{animation:pulse 1.1s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(251,191,36,.6)}70%{box-shadow:0 0 0 10px rgba(251,191,36,0)}100%{box-shadow:0 0 0 0 rgba(251,191,36,0)}}
+  .btns{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px} .btns button{flex:1 1 auto}
+  .sep{height:1px;background:var(--line);margin:12px 0}
+  .tele-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .dome{width:150px;height:150px;flex:none}
+  .dome .mk{transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+  .switch{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04)}
+  .tgl{position:relative;width:46px;height:26px;border-radius:999px;background:#2a3348;transition:.2s;flex:none;cursor:pointer;border:none;padding:0}
+  .tgl::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .tgl.on{background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 0 14px rgba(52,211,153,.5)} .tgl.on::after{left:23px}
+  /* focuser */
+  .focpos{display:flex;align-items:baseline;gap:8px} .focpos .lcd{color:#ffd9a8;text-shadow:0 0 14px rgba(255,171,64,.6);font-size:clamp(30px,6vw,44px)}
+  .bar{position:relative;height:16px;border-radius:999px;background:rgba(255,255,255,.08);margin:12px 0 8px;overflow:visible}
+  .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,#ff8f00,#ffd180);transition:width .5s ease;box-shadow:0 0 14px rgba(255,171,64,.5)}
+  .bar .th{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 14px #ffb04a;transition:left .5s ease}
+  .bar .tg{position:absolute;top:-5px;bottom:-5px;width:3px;background:#fff;opacity:.0;border-radius:3px;transition:opacity .2s}
+  .bar.mv .tg{opacity:.9} .bar.mv .th{animation:pulse2 .9s infinite}
+  @keyframes pulse2{0%,100%{box-shadow:0 0 8px #ffb04a}50%{box-shadow:0 0 22px #ffb04a}}
+  .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px} .steps button{padding:8px 2px;font-size:13px}
+  /* filter wheel */
+  .wheelbox{display:flex;justify-content:center;margin:2px 0 6px}
+  .wheel{width:min(260px,80%);aspect-ratio:1;position:relative}
+  .wheel svg{width:100%;height:100%;overflow:visible}
+  .wheel .rot{transition:transform 1.1s cubic-bezier(.3,.8,.25,1);transform-origin:130px 130px}
+  .slot{cursor:pointer;transition:.2s} .slot:hover{filter:brightness(1.3)}
+  .slot.cur circle.f{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 8px #fff)}
+  .pointer{filter:drop-shadow(0 0 8px #b388ff)}
+  .curname{text-align:center;font-weight:800;font-size:20px;margin:2px 0 6px;text-shadow:0 0 14px rgba(179,136,255,.6)}
+  .note{font-size:12px;color:var(--sub);line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:64px;transform:translateX(-50%) translateY(20px);background:rgba(20,28,48,.96);border:1px solid var(--line);padding:11px 18px;border-radius:14px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:20;max-width:92%}
+  .toast.show{opacity:1;transform:translateX(-50%)} .toast.err{border-color:var(--bad);color:#ffb4b4}
+  .brand{position:fixed;right:10px;bottom:6px;z-index:5;display:flex;align-items:center;gap:8px;font:11px monospace;color:#667}
+  #sup{background:rgba(255,80,120,.15);border:1px solid rgba(255,80,120,.4);color:#ff90ab;border-radius:50%;width:24px;height:24px;padding:0;font-size:12px}
+  .luna{position:fixed;left:10px;top:8px;z-index:5;font-size:12px;text-shadow:0 0 4px #000}
+  .ov{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:30} .ov.show{display:flex}
+  .modal{background:#111a2c;border:1px solid var(--line);border-radius:16px;padding:18px;max-width:360px;margin:16px;font-size:14px;line-height:1.6}
+  .empty{text-align:center;padding:34px 10px;color:var(--sub)} .empty .big{font-size:48px;display:block;margin-bottom:8px;filter:drop-shadow(0 0 14px rgba(120,160,255,.5))}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas><div class="glow"></div>
+<a class="luna" href="https://github.com/OnStepNinja" target="_blank" rel="noopener">🌙 LUNA Project</a>
+<div class="wrap">
+  <header style="margin-top:22px">
+    <h1>Alpaca Devices</h1>
+    <span class="tag" id="tagline"></span><span class="spacer"></span>
+  </header>
+
+  <div class="panel">
+    <h2 id="hFind"></h2>
+    <div class="row">
+      <div style="flex:2 1 220px"><label id="lTarget"></label><input id="target" placeholder="192.168.1.50:11111" autocomplete="off"></div>
+      <div class="fix"><button class="pri" id="bFind"></button></div>
+    </div>
+    <div class="chips" id="found"></div>
+    <div class="note" id="hint" style="margin-top:8px"></div>
+  </div>
+
+  <div class="grid" id="cards"></div>
+  <div class="empty" id="empty"><span class="big">🔭 🎯 🎡</span><div id="emptyTxt"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="brand"><span id="brand"></span><button id="sup" title="♥">💗</button></div>
+<div class="ov" id="supOv"><div class="modal"><b id="supT"></b><p id="supP"></p><p><a href="https://www.paypal.com/ncp/payment/WWQ7NLZ2HZ53U" target="_blank" rel="noopener" style="color:#ff90ab" id="supL"></a></p><p class="note" id="supC"></p><button id="supX" style="width:100%"></button></div></div>
+
+<script>
+"use strict";
+const VERSION = "0.1.0";
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const enc = encodeURIComponent;
+
+// ---------------- texts ----------------
+const I = {
+  en: {
+    tagline: "Control ASCOM Alpaca devices from your browser", find: "Find / add devices", target: "Alpaca server address (host:port)",
+    detect: "Detect on network", detecting: "Detecting… (about 3 s)", none: "Nothing found. Enter host:port above and press Add.",
+    hint: "Works with Alpaca servers such as ASCOM Remote (default port 11111). Press a device to add its panel below.",
+    emptyTxt: "Add a device and its control panel appears here.<br>Telescope, focuser and filter wheel are supported.",
+    addByHand: "Look up this address", soon: "(coming)", connect: "Connect", disconnect: "Disconnect", connected: "Connected", notConn: "Not connected",
+    remove: "Close panel", tracking: "Tracking", slewing: "Slewing", parked: "Parked", home: "Home", unparked: "Active",
+    ra: "RA", dec: "DEC", alt: "Alt", az: "Az", abort: "Stop", park: "Park", unpark: "Unpark", gohome: "Go home", sync: "Sync",
+    goto: "GOTO", raIn: "RA (h:m:s)", decIn: "Dec (±d:m:s)", copyPos: "Use current position", rate: "Tracking rate",
+    sid: "Sidereal", lun: "Lunar", sol: "Solar", king: "King", sys: "Device coordinate system", jnow: "Of date (JNow)", j2000: "J2000", other: "Unknown",
+    posn: "Position", temp: "Temp", halt: "Halt", moveTo: "Move", target_: "Target", maxstep: "Max", absolute: "absolute",
+    relative: "relative", moving: "Moving", curFilter: "Current filter", wheelMoving: "Rotating…", pickFilter: "Pick a filter",
+    copyDone: "Current position copied", err: "Error", ok: "Done", needConn: "Press “Connect” first",
+    supT: "Support development", supP: "This app is free to use. If you find it useful, a $5 (one coffee) contribution toward continued development is welcome (never required).",
+    supL: "Open support link", supC: "LUNA AiBridge Alpaca Console v" + VERSION + " · © 2026 Nishioka Sadahiko · Freeware", close: "Close",
+    addDone: "Panel added", dup: "Already added", poorLink: "Unstable link", noHost: "Enter an address",
+    coordsErr: "Invalid coordinates (e.g. 05:35:17 / +22:00:52)", gotoStarted: "GOTO started", syncDone: "Synced"
+  }
+};
+const lang = "en";
+const t = k => I.en[k] || k;
+
+// ---------------- storage ----------------
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("ac_" + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem("ac_" + k, JSON.stringify(v)); }catch(e){} }
+};
+
+// ---------------- communication (the Host's Alpaca relay) ----------------
+const BASE = (() => { const h = new URLSearchParams(location.search).get("host"); return h ? "http://" + h : ""; })();
+let chain = Promise.resolve();
+class AlpErr extends Error {}
+// dev: {host, port, type, num}. The ESP32 relay handles one request at a time, so requests are sent one by one.
+function relay(dev, prop, method, params){
+  const run = async () => {
+    const url = BASE + "/api/external/alpaca?target=" + enc(dev.host) + "&port=" + dev.port + "&device=" + dev.type + "&number=" + dev.num +
+      "&property=" + enc(prop) + (method && method !== "GET" ? "&method=" + method : "") + (params ? "&params=" + enc(params) : "");
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 9000);
+    try{
+      const r = await fetch(url, {cache: "no-store", signal: ac.signal});
+      const j = await r.json().catch(() => null);
+      if(!r.ok || !j || j.status !== "success") throw new AlpErr((j && j.message) || "HTTP " + r.status);
+      const d = j.data;
+      if(d && d.ErrorNumber) throw new AlpErr((d.ErrorMessage || "Alpaca error " + d.ErrorNumber).trim());
+      return d ? d.Value : undefined;
+    }finally{ clearTimeout(tm); }
+  };
+  const p = chain.then(() => sleep(30)).then(run);
+  chain = p.catch(() => {});
+  return p;
+}
+const tryGet = (dev, prop) => relay(dev, prop).catch(() => undefined);
+
+function toast(msg, err){
+  const e = $("toast"); e.textContent = msg; e.className = "toast show" + (err ? " err" : "");
+  clearTimeout(toast._t); toast._t = setTimeout(() => e.className = "toast", 2800);
+}
+
+// ---------------- coordinate formats ----------------
+const p2 = n => String(Math.trunc(n)).padStart(2, "0");
+function hms(h){ h = ((h % 24) + 24) % 24; let s = Math.round(h * 3600); s %= 86400; return p2(s / 3600) + ":" + p2((s / 60) % 60) + ":" + p2(s % 60); }
+function dms(d){ const sg = d < 0 ? "-" : "+"; let s = Math.round(Math.abs(d) * 3600); return sg + p2(s / 3600) + ":" + p2((s / 60) % 60) + ":" + p2(s % 60); }
+
+// ---------------- background (twinkling stars) ----------------
+(() => {
+  const cv = $("sky"), cx = cv.getContext("2d"); let W = 0, H = 0, st = [];
+  const size = () => { W = cv.width = innerWidth; H = cv.height = innerHeight; st = Array.from({length: Math.min(160, Math.round(W * H / 9000))}, () => ({x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.3 + .2, p: Math.random() * 6.28, s: Math.random() * .02 + .005})); };
+  size(); addEventListener("resize", size);
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches){ cx.fillStyle = "#fff"; st.forEach(s => { cx.globalAlpha = .6; cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 6.28); cx.fill(); }); return; }
+  let last = 0;
+  (function loop(ts){ if(ts - last > 66){ last = ts; cx.clearRect(0, 0, W, H); st.forEach(s => { s.p += s.s * 4; cx.globalAlpha = .25 + .55 * (Math.sin(s.p) * .5 + .5); cx.fillStyle = "#cfe0ff"; cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 6.28); cx.fill(); }); } requestAnimationFrame(loop); })(0);
+})();
+
+
+// ---------------- list of devices you plan to use (saved in AiBridge Host; in the browser when opened from an ESP32) ----------------
+let hostMode = false;
+async function hostDevices(){
+  try{
+    const r = await fetch(BASE + "/api/devices", {cache: "no-store"}), j = await r.json();
+    if(r.ok && j && j.status === "success"){ hostMode = true; return (j.data && j.data.devices) || []; }
+  }catch(e){}
+  return null;
+}
+const toEntry = d => ({proto: "alpaca", addr: d.host + ":" + d.port, type: d.type, name: d.name, num: +d.num || 0});
+const fromEntry = e => ({host: e.addr.slice(0, e.addr.lastIndexOf(":")), port: +e.addr.slice(e.addr.lastIndexOf(":") + 1), type: e.type, num: e.num, name: e.name});
+async function hostEdit(op, dev){
+  if(!hostMode) return;
+  try{
+    const r = await fetch(BASE + "/host/api/devices", {method: "POST", body: JSON.stringify({op, device: toEntry(dev)})});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+  }catch(e){ toast("Cannot save the device list (it can only be changed from the screen on this PC)", true); }
+}
+
+// ---------------- cards (device panels) ----------------
+const KINDS = {
+  telescope: {ico: "🔭", build: buildTelescope, poll: pollTelescope},
+  focuser: {ico: "🎯", build: buildFocuser, poll: pollFocuser},
+  filterwheel: {ico: "🎡", build: buildWheel, poll: pollWheel}
+};
+const cards = []; // {dev, el, kind, state, boost, busy, err}
+const typeKey = ty => (ty || "").toLowerCase();
+const same = (a, b) => a.host === b.host && String(a.port) === String(b.port) && a.type === b.type && String(a.num) === String(b.num);
+
+function saveCards(){ store.set("devices", cards.map(c => c.dev)); }
+function refreshEmpty(){ $("empty").style.display = cards.length ? "none" : ""; }
+
+function addCard(dev, silent){
+  if(cards.some(c => same(c.dev, dev))){ if(!silent) toast(t("dup")); return; }
+  const kind = KINDS[dev.type]; if(!kind) return;
+  const el = document.createElement("div"); el.className = "card " + dev.type;
+  el.innerHTML =
+    "<div class='ch'><span class='ico'>" + kind.ico + "</span><div><div class='nm'></div><div class='ad'></div></div>" +
+    "<div class='x'><span class='led'></span><button class='sm' data-a='conn'></button><button class='sm' data-a='rm' title=''>✕</button></div></div><div class='body'></div>";
+  el.querySelector(".nm").textContent = dev.name || dev.type; el.querySelector(".ad").textContent = dev.host + ":" + dev.port + " #" + dev.num;
+  const card = {dev, el, kind, state: {}, boost: 3, connected: undefined, fails: 0};
+  el.querySelector("[data-a=rm]").title = t("remove");
+  el.querySelector("[data-a=rm]").onclick = () => { cards.splice(cards.indexOf(card), 1); el.remove(); saveCards(); refreshEmpty(); hostEdit("remove", dev); };
+  el.querySelector("[data-a=conn]").onclick = async () => {
+    try{ await relay(dev, "connected", "PUT", "Connected=" + (card.connected ? "false" : "true")); card.boost = 3; await pollCard(card); }
+    catch(e){ toast(t("err") + ": " + e.message, true); }
+  };
+  kind.build(card, el.querySelector(".body"));
+  $("cards").append(el); cards.push(card); saveCards(); refreshEmpty();
+  if(!silent){ toast(t("addDone")); hostEdit("add", dev); }
+  pollCard(card);
+}
+
+function setEnabled(card, on){ card.el.querySelectorAll(".body button,.body input").forEach(x => { x.disabled = !on; }); }
+function renderHead(card){
+  const led = card.el.querySelector(".led"), b = card.el.querySelector("[data-a=conn]");
+  led.className = "led" + (card.fails > 3 ? " err" : card.connected ? " on" : "");
+  b.textContent = card.connected ? t("disconnect") : t("connect");
+  card.el.querySelector(".body").style.opacity = card.connected ? "1" : ".45";
+  if(!card.connected) setEnabled(card, false);
+}
+
+async function pollCard(card){
+  if(card.busy) return; card.busy = true;
+  try{
+    const c = await relay(card.dev, "connected");
+    card.connected = !!c; card.fails = 0;
+    if(card.connected){ if(card.wasConn !== true) setEnabled(card, true); await card.kind.poll(card); }
+    card.wasConn = card.connected;
+  }catch(e){ card.fails++; }
+  card.busy = false; renderHead(card);
+}
+
+// refresh the visible panels one by one (one request at a time)
+(async function scheduler(){
+  for(;;){
+    for(const c of cards.slice()){
+      if(document.hidden) break;
+      await pollCard(c);
+      await sleep(c.boost > 0 ? 80 : 350);
+    }
+    const anyBoost = cards.some(c => c.boost > 0); cards.forEach(c => { if(c.boost > 0) c.boost--; });
+    await sleep(cards.length ? (anyBoost ? 500 : 1700) : 800);
+  }
+})();
+
+// ---------------- telescope ----------------
+function buildTelescope(card, body){
+  body.innerHTML =
+    "<div class='tele-top'>" +
+    "<svg class='dome' viewBox='0 0 150 150'><defs><radialGradient id='dg" + cards.length + "' cx='50%' cy='50%' r='50%'><stop offset='0' stop-color='#13264a'/><stop offset='1' stop-color='#050a16'/></radialGradient></defs>" +
+    "<circle cx='75' cy='75' r='68' fill='url(#dg" + cards.length + ")' stroke='#4da3ff' stroke-opacity='.5' stroke-width='1.5'/>" +
+    "<circle cx='75' cy='75' r='45' fill='none' stroke='#fff' stroke-opacity='.12'/><circle cx='75' cy='75' r='22' fill='none' stroke='#fff' stroke-opacity='.12'/>" +
+    "<path d='M75 7V143M7 75H143' stroke='#fff' stroke-opacity='.1'/>" +
+    "<text x='75' y='16' text-anchor='middle' fill='#9fd6ff' font-size='9' font-weight='700'>N</text><text x='140' y='78' text-anchor='middle' fill='#8e9bb8' font-size='9'>E</text><text x='75' y='144' text-anchor='middle' fill='#8e9bb8' font-size='9'>S</text><text x='10' y='78' text-anchor='middle' fill='#8e9bb8' font-size='9'>W</text>" +
+    "<g class='mk' data-r='mk' style='transform:translate(75px,75px)'><circle r='9' fill='#4da3ff' fill-opacity='.25'/><circle r='4.5' fill='#bfe0ff'/><circle r='4.5' fill='none' stroke='#fff' stroke-width='1'/></g></svg>" +
+    "<div style='flex:1;min-width:150px'><div class='lcd big' data-r='ra'>--:--:--</div><div class='lab'>" + t("ra") + "</div>" +
+    "<div class='lcd big' data-r='dec' style='margin-top:6px'>--:--:--</div><div class='lab'>" + t("dec") + "</div>" +
+    "<div class='lab' style='margin-top:8px'><span data-r='altaz'></span></div></div></div>" +
+    "<div class='badges' data-r='badges'></div>" +
+    "<div class='switch'><button class='tgl' data-r='tgl'></button><b>" + t("tracking") + "</b><span class='note' data-r='rate' style='margin-left:auto'></span></div>" +
+    "<div class='btns'><button class='stop' data-a='abort'>⏹ " + t("abort") + "</button><button data-a='park'>🅿 " + t("park") + "</button><button data-a='unpark'>▶ " + t("unpark") + "</button><button data-a='home'>🏠 " + t("gohome") + "</button></div>";
+  const q = a => body.querySelector("[data-a=" + a + "]"), r = n => body.querySelector("[data-r=" + n + "]"), d = card.dev;
+  const act = (name, fn) => async () => { try{ await fn(); card.boost = 4; toast(t("ok")); await pollCard(card); }catch(e){ toast(t("err") + ": " + e.message, true); } };
+  q("abort").onclick = act("abort", () => relay(d, "abortslew", "PUT", ""));
+  q("park").onclick = act("park", () => relay(d, "park", "PUT", ""));
+  q("unpark").onclick = act("unpark", () => relay(d, "unpark", "PUT", ""));
+  q("home").onclick = act("home", () => relay(d, "findhome", "PUT", ""));
+  r("tgl").onclick = act("trk", () => relay(d, "tracking", "PUT", "Tracking=" + (card.state.tracking ? "false" : "true")));
+}
+
+async function pollTelescope(card){
+  const d = card.dev, S = card.state, body = card.el.querySelector(".body"), r = n => body.querySelector("[data-r=" + n + "]"), q = a => body.querySelector("[data-a=" + a + "]");
+  const ra = await relay(d, "rightascension"), dec = await relay(d, "declination");
+  S.ra = ra; S.dec = dec;
+  S.alt = await tryGet(d, "altitude"); S.az = await tryGet(d, "azimuth");
+  S.tracking = await tryGet(d, "tracking"); S.slewing = await tryGet(d, "slewing");
+  S.park = await tryGet(d, "atpark"); S.home = await tryGet(d, "athome");
+  if(S.caps === undefined){
+    S.caps = {park: await tryGet(d, "canpark"), unpark: await tryGet(d, "canunpark"), home: await tryGet(d, "canfindhome"), trk: await tryGet(d, "cansettracking")};
+  }
+  S.rate = await tryGet(d, "trackingrate");
+  r("ra").textContent = hms(ra); r("dec").textContent = dms(dec);
+  if(typeof S.alt === "number" && typeof S.az === "number"){
+    r("altaz").textContent = t("alt") + " " + S.alt.toFixed(1) + "° / " + t("az") + " " + S.az.toFixed(1) + "°";
+    const rr = Math.max(0, (90 - Math.max(S.alt, 0)) / 90) * 66, a = S.az * Math.PI / 180;
+    r("mk").style.transform = "translate(" + (75 + rr * Math.sin(a)).toFixed(1) + "px," + (75 - rr * Math.cos(a)).toFixed(1) + "px)";
+    r("mk").style.opacity = S.alt < 0 ? ".35" : "1";
+  }else r("altaz").textContent = "";
+  r("badges").innerHTML =
+    (S.slewing ? "<span class='bd warn pulse'>" + t("slewing") + "</span>" : "") +
+    (S.park ? "<span class='bd warn'>" + t("parked") + "</span>" : "<span class='bd'>" + t("unparked") + "</span>") +
+    (S.home ? "<span class='bd on'>" + t("home") + "</span>" : "");
+  r("tgl").classList.toggle("on", !!S.tracking);
+  r("rate").textContent = {0: t("sid"), 1: t("lun"), 2: t("sol"), 3: t("king")}[S.rate] || "";
+  q("abort").disabled = false;
+  q("park").disabled = !S.caps.park || !!S.park; q("unpark").disabled = !S.caps.unpark || !S.park; q("home").disabled = !S.caps.home || !!S.park;
+  r("tgl").disabled = !S.caps.trk;
+}
+
+// ---------------- focuser ----------------
+function buildFocuser(card, body){
+  body.innerHTML =
+    "<div class='focpos'><span class='lcd big' data-r='pos'>-----</span><span class='lab' data-r='unit'></span><span class='spacer'></span><span class='bd' data-r='temp'></span></div>" +
+    "<div class='bar' data-r='bar'><div class='fill' data-r='fill' style='width:0'></div><div class='tg' data-r='tg' style='left:0'></div><div class='th' data-r='th' style='left:0'></div></div>" +
+    "<div class='lab' style='display:flex;justify-content:space-between'><span>0</span><span data-r='mx'></span></div>" +
+    "<div class='steps' data-r='steps'></div>" +
+    "<div class='sep'></div>" +
+    "<div class='row'><div><label>" + t("target_") + "</label><input data-r='ipos' type='number' min='0' inputmode='numeric'></div><div class='fix'><button class='pri' data-a='move'>" + t("moveTo") + "</button></div><div class='fix'><button class='stop' data-a='halt'>⏹ " + t("halt") + "</button></div></div>" +
+    "<div class='note' style='margin-top:8px' data-r='info'></div>";
+  const d = card.dev, r = n => body.querySelector("[data-r=" + n + "]"), S = card.state;
+  const act = fn => async () => { try{ await fn(); card.boost = 8; toast(t("ok")); await pollCard(card); }catch(e){ toast(t("err") + ": " + e.message, true); } };
+  [-1000, -100, -10, 10, 100, 1000].forEach(n => {
+    const b = document.createElement("button"); b.textContent = (n > 0 ? "+" : "") + n;
+    b.onclick = act(async () => {
+      const cur = S.pos || 0, target = S.absolute === false ? n : Math.max(0, Math.min(S.max || 1e9, cur + n));
+      S.target = S.absolute === false ? cur + n : target; await relay(d, "move", "PUT", "Position=" + Math.round(target));
+    });
+    r("steps").append(b);
+  });
+  body.querySelector("[data-a=move]").onclick = act(async () => {
+    const v = parseInt(r("ipos").value); if(isNaN(v)) throw new AlpErr(t("posn"));
+    S.target = v; await relay(d, "move", "PUT", "Position=" + Math.max(0, Math.min(S.max || 1e9, v)));
+  });
+  body.querySelector("[data-a=halt]").onclick = act(() => relay(d, "halt", "PUT", ""));
+}
+
+async function pollFocuser(card){
+  const d = card.dev, S = card.state, body = card.el.querySelector(".body"), r = n => body.querySelector("[data-r=" + n + "]");
+  if(S.max === undefined){ S.max = await tryGet(d, "maxstep") || 0; S.absolute = await tryGet(d, "absolute"); S.stepsize = await tryGet(d, "stepsize"); }
+  const moving = await tryGet(d, "ismoving"), temp = await tryGet(d, "temperature");
+  S.moving = !!moving;
+  if(S.absolute !== false){ S.pos = await tryGet(d, "position"); }
+  r("pos").textContent = S.pos === undefined ? "-----" : String(S.pos);
+  r("unit").textContent = S.absolute === false ? t("relative") : "";
+  r("mx").textContent = S.max ? t("maxstep") + " " + S.max : "";
+  r("temp").textContent = typeof temp === "number" ? "🌡 " + temp.toFixed(1) + " °C" : "";
+  r("temp").style.display = typeof temp === "number" ? "" : "none";
+  const pct = S.max && S.pos !== undefined ? Math.max(0, Math.min(100, S.pos / S.max * 100)) : 0;
+  r("fill").style.width = pct + "%"; r("th").style.left = pct + "%";
+  const bar = r("bar"); bar.classList.toggle("mv", S.moving);
+  if(S.moving && S.target !== undefined && S.max){ r("tg").style.left = Math.max(0, Math.min(100, S.target / S.max * 100)) + "%"; }
+  if(!S.moving) S.target = undefined;
+  r("info").textContent = S.moving ? "⏳ " + t("moving") + "…" : (S.stepsize ? "step size " + S.stepsize + " µm" : "");
+  if(S.pos !== undefined && document.activeElement !== r("ipos") && !r("ipos").value) r("ipos").value = S.pos;
+}
+
+// ---------------- filter wheel ----------------
+function filterColor(name, i){
+  const n = (name || "").trim();
+  if(/^(l|lum|luminance|clear|open)/i.test(n)) return "#f1f5ff";
+  if(/^(r|red)$/i.test(n)) return "#ff4d4d";
+  if(/^(g|green)$/i.test(n)) return "#3ddc84";
+  if(/^(b|blue)$/i.test(n)) return "#4d8bff";
+  if(/h.?(a|alpha|α)|^ha$/i.test(n)) return "#ff3b30";
+  if(/s.?ii|^s2$/i.test(n)) return "#c2185b";
+  if(/o.?iii|^o3$/i.test(n)) return "#19c3b1";
+  if(/dark|none|blank/i.test(n)) return "#444b5c";
+  return "hsl(" + ((i * 67 + 200) % 360) + " 70% 60%)";
+}
+function buildWheel(card, body){
+  body.innerHTML = "<div class='curname' data-r='cur'>-</div><div class='wheelbox'><div class='wheel' data-r='wheel'></div></div><div class='note' style='text-align:center' data-r='info'></div>";
+}
+async function pollWheel(card){
+  const d = card.dev, S = card.state, body = card.el.querySelector(".body"), r = n => body.querySelector("[data-r=" + n + "]");
+  if(!S.names){
+    S.names = (await tryGet(d, "names")) || [];
+    const n = S.names.length, R = 100, cx = 130, cy = 130; let svg = "<svg viewBox='0 0 260 260'><g class='rot' data-r='rot'>" +
+      "<circle cx='130' cy='130' r='122' fill='#0c1226' stroke='#b388ff' stroke-opacity='.45' stroke-width='2'/><circle cx='130' cy='130' r='30' fill='#1a1f3a' stroke='#b388ff' stroke-opacity='.5'/>";
+    S.names.forEach((nm, i) => {
+      const a = (i / n) * 2 * Math.PI - Math.PI / 2, x = cx + R * Math.cos(a), y = cy + R * Math.sin(a), col = filterColor(nm, i), rot = (i / n) * 360;
+      svg += "<g class='slot' data-i='" + i + "'><circle class='f' cx='" + x.toFixed(1) + "' cy='" + y.toFixed(1) + "' r='" + (n > 6 ? 19 : 23) + "' fill='" + col + "' fill-opacity='.9' stroke='#0008' stroke-width='1'/>" +
+        "<text x='" + x.toFixed(1) + "' y='" + (y + 4).toFixed(1) + "' text-anchor='middle' font-size='" + (n > 6 ? 9 : 11) + "' font-weight='800' fill='#06101f' transform='rotate(" + rot + " " + x.toFixed(1) + " " + y.toFixed(1) + ")'>" + nm.replace(/&/g, "&amp;").replace(/</g, "&lt;").slice(0, 5) + "</text></g>";
+    });
+    svg += "</g><path class='pointer' d='M130 -2 l-10 -16 h20 z' fill='#fff' transform='translate(0 10)'/></svg>";
+    r("wheel").innerHTML = svg;
+    r("wheel").querySelectorAll(".slot").forEach(g => g.onclick = async () => {
+      if(!card.connected) return toast(t("needConn"), true);
+      try{ await relay(d, "position", "PUT", "Position=" + g.dataset.i); card.boost = 10; toast(t("ok")); await pollCard(card); }
+      catch(e){ toast(t("err") + ": " + e.message, true); }
+    });
+  }
+  const pos = await relay(d, "position"); S.pos = pos;
+  const n = S.names.length, rot = r("rot");
+  if(pos >= 0 && n){ S.lastAngle = -(pos / n) * 360; rot.style.transform = "rotate(" + S.lastAngle + "deg)"; r("cur").textContent = S.names[pos] || ("#" + pos); r("info").textContent = ""; }
+  else{ r("cur").textContent = t("wheelMoving"); r("info").textContent = "⏳"; }
+  r("wheel").querySelectorAll(".slot").forEach(g => g.classList.toggle("cur", +g.dataset.i === pos));
+  if(S.nameShown === undefined){ S.nameShown = true; }
+}
+
+// ---------------- detecting and adding devices ----------------
+function typeBadge(ty){ const k = typeKey(ty); return "<span class='dev-t t-" + (KINDS[k] ? k : "other") + "'>" + ty + "</span>"; }
+function showFound(list){
+  const box = $("found"); box.innerHTML = "";
+  if(!list.length){ box.innerHTML = "<span class='note'>" + t("none") + "</span>"; return; }
+  list.forEach(x => {
+    const k = typeKey(x.type), ok = !!KINDS[k];
+    const c = document.createElement("span"); c.className = "chip" + (ok ? "" : " dis");
+    c.innerHTML = typeBadge(x.type) + "<span></span>";
+    c.lastChild.textContent = x.name + " (" + x.host + ":" + x.port + " #" + x.num + ")" + (ok ? "" : " " + t("soon"));
+    if(ok) c.onclick = () => addCard({host: x.host, port: x.port, type: k, num: x.num, name: x.name});
+    box.append(c);
+  });
+}
+function parseList(host, port, payload){
+  const arr = (payload && (payload.Value || payload)) || [];
+  return (Array.isArray(arr) ? arr : []).filter(x => !/aibridge|ai-bridge/i.test((x.UniqueID || "") + " " + (x.DeviceName || "")))
+    .map(x => ({host, port, type: x.DeviceType, num: x.DeviceNumber, name: x.DeviceName}));
+}
+$("bFind").onclick = async () => {
+  const v = $("target").value.trim(), box = $("found");
+  box.innerHTML = "<span class='note'>" + t("detecting") + "</span>";
+  try{
+    let list = [];
+    if(v){ // the device list of the given address
+      const m = /^(.+?)(?::(\d+))?$/.exec(v), host = m[1], port = m[2] || "11111";
+      // the AiBridge Host relay can also relay /management/v1/configureddevices (not supported by the AiBridge firmware)
+      const j = await (await fetch(BASE + "/api/external/alpaca?target=" + enc(host) + "&port=" + port + "&device=management&number=0&property=configureddevices")).json().catch(() => null);
+      list = j && j.status === "success" ? parseList(host, +port, j.data) : [];
+      if(!list.length){
+        const dj = await (await fetch(BASE + "/api/external/discover")).json().catch(() => ({}));
+        (dj.data || []).filter(s => s.ip === host).forEach(s => list.push(...parseList(s.ip, s.port, s.devices)));
+      }
+      if(!list.length) list = ["Telescope", "Focuser", "FilterWheel"].map(ty => ({host, port: +port, type: ty, num: 0, name: ty + " #0"}));
+    }else{
+      const dj = await (await fetch(BASE + "/api/external/discover")).json();
+      (dj.data || []).forEach(s => list.push(...parseList(s.ip, s.port, s.devices)));
+    }
+    showFound(list);
+    if(v) store.set("target", v);
+  }catch(e){ box.innerHTML = "<span class='note'>" + t("err") + ": " + e.message + "</span>"; }
+};
+
+// ---------------- texts and start ----------------
+function applyLang(){
+  document.documentElement.lang = lang;
+  $("tagline").textContent = t("tagline"); $("hFind").textContent = t("find"); $("lTarget").textContent = t("target"); $("bFind").textContent = "🔎 " + t("detect");
+  $("hint").textContent = t("hint"); $("emptyTxt").innerHTML = t("emptyTxt");
+  $("brand").textContent = "LUNA AiBridge Alpaca Console v" + VERSION;
+  $("supT").textContent = t("supT"); $("supP").textContent = t("supP"); $("supL").textContent = t("supL"); $("supC").textContent = t("supC"); $("supX").textContent = t("close");
+}
+$("sup").onclick = () => $("supOv").classList.add("show"); $("supX").onclick = () => $("supOv").classList.remove("show");
+$("supOv").onclick = e => { if(e.target === $("supOv")) $("supOv").classList.remove("show"); };
+applyLang();
+$("target").value = store.get("target", "");
+(async () => {
+  const hl = await hostDevices();
+  const mine = hl ? hl.filter(e => e.proto === "alpaca") : null;
+  if(mine && !mine.length){ // if the Host has no list yet, hand the panels kept in this browser over to the Host
+    for(const d of store.get("devices", [])){ addCard(d, true); await hostEdit("add", d); }
+  }else if(mine){ mine.forEach(e => addCard(fromEntry(e), true)); }
+  else store.get("devices", []).forEach(d => addCard(d, true));
+  refreshEmpty();
+})();
+// when opened from AiBridge Host (PC), use an Alpaca server on this PC as the default suggestion
+fetch(BASE + "/api/host", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(h => { if(h && h.type === "proxy" && !$("target").value) $("target").placeholder = "127.0.0.1:11111"; }).catch(() => {});
+</script>
+</body>
+</html>

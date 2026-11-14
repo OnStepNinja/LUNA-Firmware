@@ -388,6 +388,25 @@
    "changes": {
     "en": "Longest untracked exposure (test)"
    }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "alpaca_console_en.html",
+   "version": "0.1",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/alpaca_console_en.html",
+   "size": 37718,
+   "sha256": "3b72a1752d2bead3a8d25067fac2906260150b6637d9f0e1ad0f38b598a3727d",
+   "title": {
+    "en": "Alpaca device panel (focuser, filter wheel, telescope)"
+   },
+   "category": {
+    "en": "Tools"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Control ASCOM Alpaca devices on your LAN from the board's web page: a focuser (position, move, temperature), a filter wheel and a telescope. After downloading, open http://<board IP>/alpaca_console_en.html, enter the address of your Alpaca server (for example 192.168.1.50:11111) and press \"Detect on network\". [Caution] This moves real equipment. Check that nothing can collide or tangle before you press a button. Camera images are not supported."
+   }
   }
  ],
  "data": [
