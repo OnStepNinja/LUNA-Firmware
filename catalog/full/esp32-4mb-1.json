@@ -28,6 +28,39 @@
    "product": "NS-4000",
    "mark": "LUNA OnStepNinja NS-4000 v",
    "name": "OnStepNinja NS-4000",
+   "version": "1.2.10",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.10_en.bin",
+   "size": 1339712,
+   "sha256": "8b86e77262a88b9f7e1e923940bc187b87c7fcb80fd7a189065303c566ccf967",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware"
+   },
+   "changes": {
+    "en": "Test distribution. New in 1.2.10: (1) The guide rate (0.25x, 0.5x or 1x sidereal) can now be set from Alpaca software such as NINA, PHD2 and LUNA Imaging. The new command :SX90,0.5# changes only the guide rate (unlike :R0# to :R2#, the manual move rate stays the same). (2) Shorter waits when an observing app sends many requests at once (an idle connection is closed after 1 s; the relay gives up on a device that does not answer after 1 s and answers at once for the next 10 s). In our test the longest wait went from 8.7 s to 1.3 s. The Wi-Fi fix of 1.2.8 is included. To upgrade, download this firmware and start it. Settings, Wi-Fi and apps are kept. To go back, install 1.2.8 from \"Older versions\""
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/starchart_ns4000.jpg",
+     "caption": {
+      "en": "Example of the star chart (connected to the NS-4000)"
+     }
+    }
+   ],
+   "hw": "ns4000",
+   "color": "blue",
+   "variant": {
+    "en": "German equatorial"
+   }
+  },
+  {
+   "product": "NS-4000",
+   "mark": "LUNA OnStepNinja NS-4000 v",
+   "name": "OnStepNinja NS-4000",
    "version": "1.2.8",
    "lang": "en",
    "layout": "esp32-4mb-1",
@@ -61,6 +94,32 @@
    "product": "NS-4000-FORK",
    "mark": "LUNA OnStepNinja NS-4000 Fork v",
    "name": "OnStepNinja NS-4000 Fork",
+   "version": "1.2.10",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.10_en_fork.bin",
+   "size": 1338848,
+   "sha256": "13b65be2f5f15ad1ef8d04840eb9029bc67a8bf908d94289718d2873f1adacc2",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for a fork equatorial mount"
+   },
+   "changes": {
+    "en": "Test distribution. New in 1.2.10: (1) The guide rate (0.25x, 0.5x or 1x sidereal) can now be set from Alpaca software such as NINA, PHD2 and LUNA Imaging. The new command :SX90,0.5# changes only the guide rate (unlike :R0# to :R2#, the manual move rate stays the same). (2) Shorter waits when an observing app sends many requests at once (an idle connection is closed after 1 s; the relay gives up on a device that does not answer after 1 s and answers at once for the next 10 s). In our test the longest wait went from 8.7 s to 1.3 s. The Wi-Fi fix of 1.2.8 is included. To upgrade, download this firmware and start it. Settings, Wi-Fi and apps are kept. To go back, install 1.2.8 from \"Older versions\""
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "green",
+   "variant": {
+    "en": "Fork"
+   }
+  },
+  {
+   "product": "NS-4000-FORK",
+   "mark": "LUNA OnStepNinja NS-4000 Fork v",
+   "name": "OnStepNinja NS-4000 Fork",
    "version": "1.2.8",
    "lang": "en",
    "layout": "esp32-4mb-1",
@@ -81,6 +140,32 @@
    "color": "green",
    "variant": {
     "en": "Fork"
+   }
+  },
+  {
+   "product": "NS-4000-ALTAZ",
+   "mark": "LUNA OnStepNinja NS-4000 AltAz v",
+   "name": "OnStepNinja NS-4000 Alt-Az",
+   "version": "1.2.10",
+   "lang": "en",
+   "layout": "esp32-4mb-1",
+   "chip": "esp32",
+   "status": "test",
+   "minBase": "0.7.0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/NS4000_v1.2.10_en_altazm.bin",
+   "size": 1338656,
+   "sha256": "54f35d6a576b1772b094c7f3ef795da3a14512dab5dfa03c6edddf5ad5539192",
+   "title": {
+    "en": "Test distribution. OnStep + AiBridge mount firmware for an alt-azimuth mount"
+   },
+   "changes": {
+    "en": "Test distribution. New in 1.2.10: (1) The guide rate (0.25x, 0.5x or 1x sidereal) can now be set from Alpaca software such as NINA, PHD2 and LUNA Imaging. The new command :SX90,0.5# changes only the guide rate (unlike :R0# to :R2#, the manual move rate stays the same). (2) Shorter waits when an observing app sends many requests at once (an idle connection is closed after 1 s; the relay gives up on a device that does not answer after 1 s and answers at once for the next 10 s). In our test the longest wait went from 8.7 s to 1.3 s. The Wi-Fi fix of 1.2.8 is included. To upgrade, download this firmware and start it. Settings, Wi-Fi and apps are kept. To go back, install 1.2.8 from \"Older versions\""
+   },
+   "license": "GPL v3 (source: https://github.com/OnStepNinja/OnStepNinja-NS4000)",
+   "hw": "ns4000",
+   "color": "orange",
+   "variant": {
+    "en": "Alt-Az"
    }
   },
   {
