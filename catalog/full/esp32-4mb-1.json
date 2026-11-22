@@ -359,6 +359,25 @@
   {
    "product": "NS-4000 / NS-5000X",
    "name": "starchart_en.html",
+   "version": "0.9.3",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/0.9.3/starchart_en.html",
+   "size": 99463,
+   "sha256": "c11e9c9c4145fb09dde0eb2962bc387cd627480f0a1d04415b683d131650edb4",
+   "title": {
+    "en": "Star chart (English)"
+   },
+   "category": {
+    "en": "Star chart"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Needs 2 files: this one and \"Star chart data\". Download both. NS-5000X (v0.8.4 or later) now gets the Speed, Tracking, Park/Home, Limits and Mechanics tabs in Mount control. The GOTO speed is chosen by speed-table number, and Save keeps it after power-off. Mechanics applies steps/degree (base constant / 360) at once"
+   }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "starchart_en.html",
    "version": "0.9.1",
    "lang": "en",
    "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/common/starchart_en.html",
