@@ -1,0 +1,1897 @@
+<!doctype html>
+<!--
+  LUNA Imaging v0.21 preview (English, capture only)  Copyright (c) 2026 Nishioka Sadahiko. Freeware.
+  Captures images with an ASCOM Alpaca camera and keeps them in this browser (thumbnails; save as FITS / PNG).
+  The browser receives images directly from the Alpaca server (ImageBytes), so the Alpaca server must allow
+  this page (http://<board IP>) by CORS.
+  This preview shows the capture functions only. Autofocus and on-board autoguiding will follow.
+  Made from the Japanese luna_imaging.html v0.21 by tools/make_imaging_en.py.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUNA Imaging</title>
+<style>
+:root{--bg:#07090f;--pan:#111724;--pan2:#182033;--line:#2a3550;--txt:#e6ebf5;--sub:#8b97b0;--acc:#5aa9ff;--go:#e5484d;--ok:#34d399;--warn:#fbbf24;--star:#f5c542}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:14px -apple-system,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif}
+html.red{filter:grayscale(1) sepia(1) saturate(6) hue-rotate(-50deg) brightness(.75)}
+body{display:grid;grid-template-rows:auto minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr);height:100dvh}
+#thumbs{min-width:0}
+header{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header b{font-size:15px;margin-right:6px}
+nav{display:flex;gap:4px}
+button,select,input{font:inherit;color:var(--txt);background:var(--pan2);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+button{cursor:pointer}button:hover{border-color:var(--acc)}button:disabled{opacity:.45;cursor:default}
+nav button.on{background:#17345a;border-color:var(--acc);color:#cfe5ff}
+#stat{margin-left:auto;color:var(--sub);font-size:12px;display:flex;gap:12px;align-items:center}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;margin-right:4px}.dot.on{background:var(--ok)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 270px;min-height:0}
+#view{position:relative;background:#000;min-height:0;overflow:hidden;touch-action:none}
+#cv{width:100%;height:100%;display:block}
+#info{position:absolute;left:8px;bottom:6px;font:12px monospace;color:#aab;text-shadow:0 0 3px #000;pointer-events:none}
+#empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sub);text-align:center;padding:20px;pointer-events:none}
+aside{background:var(--pan);border-left:1px solid var(--line);padding:10px;overflow:auto}
+section{display:none}section.on{display:block}
+label{display:block;color:var(--sub);font-size:12px;margin:8px 0 3px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.row>*{min-width:0}
+aside{min-width:0}select{text-overflow:ellipsis}
+input,select{width:100%}
+#go{display:block;width:120px;height:120px;border-radius:50%;margin:14px auto 6px;background:var(--go);border:none;color:#fff;font-size:18px;font-weight:700}
+#go.run{background:#7a1f22}
+.bar{height:6px;background:var(--pan2);border-radius:3px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+#prog{text-align:center;color:var(--sub);font-size:12px;min-height:1.4em;margin-top:4px}
+.small{color:var(--sub);font-size:12px;line-height:1.5}
+.big{font:700 26px monospace;color:#ffd08a}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px}.steps button{padding:6px 0;font-size:12px}
+.fsteps{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;font-size:11px;text-align:center}
+.fsteps span{padding:5px 2px;border-radius:6px;background:var(--pan2);color:var(--sub);border:1px solid transparent}
+.fsteps span.done{color:var(--ok)}.fsteps span.cur{border-color:var(--warn);color:#ffe7a3;background:#2a2410}
+#gbox{background:#2e2414;border:1px solid #6b5230;border-radius:8px;padding:6px 8px;margin:4px 0 6px}#gbox.busy{background:#3d2c12;border-color:#d59a45}#gbox .help{background:transparent;border-left:0;padding:4px 0 0;margin:0;color:#ffe3bd;font-size:13px}
+.help{background:#1a2238;border-left:3px solid var(--warn);padding:7px 9px;font-size:12px;line-height:1.6;margin:6px 0 4px;border-radius:0}
+.hfrbox{margin-top:8px}.trend{font-size:13px;font-weight:700}.trend.g{color:var(--ok)}.trend.b{color:var(--go)}.trend.s{color:var(--sub)}
+.autobox{margin-top:10px;padding-top:8px;border-top:1px solid var(--line)}
+.wide{width:100%;margin-top:6px;background:#17345a;border-color:var(--acc)}
+#gmini{width:100%;height:70px;background:#05070c;border-radius:6px;display:block;margin-top:3px}
+#ggraph{width:100%;height:150px;background:#05070c;border-radius:6px;margin-top:6px;display:block}
+#gstat.gon{color:var(--ok);font-weight:700}
+details{margin-top:8px}
+.srvl{display:flex;flex-direction:column;gap:6px;margin-top:6px}.srvi{display:block;width:100%;text-align:left;padding:6px 8px;line-height:1.45}.srvi.on{border-color:var(--acc);background:#1b2a44}.srvi b{display:block;font:600 12px monospace}.srvi span{display:block;font-size:12px;color:var(--sub)}
+#fgraph{width:100%;height:150px;background:#05070c;border-radius:6px;margin-top:6px;display:block}
+#hist{width:100%;height:60px;background:#05070c;border-radius:6px;margin-top:4px;display:block}
+footer{border-top:1px solid var(--line);padding:6px 8px;display:flex;gap:8px;align-items:center;min-height:84px}
+#thumbs{display:flex;gap:6px;overflow-x:auto;flex:1;padding-bottom:2px}
+.th{position:relative;flex:0 0 auto;width:96px;height:72px;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;background:#111}
+.th img{width:100%;height:100%;object-fit:cover;display:block}.th.sel{border-color:var(--acc)}
+.th .n{position:absolute;left:3px;bottom:2px;font:11px monospace;color:#ccd;text-shadow:0 0 3px #000}
+.th .st{position:absolute;right:2px;top:1px;background:none;border:none;padding:0 3px;font-size:16px;color:#888;text-shadow:0 0 3px #000}.th .st.on{color:var(--star)}
+#acts{display:flex;flex-direction:column;gap:4px;align-items:stretch;font-size:12px;min-width:110px}
+#acts .cnt{color:var(--sub);text-align:center}
+#toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:#1d2740;border:1px solid var(--line);padding:8px 14px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
+#toast.show{opacity:1}#toast.err{border-color:var(--go);color:#ffc4c4}
+@media (max-width:760px){body{height:auto;min-height:100dvh}main{grid-template-columns:1fr}#view{height:58vh}aside{border-left:none;border-top:1px solid var(--line)}}
+
+/* ガイド情報画面(v0.11: 全画面をやめて、ガイド画面の左側に出す) */
+.gdash{position:absolute;inset:0;z-index:5;background:var(--bg);display:none;overflow:auto}
+.gdash.on{display:block}
+.gdash header{gap:14px}
+.gdbadge{border-radius:999px;padding:3px 12px;font-weight:700;border:1px solid var(--sub);color:var(--sub)}
+.gdbadge.on{background:#0f3a2a;color:var(--ok);border-color:var(--ok)}.gdbadge.cal{background:#2a2410;color:var(--warn);border-color:var(--warn)}
+.gdk{color:var(--sub);font-size:11px;display:block}.gdv{display:flex;flex-direction:column}.gdv b{font:700 18px monospace}
+.gdbig{font:700 28px monospace;color:#ffd08a}.gdsp{flex:1}
+#gdMsg{padding:3px 12px;color:var(--sub);font-size:12px;border-bottom:1px solid var(--line)}
+.gdgrid{display:grid;gap:8px;padding:8px;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,.95fr) minmax(0,.95fr);grid-template-rows:340px 330px;
+  grid-template-areas:"star tgt tbl tbl" "graph graph adv cal"}
+.gdgrid .a-star{grid-area:star}.gdgrid .a-tgt{grid-area:tgt}.gdgrid .a-adv{grid-area:adv}.gdgrid .a-graph{grid-area:graph}.gdgrid .a-tbl{grid-area:tbl}.gdgrid .a-cal{grid-area:cal}
+.gdtabs{display:flex;gap:2px}.gdtabs button{padding:4px 10px;border-radius:6px}.gdtabs button.on{background:var(--acc);color:#04101f;border-color:var(--acc)}
+.pegrid{display:none;gap:8px;padding:8px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,.85fr);grid-template-rows:340px 330px;grid-template-areas:"pe spec num" "cmp cmp num"}
+.gdash.pe .gdgrid{display:none}.gdash.pe .pegrid{display:grid}
+.pegrid .a-pe{grid-area:pe}.pegrid .a-spec{grid-area:spec}.pegrid .a-num{grid-area:num}.pegrid .a-cmp{grid-area:cmp}
+.gdnum.pen{grid-template-columns:repeat(2,minmax(0,1fr))}.gdnum.pen b{font-size:13px}
+.pesl{display:flex;gap:10px;align-items:center;margin-top:4px}.pesl input[type=range]{flex:1}.pesl label{display:flex;gap:4px;align-items:center;margin:0;white-space:nowrap}
+.gdsub{font-size:11px;color:var(--sub);margin:-2px 0 4px}.gdsub b{color:var(--txt);font:600 12px monospace}
+.gdtw th.ra,.gdtw td.ra{color:#5aa9ff}.gdtw th.de,.gdtw td.de{color:#ff6b6b}
+#gsel{width:100%;height:190px;background:#05070c;border-radius:6px;margin-top:6px;display:none}
+.gp{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;min-height:0;min-width:0}
+.gp h3{margin:0 0 4px;font-size:12px;color:var(--sub);font-weight:600;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.gp h3 b{color:var(--txt);font-weight:600}
+.gp canvas{width:100%;flex:1;min-height:0;display:block;background:#05070c;border-radius:6px}
+.gdnum{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}.gdnum div{background:var(--pan2);border-radius:6px;padding:4px 6px}.gdnum b{font:600 14px monospace}
+.gdtw{overflow:auto;flex:1;min-height:0}.gdtw table{width:100%;border-collapse:collapse;font:11px monospace}
+.gdtw th,.gdtw td{padding:2px 4px;text-align:right;border-bottom:1px solid #1d2638}.gdtw th{color:var(--sub);font-weight:400;position:sticky;top:0;background:var(--pan)}.gdtw thead tr:nth-child(2) th{top:17px}.gdtw td.f{text-align:left;color:var(--warn)}
+.adv{margin-top:6px;background:#2a2410;border-left:3px solid var(--warn);padding:5px 8px;font-size:12px;line-height:1.5;border-radius:0}
+.adv.ok{background:#0f2a20;border-color:var(--ok)}.adv.bad{background:#3a1416;border-color:var(--go)}
+.gdnote{margin-top:6px;font-size:11px;color:var(--sub);line-height:1.5}
+.gdnum.r6{grid-template-columns:repeat(3,minmax(0,1fr))}.gdnum.r6 div{padding:3px 5px}.gdnum.r6 b{font-size:12px}
+.hb{margin-left:auto;width:20px;height:20px;padding:0;border-radius:50%;font:700 12px/18px serif;color:var(--acc);background:var(--pan2);border:1px solid var(--line);flex:0 0 auto}
+.hb:hover{border-color:var(--acc);color:#cfe5ff}
+#hdlg{max-width:min(560px,92vw);background:var(--pan);color:var(--txt);border:1px solid var(--acc);border-radius:12px;padding:14px 18px}
+#hdlg::backdrop{background:rgba(0,0,0,.6)}#hdlg h3{margin:0 0 8px;font-size:15px}#hdlg p{margin:6px 0;font-size:13px;line-height:1.65}
+#hdlg ul{margin:4px 0 8px;padding-left:20px;font-size:13px;line-height:1.65}#hdlg .k{color:var(--warn);font-weight:700}
+@media (max-width:1100px){.pegrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:320px auto 320px;grid-template-areas:"pe pe" "spec num" "cmp cmp"}.pegrid .a-spec{min-height:240px}}
+@media (max-width:1100px){.gdgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:350px 300px 240px 200px 210px;grid-template-areas:"star star" "tgt tbl" "graph graph" "adv cal" "adv cal"}}
+@media (max-width:760px){#view.gi{height:auto;min-height:58vh}#view.gi .gdash{position:static}.gdgrid{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"star" "tgt" "adv" "graph" "tbl" "cal"}.pegrid{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"pe" "spec" "num" "cmp"}.gp{min-height:260px}.gp.a-star{min-height:340px}}
+</style>
+</head>
+<body>
+<header>
+  <b>LUNA Imaging <span style="font:600 11px sans-serif;color:#f0b44c">PREVIEW</span> <span id="ver" style="font:400 11px monospace;color:var(--sub)"></span></b>
+  <nav id="modes"><button data-m="shoot" class="on">Capture</button><button data-m="focus" style="display:none">Focus</button><button data-m="guide" style="display:none">Guide</button></nav>
+  <span id="stat"><span><span class="dot" id="cdot"></span><span id="cname">Camera not connected</span></span><span id="ctemp"></span><span id="gstat"></span><button id="red" title="Red night display">Red</button></span>
+</header>
+<main>
+  <div id="view"><canvas id="cv"></canvas><div id="info"></div><div id="empty">Choose a camera with "Find Alpaca devices" on the right, press "Connect", then "Capture"</div>
+<div class="gdash" id="gdash">
+  <header>
+    <span class="gdbadge" id="gdState">●</span>
+    <span class="gdtabs"><button id="gdTabG" class="on">ガイド</button><button id="gdTabP">周期誤差 PE</button></span>
+    <div class="gdv"><span class="gdk">全体 RMS</span><span class="gdbig" id="gdTot">--</span></div>
+    <div class="gdv"><span class="gdk">赤経 RMS</span><b id="gdRa" style="color:#5aa9ff">--</b></div>
+    <div class="gdv"><span class="gdk">赤緯 RMS</span><b id="gdDec" style="color:#ff6b6b">--</b></div>
+    <div class="gdv"><span class="gdk">最大のずれ</span><b id="gdPk">--</b></div>
+    <div class="gdv"><span class="gdk">ガイドの速さ</span><b id="gdRate">--</b></div>
+    <div class="gdv"><span class="gdk">回数 / 見失い / 断られ</span><b id="gdCnt">--</b></div>
+    <div class="gdv"><span class="gdk" id="gdIntK">間隔</span><b id="gdInt">--</b></div>
+    <span class="gdsp"></span>
+    <button id="gdClose">星を選ぶ画面へ</button><button id="gdStop" style="background:#5a1f22;border-color:var(--go)">止める</button>
+  </header>
+  <div id="gdMsg"></div>
+  <div class="gdgrid" id="gdGrid">
+    <section class="gp a-star"><h3>ガイド星 周辺画像・輝度分布 <b>緑 + = 基準の位置、黄 ○ = いまの中心</b><button class="hb" data-h="star" title="このグラフの説明">i</button></h3>
+      <div class="gdsub">中心 x,y = <b id="gdCen">--</b> 画素(センサー座標)  ・  <span id="gdSize"></span></div><canvas id="gdStarCv"></canvas></section>
+    <section class="gp a-tgt"><h3>ガイド誤差の散布図 <b>最近 100 回、円 = 1″・2″</b><button class="hb" data-h="tgt" title="このグラフの説明">i</button></h3><canvas id="gdTgtCv"></canvas></section>
+    <section class="gp a-adv"><h3>ガイド星の状態と助言<button class="hb" data-h="adv" title="このグラフの説明">i</button></h3>
+      <div class="gdnum r6" style="margin-top:0"><div><span class="gdk">背景</span><b id="gdBg">--</b></div><div><span class="gdk">雑音 σ</span><b id="gdNs">--</b></div><div><span class="gdk">ピーク</span><b id="gdPeak">--</b></div>
+        <div><span class="gdk">SN</span><b id="gdSn">--</b></div><div><span class="gdk">HFR</span><b id="gdHfr">--</b></div><div><span class="gdk">飽和</span><b id="gdSat">--</b></div></div>
+      <div id="gdAdv" style="overflow:auto;min-height:0"></div></section>
+    <section class="gp a-graph"><h3>ガイド誤差の推移(赤経・赤緯) <b id="gdGraphHd"></b> <b style="color:#5aa9ff">赤経</b> <b style="color:#ff6b6b">赤緯</b> <b>棒 = パルスの長さ</b><button class="hb" data-h="graph" title="このグラフの説明">i</button></h3><canvas id="gdGraphCv"></canvas></section>
+    <section class="gp a-tbl"><h3>パルスガイドの記録 <b>新しい順、+ = 西・北</b><button class="hb" data-h="tbl" title="このグラフの説明">i</button></h3><div class="gdtw"><table id="gdTbl"><thead><tr><th rowspan="2">時刻</th><th class="ra" colspan="2" style="text-align:center">赤経</th><th class="de" colspan="2" style="text-align:center">赤緯</th><th rowspan="2">SN</th><th rowspan="2">印</th></tr>
+      <tr><th class="ra">誤差″</th><th class="ra">パルス ms</th><th class="de">誤差″</th><th class="de">パルス ms</th></tr></thead><tbody></tbody></table></div></section>
+    <section class="gp a-cal"><h3>校正 <b id="gdCalHd"></b><button class="hb" data-h="cal" title="このグラフの説明">i</button></h3><canvas id="gdCalCv"></canvas><div class="gdnote" id="gdCalNote"></div></section>
+  </div>
+  <div class="pegrid" id="peGrid">
+    <section class="gp a-pe"><h3>周期誤差(PE)の重ね描き(赤経) <b id="peHd"></b><button class="hb" data-h="pe" title="このグラフの説明">i</button></h3><canvas id="peCv"></canvas></section>
+    <section class="gp a-spec"><h3>周期の成分 <b id="peSpecHd"></b><button class="hb" data-h="spec" title="このグラフの説明">i</button></h3><canvas id="peSpecCv"></canvas></section>
+    <section class="gp a-num"><h3>PE の数値<button class="hb" data-h="penum" title="この欄の説明">i</button></h3>
+      <div class="gdnum pen" style="margin-top:0">
+        <div><span class="gdk">P-P(山から谷)</span><b id="peP2P">--</b></div><div><span class="gdk">片振幅</span><b id="peAmp">--</b></div>
+        <div><span class="gdk">RMS</span><b id="peRms">--</b></div><div><span class="gdk">周期</span><b id="pePerV">--</b></div>
+        <div><span class="gdk">測った長さ</span><b id="peLen">--</b></div><div><span class="gdk">点の数</span><b id="peN">--</b></div>
+        <div><span class="gdk">赤経の流れ</span><b id="peDrR">--</b></div><div><span class="gdk">赤緯の流れ</span><b id="peDrD">--</b></div></div>
+      <label style="margin-top:8px">比べる(保存した測定を重ねる)</label><select id="peCmp"></select>
+      <div class="row" style="margin-top:6px"><button id="peSave">この測定を保存</button><button id="peCsv">CSV に書き出す</button></div>
+      <button id="peDel" style="margin-top:6px">選んだ保存を消す</button>
+      <div class="gdnote" id="peNote"></div></section>
+    <section class="gp a-cmp"><h3>ガイド誤差・再生した PE・測った PE(1 周期分) <b id="peCmpHd"></b><button class="hb" data-h="cmp" title="このグラフの説明">i</button></h3>
+      <canvas id="peCmpCv"></canvas>
+      <div class="pesl"><input type="range" id="peSl" min="0" max="1000" value="1000"><label class="small"><input type="checkbox" id="peLive" checked> いまを表示</label><span class="small" id="peSlT"></span></div></section>
+  </div>
+</div></div>
+  <aside>
+    <section data-p="shoot" class="on">
+      <button id="disc" class="wide" style="margin-top:0">Find Alpaca devices</button>
+      <div id="srv" class="srvl" style="display:none"></div>
+      <details id="manual"><summary class="small">Not found? Enter the address by hand</summary>
+      <input id="host" placeholder="192.168.3.23:11111" autocomplete="off" style="margin-top:6px">
+      <div style="margin-top:6px"><button id="scan">Read devices at this address</button></div>
+      <p class="small" style="margin:4px 0 0">Usually "Find Alpaca devices" is enough. Enter host:port only for an Alpaca server that does not answer discovery (another network, discovery turned off, etc.).</p>
+      </details>
+      <label>Camera</label>
+      <div class="row"><select id="cam"></select><button id="conn">Connect</button></div>
+      <p class="small" id="camInfo"></p>
+      <hr style="border:0;border-top:1px solid var(--line,#333);margin:10px 0 4px">
+      <div class="row">
+        <div><label>Exposure (s)</label><input id="exp" type="number" min="0.001" step="0.1"></div>
+        <div><label>Frames</label><input id="count" type="number" min="1" max="999" step="1"></div>
+      </div>
+      <div class="row">
+        <div><label>Binning</label><select id="bin"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <div><label>Type</label><select id="type"><option value="Light">Light</option><option value="Dark">Dark</option><option value="Flat">Flat</option><option value="Bias">Bias</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>Interval (s)</label><input id="interval" type="number" min="0" step="1"></div>
+        <div><label>Save</label><select id="save"><option value="1">Keep as thumbnail</option><option value="0">Do not keep</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>Frames to keep (★ kept)</label><select id="keep"><option>10</option><option>15</option><option>20</option></select></div>
+        <div></div>
+      </div>
+      <button id="go">Capture</button>
+      <div class="bar"><i id="pbar"></i></div>
+      <div id="prog"></div>
+      <div id="gminiBox" style="display:none;margin-top:8px"><div class="small" id="gminiT"></div><canvas id="gmini" width="250" height="70"></canvas></div>
+      <div style="text-align:center;margin-top:6px"><button id="snap">Test shot (not kept)</button></div>
+      <label>Display stretch (the image data is not changed)</label>
+      <input id="str" type="range" min="1" max="10" step="1">
+      <canvas id="hist" width="250" height="60"></canvas>
+      <details><summary class="small">Manage thumbnails</summary>
+      <p class="small" id="usage"></p>
+      <button id="clear">Delete all except ★</button>
+      <p class="small">Images are kept inside this browser (not on the board). Other browsers and phones cannot see them.<br>On the Alpaca server, allow this page's address (<span id="origin"></span>) by CORS.</p>
+      </details>
+    </section>
+    <section data-p="focus">
+      <div class="fsteps" id="fsteps"><span>① 接続</span><span>② 星を選ぶ</span><span>③ 動かして測る</span><span>④ 最良へ</span></div>
+      <p class="help" id="fhelp"></p>
+      <label>フォーカサー</label>
+      <div class="row"><select id="foc"></select><button id="fconn">接続</button></div>
+      <div class="row">
+        <div><label>Exposure (s)</label><input id="fexp" type="number" min="0.01" step="0.1"></div>
+        <div><label>星の周り(画素)</label><select id="froi"><option>150</option><option>300</option><option>500</option></select></div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px"><span id="fpos" class="big">-----</span><span id="ftemp" class="small"></span><span id="fmov" class="small"></span></div>
+      <div class="steps"><button data-d="-1000">-1000</button><button data-d="-100">-100</button><button data-d="-10">-10</button><button data-d="10">+10</button><button data-d="100">+100</button><button data-d="1000">+1000</button></div>
+      <div class="row" style="margin-top:6px"><input id="ftarget" type="number" step="1" placeholder="目標の位置"><div style="display:flex;gap:6px"><button id="fmove" style="flex:1">移動</button><button id="fhalt">止</button></div></div>
+      <button id="fpick" class="wide" style="margin-top:8px">② 全体を撮って星を選ぶ</button>
+      <div class="autobox">
+        <label style="margin-top:0">手で合わせる(②のあと)</label>
+        <button id="flive" class="wide">③ ライブ手動で合わせる</button>
+        <p class="small" style="margin:4px 0 0">撮り続けて HFR を表示します。上のボタンでフォーカサーを動かし、HFR が小さくなる所を探します。</p>
+      </div>
+      <div class="hfrbox">
+        <div style="display:flex;align-items:baseline;gap:8px"><span class="small">HFR</span><span id="fhfr" class="big">--</span><span id="ftrend" class="trend"></span></div>
+        <div class="small">星の大きさ。<b>小さいほどピントが合っています</b><span id="fminv"></span></div>
+        <div class="small" id="fsub"></div>
+      </div>
+      <canvas id="fgraph" width="250" height="150"></canvas>
+      <div class="row" style="margin-top:6px"><button id="fbest" disabled>④ 最良の目安へ</button><button id="fclr">グラフを消す</button></div>
+      <div class="autobox">
+        <label style="margin-top:0">自動で合わせる(②のあと)</label>
+        <div class="row"><select id="fstep" title="1 回に動かす量"><option value="50">刻み 50</option><option value="100">刻み 100</option><option value="200">刻み 200</option><option value="500">刻み 500</option><option value="1000">刻み 1000</option></select>
+        <select id="fnum" title="測る点の数"><option value="7">7 か所</option><option value="9">9 か所</option><option value="11">11 か所</option></select></div>
+        <button id="fauto" class="wide">自動で合わせる</button>
+        <p class="small" style="margin:4px 0 0">いまの位置を中心に、前後を刻みずつ動かして HFR を測り、最良の位置へ動かします。刻みは「星が少しぼけて見える」くらいの量にします。</p>
+      </div>
+    </section>
+    <section data-p="guide">
+      <div id="gbox"><div class="fsteps" id="gsteps"><span>① 接続</span><span>② 星を選ぶ</span><span>③ 校正</span><span>④ ガイド</span></div>
+      <p class="help" id="ghelp"></p></div>
+      <label>ガイドカメラ</label>
+      <div class="row"><select id="gcam"></select><button id="gconn">接続</button></div>
+      <label>マウント(補正の送り先)</label>
+      <div class="row"><select id="gmount"></select><button id="gmconn">接続</button></div>
+      <p class="small" id="gmInfo" style="margin:4px 0 0"></p>
+      <div class="row">
+        <div><label>Exposure (s)</label><input id="gexp" type="number" min="0.1" step="0.5"></div>
+        <div><label>ガイド鏡の焦点距離(mm)</label><input id="gfl" type="number" min="10" step="10"></div>
+      </div>
+      <p class="small" id="gdest" style="margin:6px 0 0"></p>
+      <div style="display:none"><select id="gout"><option value="board"></option><option value="alpaca"></option></select><div id="gtelrow"><select id="gtel"></select></div>
+        <select id="gwhere"><option value="browser"></option><option value="board"></option></select></div>
+      <div class="row" style="margin-top:8px"><button id="gloop">② ループ撮影・星を選ぶ</button><button id="gcal">③ 校正(キャリブレーション)</button></div>
+      <button id="gguide" class="wide">④ ガイド開始</button>
+      <div class="row" style="margin-top:6px">
+        <div><label>ウォームの周期(秒)</label><input id="pePer" type="number" min="30" step="1"></div>
+        <div style="display:none"><select id="peCyc"><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+      </div>
+      <button id="gpe" class="wide">周期誤差(PE)を測る</button>
+      <p class="small" style="margin:4px 0 0">補正を送らずに、星のずれだけを記録します(校正が要ります)。「PE の測定を止める」を押すまで続けます。2 周以上が目安です。周期 = 86164 ÷ ウォームホイールの歯数(144 歯 = 598 秒、180 歯 = 479 秒)。</p>
+      <div class="hfrbox">
+        <div style="display:flex;align-items:baseline;gap:8px"><span class="small">ずれ RMS</span><span id="grms" class="big">--</span></div>
+        <div class="small" id="grmsd">星がどれだけ揺れているか。小さいほど良い(秒角、1" 以内が目安)</div>
+        <div class="small" id="gsub"></div>
+      </div>
+      <canvas id="ggraph" width="250" height="150"></canvas>
+      <canvas id="gsel"></canvas>
+      <button id="gdBtn" class="wide">ガイドのグラフ画面を開く</button>
+      <p class="small" id="gcalinfo"></p>
+      <details><summary class="small">細かい設定</summary>
+        <div class="row">
+          <div><label>校正の 1 回(ms)</label><input id="gcalms" type="number" min="100" step="100"></div>
+          <div><label>補正の強さ(%)</label><input id="gaggr" type="number" min="10" max="100" step="5"></div>
+        </div>
+        <div class="row">
+          <div><label>無視するずれ(画素)</label><input id="gmin" type="number" min="0" step="0.05"></div>
+          <div><label>1 回の最長(ms)</label><input id="gmax" type="number" min="100" step="100"></div>
+        </div>
+      </details>
+    </section>
+  </aside>
+</main>
+<footer>
+  <div id="thumbs"></div>
+  <div id="acts">
+    <div class="cnt" id="tcount">0 frames</div>
+    <button id="dlFits" disabled>Save FITS</button>
+    <button id="dlPng" disabled>Save PNG</button>
+    <button id="del" disabled>Delete</button>
+  </div>
+</footer>
+<dialog id="hdlg"><h3 id="hdT"></h3><div id="hdB"></div><div style="text-align:right;margin-top:10px"><button id="hdX">Close</button></div></dialog>
+<div id="toast"></div>
+<script>
+"use strict";
+const VERSION = "0.21";
+let BN = "NS-4000";   // 基板の名前(画面の文言)。/api/system/info の version(:=V#)が NS-5000X なら "NS-5000X"  v0.21
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ---------- 設定(このブラウザに残す) ----------
+const DEF = {host: "", cam: 0, exp: 2, count: 10, interval: 0, bin: 1, type: "Light", save: "1", keep: 20, str: 5, foc: 0, fexp: 1, froi: 300, fstep: 500, fnum: 9, gcam: 1, gexp: 1.5, gfl: 240, gout: "board", gtel: 0, gcalms: 1000, gaggr: 70, gmin: 0.15, gmax: 2000, gwhere: "board", gmount: "board", pePer: 598, peCyc: 2};
+let S = Object.assign({}, DEF);
+try { Object.assign(S, JSON.parse(localStorage.getItem("li_cfg") || "{}")); } catch (e) {}
+if (!S.host && location.port && location.port !== "80") S.host = location.host;   // 試験用サーバーがページも出しているとき
+function saveCfg(){ try { localStorage.setItem("li_cfg", JSON.stringify(S)); } catch (e) {} }
+
+function toast(msg, err){
+  const t = $("toast"); t.textContent = msg; t.className = "show" + (err ? " err" : "");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.className = "", err ? 5000 : 2500);
+}
+
+// ---------- Alpaca(ブラウザから直接) ----------
+let txid = 1, camInfo = null;
+function base(){ return "http://" + S.host.replace(/^https?:\/\//, "").replace(/\/+$/, ""); }
+const alp = (prop, method, params, timeout) => alpd("camera", S.cam, prop, method, params, timeout);
+const falp = (prop, method, params, timeout) => alpd("focuser", S.foc, prop, method, params, timeout);
+function alpd(dev, num, prop, method, params, timeout){ return alpAt(base(), dev, num, prop, method, params, timeout); }
+async function alpAt(root, dev, num, prop, method, params, timeout){
+  const body = new URLSearchParams(Object.assign({}, params || {}, {ClientID: "4242", ClientTransactionID: String(txid++)}));
+  const url = root + "/api/v1/" + dev + "/" + num + "/" + prop;
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), timeout || 10000);
+  try {
+    const r = method === "PUT" ? await fetch(url, {method: "PUT", body, signal: ac.signal})
+                               : await fetch(url + "?" + body, {cache: "no-store", signal: ac.signal});
+    if (!r.ok) throw new Error("HTTP " + r.status + "(" + prop + ")");
+    const j = await r.json();
+    if (j.ErrorNumber) throw new Error((j.ErrorMessage || "Alpaca error " + j.ErrorNumber) + " (" + prop + ")");
+    return j.Value;
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("No response (" + S.host + ")");
+    if (e instanceof TypeError) throw new Error("Cannot connect. Check the address and the CORS setting of the Alpaca server");
+    throw e;
+  } finally { clearTimeout(tm); }
+}
+
+// 画像: ImageBytes を受け取り、行ごとの並び(y*w+x)の Uint16Array にする
+async function getImage(num){
+  if (num == null) num = S.cam;
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 180000);
+  try {
+    const r = await fetch(base() + "/api/v1/camera/" + num + "/imagearray?ClientID=4242&ClientTransactionID=" + (txid++),
+                          {headers: {Accept: "application/imagebytes"}, cache: "no-store", signal: ac.signal});
+    if (!r.ok) throw new Error("HTTP " + r.status + "(imagearray)");
+    if ((r.headers.get("content-type") || "").includes("imagebytes")) return parseIB(await r.arrayBuffer());
+    const j = await r.json();
+    if (j.ErrorNumber) throw new Error(j.ErrorMessage || "Alpaca error " + j.ErrorNumber);
+    return fromJson(j);
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("Timed out receiving the image");
+    if (e instanceof TypeError) throw new Error("Cannot receive the image (check the CORS setting)");
+    throw e;
+  } finally { clearTimeout(tm); }
+}
+function parseIB(buf){
+  const h = new Int32Array(buf.slice(0, 44));
+  if (h[1]) throw new Error(new TextDecoder().decode(new Uint8Array(buf, h[4] || 44)) || "Alpaca error " + h[1]);
+  const ds = h[4], tt = h[6], rank = h[7], w = h[8], hh = h[9];
+  if (rank !== 2) throw new Error("Color (3-D) images are not supported yet");
+  const T = {1: Int16Array, 2: Int32Array, 3: Float64Array, 4: Float32Array, 6: Uint8Array, 8: Uint16Array}[tt];
+  if (!T) throw new Error("This image type (" + tt + ") is not supported");
+  const src = new T(buf.slice(ds, ds + w * hh * T.BYTES_PER_ELEMENT));
+  const out = new Uint16Array(w * hh);
+  for (let x = 0; x < w; x++) { const o = x * hh; for (let y = 0; y < hh; y++) { const v = src[o + y]; out[y * w + x] = v < 0 ? 0 : v > 65535 ? 65535 : v; } }
+  return {w, h: hh, data: out};
+}
+function fromJson(j){
+  const v = j.Value, w = v.length, hh = v[0].length, out = new Uint16Array(w * hh);
+  if (j.Rank === 3) throw new Error("Color (3-D) images are not supported yet");
+  for (let x = 0; x < w; x++) for (let y = 0; y < hh; y++) { const a = v[x][y]; out[y * w + x] = a < 0 ? 0 : a > 65535 ? 65535 : a; }
+  return {w, h: hh, data: out};
+}
+
+// ---------- 表示(強調は表示だけ。元のデータは変えない) ----------
+const cv = $("cv"), ctx = cv.getContext("2d");
+let off = document.createElement("canvas"), cur = null;     // cur = {w,h,data,meta,id}
+const V = {s: 1, x: 0, y: 0};
+
+function stats(d){
+  const step = Math.max(1, Math.floor(d.length / 200000)), a = [];
+  for (let i = 0; i < d.length; i += step) a.push(d[i]);
+  a.sort((p, q) => p - q);
+  const med = a[a.length >> 1];
+  const dev = a.map(v => Math.abs(v - med)).sort((p, q) => p - q);
+  return {med, mad: dev[dev.length >> 1] || 1, hi: a[Math.floor(a.length * 0.9995)], max: a[a.length - 1]};
+}
+function render(img){
+  const st = stats(img.data), lut = new Uint8Array(65536);
+  const lo = Math.max(0, st.med - 2.8 * 1.4826 * st.mad), hi = Math.max(lo + 1, st.max);
+  const target = 0.04 + S.str * 0.03;                       // 背景の明るさの目標
+  const mb = (st.med - lo) / (hi - lo);
+  const m = mb <= 0 ? 0.5 : ((target - 1) * mb) / (2 * target * mb - target - mb);   // 中間調の変換(背景を target にする)
+  for (let v = 0; v < 65536; v++) {
+    let x = (v - lo) / (hi - lo); x = x < 0 ? 0 : x > 1 ? 1 : x;
+    const y = x === 0 ? 0 : x === 1 ? 1 : ((m - 1) * x) / ((2 * m - 1) * x - m);
+    lut[v] = Math.round(y * 255);
+  }
+  off.width = img.w; off.height = img.h;
+  const oc = off.getContext("2d"), id = oc.createImageData(img.w, img.h), p = id.data, d = img.data;
+  for (let i = 0, j = 0; i < d.length; i++, j += 4) { const g = lut[d[i]]; p[j] = p[j + 1] = p[j + 2] = g; p[j + 3] = 255; }
+  oc.putImageData(id, 0, 0);
+  drawHist(img.data, lo, hi);
+  img.st = st;
+}
+function drawHist(d, lo, hi){
+  const c = $("hist"), g = c.getContext("2d"), W = c.width, H = c.height, bins = new Uint32Array(W);
+  const step = Math.max(1, Math.floor(d.length / 300000));
+  for (let i = 0; i < d.length; i += step) bins[Math.min(W - 1, Math.floor(d[i] / 65536 * W))]++;
+  const mx = Math.log(1 + Math.max(...bins));
+  g.clearRect(0, 0, W, H); g.fillStyle = "#5aa9ff";
+  for (let x = 0; x < W; x++) { const h = Math.log(1 + bins[x]) / mx * (H - 2); g.fillRect(x, H - h, 1, h); }
+  g.fillStyle = "#e5484d"; g.fillRect(Math.floor(lo / 65536 * W), 0, 1, H); g.fillRect(Math.min(W - 1, Math.floor(hi / 65536 * W)), 0, 1, H);
+}
+function show(img, keepView){
+  const first = !cur || cur.w !== img.w || cur.h !== img.h;
+  cur = img; render(img); $("empty").style.display = "none";
+  if (first || !keepView) fit(); else draw();
+  info();
+}
+function sizeCanvas(){
+  const r = cv.getBoundingClientRect(), dp = window.devicePixelRatio || 1;
+  cv.width = Math.max(1, Math.round(r.width * dp)); cv.height = Math.max(1, Math.round(r.height * dp));
+}
+function fit(){
+  sizeCanvas(); if (!cur) return;
+  V.s = Math.min(cv.width / cur.w, cv.height / cur.h); V.x = (cv.width - cur.w * V.s) / 2; V.y = (cv.height - cur.h * V.s) / 2; draw();
+}
+function draw(){
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = "#000"; ctx.fillRect(0, 0, cv.width, cv.height);
+  if (!cur) return;
+  ctx.imageSmoothingEnabled = V.s < 1; ctx.drawImage(off, V.x, V.y, cur.w * V.s, cur.h * V.s);
+  if (cur.mark) {      // 選んだ星(円の半径 = HFR、最低 8 画素)
+    const dp = window.devicePixelRatio || 1, mx = V.x + cur.mark.x * V.s, my = V.y + cur.mark.y * V.s, r = Math.max(8 * dp, cur.mark.r * V.s);
+    ctx.strokeStyle = "#ffd08a"; ctx.lineWidth = 1.5 * dp; ctx.beginPath(); ctx.arc(mx, my, r, 0, 2 * Math.PI); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mx - r * 1.8, my); ctx.lineTo(mx - r * 1.2, my); ctx.moveTo(mx + r * 1.2, my); ctx.lineTo(mx + r * 1.8, my);
+    ctx.moveTo(mx, my - r * 1.8); ctx.lineTo(mx, my - r * 1.2); ctx.moveTo(mx, my + r * 1.2); ctx.lineTo(mx, my + r * 1.8); ctx.stroke();
+  }
+}
+function info(px){
+  if (!cur) return;
+  const m = cur.meta || {}, z = Math.round(V.s * 100 / (window.devicePixelRatio || 1));
+  let t = (m.q ? qText(m.q) + "  " : "") + (m.n ? "#" + m.n + "  " : "") + (m.exp != null ? m.exp + " s  " : "") + cur.w + "×" + cur.h + "  median " + cur.st.med + "  max " + cur.st.max + "  zoom " + z + "%";
+  if (px) t += "  (" + px.x + "," + px.y + ")=" + px.v;
+  $("info").textContent = t;
+}
+// 拡大・移動(ホイール、ドラッグ、ピンチ、ダブルクリックで 等倍⇔全体)
+const ptrs = new Map(); let pinch = null;
+function zoomAt(f, cx, cy){ const s = Math.min(16, Math.max(0.02, V.s * f)); f = s / V.s; V.x = cx - (cx - V.x) * f; V.y = cy - (cy - V.y) * f; V.s = s; draw(); info(); }
+function evXY(e){ const r = cv.getBoundingClientRect(), dp = cv.width / r.width; return {x: (e.clientX - r.left) * dp, y: (e.clientY - r.top) * dp}; }
+cv.addEventListener("wheel", e => { e.preventDefault(); const p = evXY(e); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, p.x, p.y); }, {passive: false});
+cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, evXY(e)); if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); } });
+cv.addEventListener("pointermove", e => {
+  const p = evXY(e);
+  if (cur && !ptrs.size) { const ix = Math.floor((p.x - V.x) / V.s), iy = Math.floor((p.y - V.y) / V.s); if (ix >= 0 && iy >= 0 && ix < cur.w && iy < cur.h) info({x: ix, y: iy, v: cur.data[iy * cur.w + ix]}); }
+  if (!ptrs.has(e.pointerId)) return;
+  const q = ptrs.get(e.pointerId); ptrs.set(e.pointerId, p);
+  if (ptrs.size === 1) { V.x += p.x - q.x; V.y += p.y - q.y; draw(); }
+  else if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y); zoomAt(d / pinch, (a.x + b.x) / 2, (a.y + b.y) / 2); pinch = d; }
+});
+let downAt = null;
+cv.addEventListener("pointerdown", e => { downAt = ptrs.size === 1 ? evXY(e) : null; });
+const up = e => {
+  ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null;
+  const p = evXY(e);   // 動かさずに押しただけ = フォーカスの星を選ぶ
+  if (downAt && Math.hypot(p.x - downAt.x, p.y - downAt.y) < 6 && cur && cur.meta && cur.meta.full) {
+    if (mode === "focus" && !cur.meta.guide) pickStar(cur, (p.x - V.x) / V.s, (p.y - V.y) / V.s);
+    else if (mode === "guide" && cur.meta.guide && G.task !== "guide" && G.task !== "cal") gPick(cur, (p.x - V.x) / V.s, (p.y - V.y) / V.s);
+  }
+  downAt = null;
+};
+cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+cv.addEventListener("dblclick", e => { if (!cur) return; const p = evXY(e), fitS = Math.min(cv.width / cur.w, cv.height / cur.h); if (V.s > fitS * 1.05) fit(); else zoomAt(1 / V.s, p.x, p.y); });
+window.addEventListener("resize", () => { if (cur) fit(); else sizeCanvas(); });
+
+// ---------- 保存(IndexedDB。frames = 一覧とサムネイル、raw = 元のデータ) ----------
+let db = null, frames = [], selId = null;
+function idb(){
+  return new Promise((ok, ng) => {
+    const r = indexedDB.open("luna_imaging", 1);
+    r.onupgradeneeded = () => { const d = r.result; d.createObjectStore("frames", {keyPath: "id", autoIncrement: true}); d.createObjectStore("raw"); };
+    r.onsuccess = () => ok(r.result); r.onerror = () => ng(r.error);
+  });
+}
+function tx(stores, mode, fn){
+  return new Promise((ok, ng) => { const t = db.transaction(stores, mode); let res; t.oncomplete = () => ok(res); t.onerror = t.onabort = () => ng(t.error || new Error("Could not save"));
+    res = fn(t); });
+}
+const reqP = r => new Promise((ok, ng) => { r.onsuccess = () => ok(r.result); r.onerror = () => ng(r.error); });
+async function loadList(){ frames = await new Promise((ok, ng) => { const r = db.transaction("frames").objectStore("frames").getAll(); r.onsuccess = () => ok(r.result); r.onerror = () => ng(r.error); }); }
+function thumbURL(){
+  const tw = 192, th = Math.round(tw * off.height / off.width), c = document.createElement("canvas");
+  c.width = tw; c.height = th; c.getContext("2d").drawImage(off, 0, 0, tw, th); return c.toDataURL("image/jpeg", 0.8);
+}
+async function saveFrame(img){
+  if (!db) throw new Error("This browser cannot store images");
+  const keep = +S.keep;
+  if (frames.length >= keep && frames.every(f => f.star)) { toast("All kept frames have ★. Remove a ★ or raise \"Frames to keep\"", true); return; }
+  const rec = {t: Date.now(), w: img.w, h: img.h, meta: img.meta, thumb: thumbURL(), star: false};
+  await tx(["frames", "raw"], "readwrite", t => { const r = t.objectStore("frames").add(rec); r.onsuccess = () => { rec.id = r.result; t.objectStore("raw").put(img.data.buffer, r.result); }; });
+  img.id = rec.id; frames.push(rec); selId = rec.id;
+  // 上限を超えたら、★のない古いものから消す
+  const del = [];
+  while (frames.length - del.length > keep) { const f = frames.find(f => !f.star && !del.includes(f) && f.id !== rec.id); if (!f) break; del.push(f); }
+  if (del.length) await removeFrames(del.map(f => f.id), true);
+  drawStrip(); usage();
+}
+async function removeFrames(ids, quiet){
+  await tx(["frames", "raw"], "readwrite", t => { for (const id of ids) { t.objectStore("frames").delete(id); t.objectStore("raw").delete(id); } });
+  frames = frames.filter(f => !ids.includes(f.id)); if (ids.includes(selId)) selId = null;
+  if (!quiet) { drawStrip(); usage(); }
+}
+async function openFrame(id){
+  const f = frames.find(x => x.id === id); if (!f) return;
+  const buf = await new Promise((ok, ng) => { const r = db.transaction("raw").objectStore("raw").get(id); r.onsuccess = () => ok(r.result); r.onerror = () => ng(r.error); });
+  if (!buf) { toast("The original data was not found", true); return; }
+  selId = id; show({w: f.w, h: f.h, data: new Uint16Array(buf), meta: f.meta, id}); drawStrip();
+}
+function drawStrip(){
+  const box = $("thumbs"); box.textContent = "";
+  for (const f of frames.slice().reverse()) {
+    const d = document.createElement("div"); d.className = "th" + (f.id === selId ? " sel" : "");
+    d.innerHTML = '<img alt=""><span class="n"></span><button class="st" title="Frames with ★ are not deleted automatically">★</button>';
+    d.querySelector("img").src = f.thumb;
+    d.querySelector(".n").textContent = "#" + (f.meta && f.meta.n || f.id) + " " + (f.meta ? f.meta.exp + "s" : "") + (f.meta && f.meta.q && f.meta.q.hfr != null ? " " + f.meta.q.hfr.toFixed(1) : "");
+    if (f.meta && f.meta.q) d.title = qText(f.meta.q);
+    const sb = d.querySelector(".st"); if (f.star) sb.classList.add("on");
+    sb.onclick = async ev => { ev.stopPropagation(); f.star = !f.star; await tx(["frames"], "readwrite", t => t.objectStore("frames").put(f)); drawStrip(); };
+    d.onclick = () => openFrame(f.id).catch(e => toast(e.message, true));
+    box.appendChild(d);
+  }
+  $("tcount").textContent = frames.length + " / " + S.keep + " frames";
+  const has = frames.some(f => f.id === selId);
+  $("dlFits").disabled = $("dlPng").disabled = $("del").disabled = !has;
+}
+async function usage(){
+  try { const e = await navigator.storage.estimate(); $("usage").textContent = "Used in this browser: " + (e.usage / 1048576).toFixed(0) + " MB (about " + (e.quota / 1073741824).toFixed(1) + " GB available)"; } catch (e) {}
+}
+
+// ---------- ファイルに保存 ----------
+function fitsCard(k, v, c){
+  let s = k.padEnd(8);
+  if (v === undefined) return s.padEnd(80);
+  let val = typeof v === "string" ? ("'" + v.replace(/'/g, "''").padEnd(8) + "'").padEnd(20) : typeof v === "boolean" ? (v ? "T" : "F").padStart(20) : String(v).padStart(20);
+  s += "= " + val; if (c) s += " / " + c; return s.slice(0, 80).padEnd(80);
+}
+function makeFits(img){
+  const m = img.meta || {}, cards = [
+    fitsCard("SIMPLE", true), fitsCard("BITPIX", 16), fitsCard("NAXIS", 2), fitsCard("NAXIS1", img.w), fitsCard("NAXIS2", img.h),
+    fitsCard("BZERO", 32768), fitsCard("BSCALE", 1), fitsCard("EXPTIME", m.exp, "seconds"), fitsCard("DATE-OBS", m.date || "", "UTC start"),
+    fitsCard("IMAGETYP", m.type || "Light"), fitsCard("XBINNING", m.bin || 1), fitsCard("YBINNING", m.bin || 1)];
+  if (m.pix) cards.push(fitsCard("XPIXSZ", +(m.pix * (m.bin || 1)).toFixed(3), "um"), fitsCard("YPIXSZ", +(m.pix * (m.bin || 1)).toFixed(3), "um"));
+  if (m.temp != null) cards.push(fitsCard("CCD-TEMP", +m.temp.toFixed(2), "C"));
+  if (m.cam) cards.push(fitsCard("INSTRUME", m.cam.slice(0, 60)));
+  if (m.q) { cards.push(fitsCard("STARS", m.q.n, "stars detected (LUNA Imaging)")); if (m.q.hfr != null) cards.push(fitsCard("HFR", m.q.hfr, "median HFR in pixels")); }
+  cards.push(fitsCard("ROWORDER", "TOP-DOWN"), fitsCard("SWCREATE", "LUNA Imaging " + VERSION), fitsCard("END"));
+  const hdr = cards.join(""), hlen = Math.ceil(hdr.length / 2880) * 2880, dlen = Math.ceil(img.data.length * 2 / 2880) * 2880;
+  const out = new Uint8Array(hlen + dlen); out.fill(32, 0, hlen);
+  for (let i = 0; i < hdr.length; i++) out[i] = hdr.charCodeAt(i);
+  const dv = new DataView(out.buffer, hlen);
+  for (let i = 0; i < img.data.length; i++) dv.setInt16(i * 2, img.data[i] - 32768, false);
+  return new Blob([out], {type: "application/fits"});
+}
+function fname(img, ext){
+  const m = img.meta || {}, d = new Date(m.t || Date.now()), p = n => String(n).padStart(2, "0");
+  const ts = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+  return (m.type || "Light") + "_" + (m.exp != null ? m.exp + "s_" : "") + "bin" + (m.bin || 1) + "_" + ts + (m.n ? "_" + String(m.n).padStart(3, "0") : "") + "." + ext;
+}
+function download(blob, name){ const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); }
+$("dlFits").onclick = async () => { if (!cur || cur.id !== selId) await openFrame(selId); download(makeFits(cur), fname(cur, "fits")); };
+$("dlPng").onclick = async () => { if (!cur || cur.id !== selId) await openFrame(selId); off.toBlob(b => download(b, fname(cur, "png")), "image/png"); };
+$("del").onclick = async () => { if (selId == null) return; const f = frames.find(x => x.id === selId); if (f && f.star && !confirm("This frame has ★. Delete it?")) return; await removeFrames([selId]); };
+$("clear").onclick = async () => { const ids = frames.filter(f => !f.star).map(f => f.id); if (!ids.length) return toast("Nothing to delete"); if (!confirm("Delete " + ids.length + " frame(s) without ★?")) return; await removeFrames(ids); toast("Deleted"); };
+
+// ---------- 機材 ----------
+// ---- Alpaca デバイス検索(基板の /api/external/discover。Alpaca の標準の探し方)  v0.10
+let DEVN = {};
+async function discover(){
+  const b = $("disc"); b.disabled = true; b.textContent = "Searching… (a few seconds)";
+  try {
+    const r = await fetch(location.origin + "/api/external/discover", {cache: "no-store"});
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j || j.status !== "success") throw new Error((j && j.message) || "This board cannot search");
+    const TY = {camera: "Camera", focuser: "Focuser", telescope: "Telescope", filterwheel: "Filter wheel", rotator: "Rotator", dome: "Dome", switch: "Switch", safetymonitor: "Safety", observingconditions: "Weather", covercalibrator: "Cover"};
+    const svAll = (j.data || []).map(x => { const ds = Array.isArray(x.devices) ? x.devices : (x.devices && x.devices.Value) || [];
+      return {addr: x.ip + ":" + x.port, c: ds.filter(d => /camera/i.test(d.DeviceType)).length, ds}; });
+    for (const x of svAll) gMntAdd(x.addr, x.ds);   // マウントの候補は、カメラの無いサーバーの望遠鏡も入れる  v0.16
+    const sv = svAll.filter(x => x.c > 0);
+    const box = $("srv"); box.textContent = "";
+    if (!sv.length) { box.style.display = "none"; $("manual").open = true; return toast("No Alpaca server with a camera was found. Enter the address and read it", true); }
+    const pick = a => { $("host").value = a; box.querySelectorAll(".srvi").forEach(e => e.classList.toggle("on", e.dataset.a === a)); };
+    for (const x of sv) {
+      const b2 = document.createElement("button"); b2.className = "srvi"; b2.dataset.a = x.addr;
+      const h = document.createElement("b"); h.textContent = x.addr; b2.appendChild(h);
+      for (const d of x.ds) { const t = document.createElement("span"); const k = String(d.DeviceType).toLowerCase();
+        t.textContent = (TY[k] || d.DeviceType) + " #" + d.DeviceNumber + "  " + d.DeviceName; b2.appendChild(t); }
+      b2.onclick = () => { pick(x.addr); scan(); }; box.appendChild(b2);
+    }
+    box.style.display = ""; const sel = {value: sv.some(x => x.addr === S.host) ? S.host : sv[0].addr}; pick(sel.value);
+    $("host").value = sel.value; await scan();
+  } catch (e) { toast(e.message.indexOf("fetch") >= 0 ? "This board cannot search (open this page from the " + BN + " board)" : e.message, true); }
+  finally { b.disabled = false; b.textContent = "Find Alpaca devices"; }
+}
+$("disc").onclick = discover;
+// ガイドカメラがシミュレーター(LUNA Test Sky)か
+function gIsSim(){ const n = (G && G.cam && G.cam.name) || DEVN["camera" + S.gcam] || ""; return /LUNA Test Sky/i.test(n); }
+// ---- マウント(補正の送り先)  v0.16
+//   "board" = NS-4000(この基板の OnStep)。それ以外は "ip:port/番号" の Alpaca 望遠鏡(LUNA Test Sky・ほかの赤道儀)
+const MNT = {};   // 値 → 名前
+function gMntAdd(addr, devs){
+  for (const d of devs || []) if (/telescope/i.test(d.DeviceType)) {
+    if (addr.split(":")[0] === location.hostname) continue;   // この基板自身の Alpaca は「NS-4000(本機)」と同じ
+    MNT[addr + "/" + d.DeviceNumber] = d.DeviceName;
+  }
+  gMntList();
+}
+function gMnt(v){ v = v || S.gmount || "board"; if (v === "board") return {board: true, num: 0};
+  const i = v.lastIndexOf("/"); return {board: false, host: v.slice(0, i), num: +v.slice(i + 1) || 0, name: MNT[v] || (v === S.gmount && S.gmname) || ""}; }
+function gMntList(){
+  const sel = $("gmount"); if (!sel) return; const cur = S.gmount || "board"; sel.textContent = "";
+  const add = (v, t) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.appendChild(o); };
+  add("board", BN + "(本機)");
+  for (const [v, n] of Object.entries(MNT)) { const m = gMnt(v); add(v, n + "  (" + m.host + " #" + m.num + ")"); }
+  if (cur !== "board" && !(cur in MNT)) { const m = gMnt(cur); add(cur, (m.name || "Alpaca 望遠鏡") + "  (" + m.host + " #" + m.num + ")"); }
+  sel.value = cur;
+}
+async function gMntConnect(){
+  readForm(); const m = gMnt(), b = $("gmconn"), info = $("gmInfo"); b.disabled = true; info.textContent = "接続しています…";
+  try {
+    const root = m.board ? location.origin : "http://" + m.host;
+    const q = p => alpAt(root, "telescope", m.num, p).catch(() => null);
+    if (!m.board && !(await q("connected"))) await alpAt(root, "telescope", m.num, "connected", "PUT", {Connected: true});
+    const name = await q("name"), tr = await q("tracking"), pg = await q("canpulseguide");
+    if (name == null) throw new Error("fetch");
+    info.textContent = "✓ " + name + "  ・  追尾 " + (tr ? "中" : "停止") + (pg === false ? "  ・  パルスガイドに対応していません" : "");
+    info.style.color = tr && pg !== false ? "" : "var(--warn)";
+    b.textContent = "接続済み";
+  } catch (e) {
+    info.style.color = "var(--warn)";
+    info.textContent = (/fetch|abort/i.test(e.message) ? "このページからは届きませんでした(アドレス・CORS)。" : e.message + "。") + (m.board ? "" : "ガイドの補正は基板から直接送るので、ガイドはできることがあります。");
+    b.textContent = "接続";
+  } finally { b.disabled = false; }
+}
+function gDest(){
+  const e = $("gdest"); if (!e) return;
+  e.innerHTML = ""; const t = document.createElement("span"), m = gMnt(), mSim = !m.board && /LUNA Test Sky/i.test(m.name || ""), cSim = gIsSim();
+  if (m.board) t.textContent = "補正は " + BN + "(この基板)へ送ります。";
+  else t.textContent = "補正は Alpaca の望遠鏡「" + (m.name || m.host + " #" + m.num) + "」へパルスガイドで送ります(基板から " + m.host + " へ)。";
+  t.textContent += "ガイドの計算は基板が行うので、このページを閉じてもガイドは続きます。";
+  const cKnown = !!((G && G.cam && G.cam.name) || DEVN["camera" + S.gcam]);   // カメラの名前が分かるまでは注意を出さない
+  if (cKnown && cSim !== mSim) { t.style.color = "var(--warn)";
+    t.textContent += cSim ? " 注意: ガイドカメラはシミュレーター(LUNA Test Sky)です。星は本物の架台の動きに反応しないので、試験ではマウントに LUNA Test Sky の望遠鏡を選んでください。"
+                          : " 注意: マウントはシミュレーター(LUNA Test Sky)ですが、ガイドカメラは本物です。星は動きません。"; }
+  e.appendChild(t);
+}
+async function scan(){
+  readForm(); if (!S.host) return toast("Enter the address of the Alpaca server", true);
+  try {
+    const r = await fetch(base() + "/management/v1/configureddevices", {cache: "no-store"});
+    const all = (await r.json()).Value, list = all.filter(d => String(d.DeviceType).toLowerCase() === "camera");
+    DEVN = {}; for (const d of all) DEVN[String(d.DeviceType).toLowerCase() + d.DeviceNumber] = d.DeviceName;
+    const fl = all.filter(d => String(d.DeviceType).toLowerCase() === "focuser"), fs = $("foc"); fs.textContent = "";
+    for (const d of fl) { const o = document.createElement("option"); o.value = d.DeviceNumber; o.textContent = "#" + d.DeviceNumber + " " + d.DeviceName; fs.appendChild(o); }
+    if (fl.length) { fs.value = fl.some(d => d.DeviceNumber == S.foc) ? S.foc : fl[0].DeviceNumber; S.foc = +fs.value; }
+    const gs = $("gcam"); gs.textContent = "";
+    for (const d of list) { const o = document.createElement("option"); o.value = d.DeviceNumber; o.textContent = "#" + d.DeviceNumber + " " + d.DeviceName; gs.appendChild(o); }
+    gs.value = list.some(d => d.DeviceNumber == S.gcam) ? S.gcam : (list.find(d => d.DeviceNumber != S.cam) || list[0]).DeviceNumber; S.gcam = +gs.value;
+    const tl = all.filter(d => String(d.DeviceType).toLowerCase() === "telescope"), ts = $("gtel"); ts.textContent = "";
+    for (const d of tl) { const o = document.createElement("option"); o.value = d.DeviceNumber; o.textContent = "#" + d.DeviceNumber + " " + d.DeviceName; ts.appendChild(o); }
+    gMntAdd(S.host.replace(/^https?:\/\//, "").replace(/\/+$/, ""), tl);   // マウントの候補に入れる(選ぶのは「ガイド」の「マウント」)  v0.16
+    const sel = $("cam"); sel.textContent = "";
+    for (const d of list) { const o = document.createElement("option"); o.value = d.DeviceNumber; o.textContent = "#" + d.DeviceNumber + " " + d.DeviceName; sel.appendChild(o); }
+    if (!list.length) return toast("No camera found", true);
+    sel.value = list.some(d => d.DeviceNumber == S.cam) ? S.cam : list[0].DeviceNumber; S.cam = +sel.value; saveCfg();
+    toast(list.length + " camera(s)"); gDest();
+  } catch (e) { toast("Cannot read the device list. Check the address and the CORS setting", true); }
+}
+async function connect(){
+  readForm();
+  try {
+    if (!(await alp("connected"))) await alp("connected", "PUT", {Connected: true});
+    const g = p => alp(p).catch(() => null);
+    camInfo = {name: await g("name"), w: await g("cameraxsize"), h: await g("cameraysize"), pix: await g("pixelsizex"), maxbin: await g("maxbinx"), sensor: await g("sensortype")};
+    $("cdot").className = "dot on"; $("cname").textContent = camInfo.name || "Camera";
+    $("camInfo").textContent = (camInfo.w + "×" + camInfo.h) + "  pixel " + camInfo.pix + "µm  max bin " + camInfo.maxbin + (camInfo.sensor >= 2 ? "  color (shown in mono)" : "  mono");
+    $("conn").textContent = "Disconnect";
+    toast("Connected"); steps();
+  } catch (e) { camInfo = null; $("cdot").className = "dot"; toast(e.message, true); }
+}
+async function disconnect(){ try { await alp("connected", "PUT", {Connected: false}); } catch (e) {} camInfo = null; $("cdot").className = "dot"; $("cname").textContent = "Camera not connected"; $("ctemp").textContent = ""; $("conn").textContent = "Connect"; }
+$("scan").onclick = scan;
+$("conn").onclick = () => camInfo ? disconnect() : connect();
+setInterval(async () => { if (!camInfo || run || document.hidden) return; const t = await alp("ccdtemperature").catch(() => null); $("ctemp").textContent = t != null ? t.toFixed(1) + "°C" : ""; }, 10000);
+
+// ---------- 撮影 ----------
+let run = null;
+function readForm(){
+  S.exp = +$("exp").value || 1; S.count = Math.max(1, +$("count").value || 1); S.interval = Math.max(0, +$("interval").value || 0);
+  S.bin = +$("bin").value; S.type = $("type").value; S.save = $("save").value; S.keep = +$("keep").value; S.str = +$("str").value;
+  S.host = $("host").value.trim(); if ($("cam").value !== "") S.cam = +$("cam").value;
+  S.fexp = +$("fexp").value || 1; S.froi = +$("froi").value; S.fstep = +$("fstep").value; S.fnum = +$("fnum").value;
+  if ($("gcam").value !== "") S.gcam = +$("gcam").value; if ($("gtel").value !== "") S.gtel = +$("gtel").value; S.gout = $("gout").value;
+  S.gexp = +$("gexp").value || 1; S.gfl = +$("gfl").value || 240; S.gcalms = +$("gcalms").value || 1000; S.gaggr = +$("gaggr").value || 70;
+  S.gmin = +$("gmin").value || 0; S.gmax = +$("gmax").value || 2000; S.gwhere = "board";
+  if ($("gmount").value) { S.gmount = $("gmount").value; if (MNT[S.gmount]) S.gmname = MNT[S.gmount]; } { const m = gMnt(); S.gout = m.board ? "board" : "alpaca"; S.gtel = m.num; }   // v0.16 マウントで送り先を決める
+  S.pePer = Math.max(30, +$("pePer").value || 598); S.peCyc = +$("peCyc").value || 2;
+  if (G.cam) G.scale = 206.265 * G.cam.pix / S.gfl;
+  if ($("foc").value !== "") S.foc = +$("foc").value; saveCfg();   // v0.13: v0.10 の注記がこの行を消していた(画素スケール・設定の保存が効いていなかった)
+}
+function prog(t, f){ $("prog").textContent = t; if (f != null) $("pbar").style.width = Math.round(f * 100) + "%"; }
+async function shoot(n, save){
+  readForm();
+  if (F.live) return toast("Stop the focus live view first", true);
+  if (!S.host) { setMode("shoot"); return toast("Choose a camera with \"Find Alpaca devices\"", true); }
+  if (!camInfo) await connect(); if (!camInfo) return;
+  run = {stop: false}; $("go").textContent = "Stop"; $("go").classList.add("run"); $("snap").disabled = true;
+  try {
+    const b = Math.min(S.bin, camInfo.maxbin || 1);
+    await alp("binx", "PUT", {BinX: b}); await alp("biny", "PUT", {BinY: b}).catch(() => {});
+    await alp("startx", "PUT", {StartX: 0}); await alp("starty", "PUT", {StartY: 0});
+    await alp("numx", "PUT", {NumX: Math.floor(camInfo.w / b)}); await alp("numy", "PUT", {NumY: Math.floor(camInfo.h / b)}); F.roiSet = null;
+    for (let i = 1; i <= n && !run.stop; i++) {
+      const exp = S.type === "Bias" ? 0.001 : S.exp, light = S.type === "Light" || S.type === "Flat";
+      if (save) { S.seq = (S.seq || 0) + 1; saveCfg(); }      // 通し番号(撮影を始め直しても続く)
+      const meta = {n: save ? S.seq : 0, exp, bin: b, type: S.type, pix: camInfo.pix, cam: camInfo.name, t: Date.now(), date: new Date().toISOString().slice(0, 19)};
+      await alp("startexposure", "PUT", {Duration: exp, Light: light});
+      const t0 = performance.now(), limit = exp * 1000 + 60000;
+      for (;;) {
+        if (run.stop) { await alp("abortexposure", "PUT").catch(() => {}); break; }
+        const el = (performance.now() - t0) / 1000;
+        prog((n > 1 ? i + " / " + n + "  " : "") + (el < exp ? "Exposing " + Math.max(0, exp - el).toFixed(exp < 10 ? 1 : 0) + " s" : "Reading out"), ((i - 1) + Math.min(1, el / Math.max(exp, 0.1))) / n);
+        if (el >= exp * 0.9 && await alp("imageready")) break;
+        if (performance.now() - t0 > limit) throw new Error("The camera did not get the image ready (timed out)");
+        await sleep(exp > 2 && el < exp - 1 ? 500 : 200);
+      }
+      if (run.stop) break;
+      prog((n > 1 ? i + " / " + n + "  " : "") + "Downloading", null);
+      const tg = performance.now(), img = await getImage();
+      meta.temp = await alp("ccdtemperature").catch(() => null); img.meta = meta;
+      show(img, true);
+      meta.q = frameQuality(img); info();
+      if (save) await saveFrame(img);
+      toast((save ? "#" + meta.n + " kept  " : "Test shot  ") + img.w + "×" + img.h + "  download " + ((performance.now() - tg) / 1000).toFixed(1) + " s  " + qText(meta.q));
+      if (S.interval && i < n) for (let k = S.interval; k > 0 && !run.stop; k--) { prog(i + " / " + n + "  next in " + k + " s", i / n); await sleep(1000); }
+    }
+    prog(run.stop ? "Stopped" : "Done", run.stop ? null : 1);
+  } catch (e) { prog("Stopped", null); toast(e.message, true); }
+  finally { run = null; $("go").textContent = "Capture"; $("go").classList.remove("run"); $("snap").disabled = false; }
+}
+$("go").onclick = () => run ? (run.stop = true, prog("Stopping…")) : shoot(+$("count").value || 1, $("save").value === "1");
+$("snap").onclick = () => { if (!run) shoot(1, false); };
+$("str").oninput = () => { S.str = +$("str").value; saveCfg(); if (cur) { render(cur); draw(); } };
+
+// ---------- 画像ごとの品質: 星の数と HFR の中央値 ----------
+function frameQuality(img){
+  const {w, h, data} = img, st = img.st || stats(data), sd = Math.max(1, 1.4826 * st.mad), th = 9 * st.med + 3 * 8 * sd, low = st.med + 4 * sd, found = [];
+  for (let y = 8; y < h - 8; y++) for (let x = 8; x < w - 8; x++) {
+    const i = y * w + x, c = data[i];
+    if (c < low) continue;
+    if (c < data[i - 1] || c < data[i + 1] || c < data[i - w] || c < data[i + w] || c < data[i - w - 1] || c < data[i - w + 1] || c < data[i + w - 1] || c < data[i + w + 1]) continue;
+    const v = data[i - w - 1] + data[i - w] + data[i - w + 1] + data[i - 1] + c + data[i + 1] + data[i + w - 1] + data[i + w] + data[i + w + 1];
+    if (v >= th) found.push({x, y, v, c});
+  }
+  found.sort((a, b) => b.v - a.v);
+  const pick = [];
+  for (const f of found) { if (pick.length >= 500) break; if (!pick.some(q => Math.abs(q.x - f.x) < 8 && Math.abs(q.y - f.y) < 8)) pick.push(f); }
+  const hs = [];
+  for (const q of pick.slice(0, 150)) {          // 明るい方から 150 個で HFR を測る(飽和した星は除く)
+    if (q.c >= 60000) continue;
+    const r = starHfr(data, w, h, q.x, q.y, st.med, sd, 20); if (r) hs.push(r.hfr);
+  }
+  hs.sort((a, b) => a - b);
+  return {n: pick.length, hfr: hs.length ? +hs[hs.length >> 1].toFixed(2) : null};
+}
+const qText = q => q ? "stars " + q.n + (q.n >= 500 ? "+" : "") + (q.hfr != null ? "  HFR " + q.hfr.toFixed(2) : "") : "";
+
+// ---------- フォーカス ----------
+// 全体を撮って星を選ぶ → 星の周りだけ(部分読み出し、ビン 1)をくり返し撮り、HFR(光の半分が入る半径)を測る
+const F = {live: false, auto: null, done: false, conn: false, cx: null, cy: null, pts: [], roiSet: null, max: 50000, lastH: null};
+async function expose(exp, light, label, num){
+  if (num == null) num = S.cam;
+  const ca = (pr, m, pa) => alpd("camera", num, pr, m, pa);
+  await ca("startexposure", "PUT", {Duration: exp, Light: light});
+  const t0 = performance.now();
+  for (;;) {
+    const el = (performance.now() - t0) / 1000;
+    if (label) prog(label + (el < exp ? "  露出中 " + Math.max(0, exp - el).toFixed(1) + " 秒" : "  読み出し中"), null);
+    if (el >= exp * 0.9 && await ca("imageready")) break;
+    if (el > exp + 60) throw new Error("The camera did not get the image ready (timed out)");
+    await sleep(exp > 2 && el < exp - 1 ? 400 : 150);
+  }
+  return getImage(num);
+}
+async function setFrame(sx, sy, nx, ny, bin){
+  const k = [sx, sy, nx, ny, bin].join(",");
+  if (F.roiSet === k) return;
+  await alp("binx", "PUT", {BinX: bin}); await alp("biny", "PUT", {BinY: bin}).catch(() => {});
+  await alp("numx", "PUT", {NumX: 1}); await alp("numy", "PUT", {NumY: 1});          // 先に小さくしてから位置を変える(範囲外のエラーを避ける)
+  await alp("startx", "PUT", {StartX: sx}); await alp("starty", "PUT", {StartY: sy});
+  await alp("numx", "PUT", {NumX: nx}); await alp("numy", "PUT", {NumY: ny});
+  F.roiSet = k;
+}
+// 星を測る: 背景(外周の中央値)・雑音を求め、最大の点のまわりで重心と HFR
+function measure(img, hx, hy, rs){
+  const {w, h, data} = img, ring = [];
+  for (let x = 0; x < w; x++) { ring.push(data[x], data[(h - 1) * w + x]); }
+  for (let y = 0; y < h; y++) { ring.push(data[y * w], data[y * w + w - 1]); }
+  ring.sort((a, b) => a - b);
+  const bg = ring[ring.length >> 1], sd = Math.max(1, 1.4826 * ring.map(v => Math.abs(v - bg)).sort((a, b) => a - b)[ring.length >> 1]);
+  let px = -1, py = -1, ps = -1;
+  const r0 = hx != null ? (rs || 25) : Math.max(w, h);       // 指定があれば、そのまわりだけ探す。3x3 の合計で探す(ぼけた暗い星も拾う)
+  for (let y = Math.max(1, Math.round((hy ?? 0) - r0)); y < Math.min(h - 1, Math.round((hy ?? 0) + r0)); y++)
+    for (let x = Math.max(1, Math.round((hx ?? 0) - r0)); x < Math.min(w - 1, Math.round((hx ?? 0) + r0)); x++) {
+      const i = y * w + x, v = data[i - w - 1] + data[i - w] + data[i - w + 1] + data[i - 1] + data[i] + data[i + 1] + data[i + w - 1] + data[i + w] + data[i + w + 1];
+      if (v > ps) { ps = v; px = x; py = y; } }
+  if (ps < 0 || ps - 9 * bg < 3 * 6 * sd) return null;
+  let pv = 0; for (let y = Math.max(0, py - 3); y <= Math.min(h - 1, py + 3); y++) for (let x = Math.max(0, px - 3); x <= Math.min(w - 1, px + 3); x++) pv = Math.max(pv, data[y * w + x]);
+  const r = starHfr(data, w, h, px, py, bg, sd, Math.max(8, Math.min(60, Math.floor(Math.min(w, h) / 2) - 1)));
+  if (!r) return null;
+  return {x: r.x, y: r.y, hfr: r.hfr, peak: pv, bg, snr: r.sf / (sd * Math.sqrt(r.n))};
+}
+// HFR: 1 回目は星の芯(4σ を超える所、半径 12)で位置と大きさを見積もる。2 回目からは、しきい値なしで(背景を引いた値を
+// 負の値も含めてそのまま)測り、測る半径を「HFR の 3 倍 + 3」に合わせて広げる。しきい値で切ると、暗い星のぼけた裾が消えて
+// ピントのずれが数字に出にくく、広い半径でしきい値を使うと雑音を星として数えて大きく出るため(2026-11-14 v0.7)
+function starHfr(data, w, h, px, py, bg, sd, Rmax){
+  let R = Math.min(12, Rmax), cx = px, cy = py, res = null;
+  for (let it = 0; it < 8; it++) {
+    const core = it === 0, th = 4 * sd, x0 = Math.round(cx), y0 = Math.round(cy);
+    const ya = Math.max(0, y0 - R), yb = Math.min(h - 1, y0 + R), xa = Math.max(0, x0 - R), xb = Math.min(w - 1, x0 + R);
+    let sf = 0, sx = 0, sy = 0, n = 0;
+    for (let y = ya; y <= yb; y++) for (let x = xa; x <= xb; x++) {
+      if ((x - x0) ** 2 + (y - y0) ** 2 > R * R) continue;
+      n++; const f = data[y * w + x] - bg; if (!core || f > th) { sf += f; sx += f * x; sy += f * y; }
+    }
+    if (sf <= 0) return res;
+    const nx = core ? sx / sf : cx, ny = core ? sy / sf : cy;     // 位置は芯で決めたものを使う(しきい値なしの重心は雑音でぶれる)
+    let sr = 0;
+    for (let y = ya; y <= yb; y++) for (let x = xa; x <= xb; x++) {
+      if ((x - x0) ** 2 + (y - y0) ** 2 > R * R) continue;
+      const f = data[y * w + x] - bg; if (!core || f > th) sr += f * Math.hypot(x - nx, y - ny);
+    }
+    res = {x: nx, y: ny, hfr: Math.max(0.3, sr / sf), sf, n, R};
+    const nR = Math.max(6, Math.min(Rmax, Math.ceil(3 * res.hfr + 3)));
+    cx = nx; cy = ny;
+    if (!core && Math.abs(nR - R) <= 1) break;
+    R = nR;
+  }
+  return res;
+}
+// 全体の画像から、端から離れた、飽和していない明るい星を選ぶ
+function autoStar(img, cap){
+  const {w, h, data} = img, st = img.st || stats(data), sd = 1.4826 * st.mad, m = 40;
+  let best = null;
+  for (let y = m; y < h - m; y++) for (let x = m; x < w - m; x++) {     // 3x3 の合計が最も大きく、飽和していない所
+    const i = y * w + x;
+    if (data[i] > (cap || 20000)) continue;          // ピントが合うと明るさが何倍にもなるので、今の時点で控えめな星を選ぶ(飽和すると HFR が狂う)
+    const v = data[i - w - 1] + data[i - w] + data[i - w + 1] + data[i - 1] + data[i] + data[i + 1] + data[i + w - 1] + data[i + w] + data[i + w + 1];
+    if (v < 9 * st.med + 3 * 10 * sd || (best && v <= best.v)) continue;
+    best = {x, y, v};
+  }
+  return best;
+}
+function pickStar(img, x, y){
+  const s = measure(img, x, y);
+  if (!s) return toast("そこに星が見つかりません", true);
+  const b = img.meta.bin || 1;
+  F.cx = Math.round(s.x * b + (img.meta.sx || 0)); F.cy = Math.round(s.y * b + (img.meta.sy || 0));
+  img.mark = {x: s.x, y: s.y, r: s.hfr}; draw();
+  $("fsub").textContent = "星を選びました(" + F.cx + ", " + F.cy + ")"; steps();
+}
+async function focusPick(){
+  readForm(); if (run || F.live) return;
+  if (!camInfo) await connect(); if (!camInfo) return;
+  const nested = !!F.auto; if (!nested) run = {stop: false};
+  try {
+    const b = Math.min(2, camInfo.maxbin || 1);           // 星を探すだけなのでビン 2 で軽く
+    await setFrame(0, 0, Math.floor(camInfo.w / b), Math.floor(camInfo.h / b), b);
+    const img = await expose(S.fexp, true, "全体");
+    img.meta = {exp: S.fexp, bin: b, sx: 0, sy: 0, full: true, type: "Light"};
+    show(img);
+    const s = autoStar(img);
+    if (s) pickStar(img, s.x, s.y); else toast("星が見つかりません。露出を長くしてください", true);
+    prog("", null);
+  } catch (e) { toast(e.message, true); prog("", null); }
+  finally { if (!nested) run = null; }
+}
+// 星の周りを 1 枚撮って測る(ライブと自動の両方で使う)
+async function roiShot(label, record){
+  const r = Math.min(+S.froi, camInfo.w, camInfo.h);
+  const sx = Math.max(0, Math.min(camInfo.w - r, F.cx - (r >> 1))), sy = Math.max(0, Math.min(camInfo.h - r, F.cy - (r >> 1)));
+  await setFrame(sx, sy, r, r, 1);
+  const img = await expose(S.fexp, true, label);
+  img.meta = {exp: S.fexp, bin: 1, sx, sy, roi: true};
+  const s = measure(img, F.cx - sx, F.cy - sy);
+  const pos = F.conn ? await falp("position").catch(() => null) : null;
+  if (s) {
+    img.mark = {x: s.x, y: s.y, r: s.hfr};
+    F.cx = Math.round(sx + s.x); F.cy = Math.round(sy + s.y);          // 星がずれても追いかける
+    showHfr(s);
+    if (record && pos != null) addPt(pos, s.hfr);
+  } else { $("fhfr").textContent = "--"; $("ftrend").textContent = ""; $("fsub").textContent = "星が見つかりません(ぼけすぎ・露出不足)"; }
+  if (pos != null) $("fpos").textContent = pos;
+  show(img, true);
+  return {s, pos};
+}
+function showHfr(s){
+  $("fhfr").textContent = s.hfr.toFixed(2);
+  const t = $("ftrend");
+  if (F.lastH != null) {
+    const d = (s.hfr - F.lastH) / F.lastH;
+    if (d < -0.03) { t.textContent = "↓ 良くなった"; t.className = "trend g"; }
+    else if (d > 0.03) { t.textContent = "↑ 悪くなった"; t.className = "trend b"; }
+    else { t.textContent = "→ 同じくらい"; t.className = "trend s"; }
+  }
+  F.lastH = s.hfr;
+  $("fsub").textContent = "明るさ " + s.peak + (s.peak >= 60000 ? "(飽和。露出を短く)" : "") + "  SN " + Math.round(s.snr);
+}
+function addPt(pos, h){
+  F.pts.push({p: pos, h, t: Date.now()}); if (F.pts.length > 300) F.pts.shift();
+  const m = F.pts.reduce((a, q) => q.h < a.h ? q : a);
+  $("fminv").textContent = "  これまでの最小 " + m.h.toFixed(2) + "(位置 " + m.p + ")";
+  graph();
+}
+async function focusLive(){
+  if (F.live) { F.live = false; return; }
+  readForm(); if (run || F.auto) return toast("撮影中です", true);
+  if (!camInfo) await connect(); if (!camInfo) return;
+  if (F.cx == null) await focusPick();
+  if (F.cx == null) return;
+  F.live = true; F.done = false; $("flive").textContent = "ライブ停止"; $("fpick").disabled = $("fauto").disabled = true; steps();
+  try {
+    while (F.live) {
+      if (F.conn) { while (F.live && await falp("ismoving").catch(() => false)) { $("fmov").textContent = "移動中"; await sleep(200); } $("fmov").textContent = ""; }
+      await roiShot("ライブ", true);
+      prog("", null);
+    }
+  } catch (e) { toast(e.message, true); }
+  finally { F.live = false; $("flive").textContent = "③ ライブ手動で合わせる"; $("fpick").disabled = $("fauto").disabled = false; prog("", null); steps(); }
+}
+// 自動: 中心の前後を刻みずつ測る → 端で最小なら範囲をずらして測り直す(最大 3 回)→ 2 次式の最良へ(いつも小さい側から近づく)
+async function waitFoc(){
+  for (let k = 0; k < 600; k++) { if (F.auto && F.auto.stop) throw new Error("止めました"); if (!(await falp("ismoving").catch(() => false))) return; await sleep(150); }
+  throw new Error("フォーカサーが止まりません");
+}
+async function moveWait(p){ await falp("move", "PUT", {Position: Math.round(Math.max(0, Math.min(F.max, p)))}); await sleep(150); await waitFoc(); $("fpos").textContent = Math.round(p); }
+async function focusAuto(){
+  if (F.auto) { F.auto.stop = true; prog("Stopping…"); return; }
+  readForm(); if (run || F.live) return toast("ライブ・撮影を止めてから押してください", true);
+  if (!camInfo) await connect(); if (!camInfo) return;
+  if (!F.conn) await focConnect(); if (!F.conn) return;
+  F.auto = {stop: false}; F.done = false; $("fauto").textContent = "自動を止める"; $("flive").disabled = $("fpick").disabled = true; steps();
+  try {
+    if (F.cx == null) await focusPick();
+    if (F.cx == null) throw new Error("星を選べませんでした");
+    const step = +$("fstep").value, N = +$("fnum").value;
+    let center = await falp("position");
+    for (let round = 1; round <= 3; round++) {
+      const ps = []; for (let i = 0; i < N; i++) ps.push(Math.round(center + (i - (N - 1) / 2) * step));
+      F.pts = []; F.lastH = null; graph();
+      await moveWait(ps[0] - step);                                   // 遊び(バックラッシュ)を取るため、いつも小さい側から近づく
+      const res = [];
+      for (let i = 0; i < N; i++) {
+        if (F.auto.stop) throw new Error("止めました");
+        await moveWait(ps[i]);
+        const hs = [];
+        for (let k = 0; k < 2; k++) { const r = await roiShot("自動" + (round > 1 ? "(" + round + " 回目)" : "") + " " + (i + 1) + " / " + N, false); if (r.s) hs.push(r.s.hfr); }
+        if (hs.length) { const h = hs.reduce((a, b) => a + b) / hs.length; res.push({p: ps[i], h}); addPt(ps[i], h); }
+      }
+      if (res.length < 3) throw new Error("星を測れませんでした(露出を長く、刻みを小さくしてみてください)");
+      const mi = res.reduce((a, q, k) => q.h < res[a].h ? k : a, 0);
+      if ((mi < 2 || mi > res.length - 3) && round < 3) { center = res[mi].p; toast("いちばん小さい所が真ん中にないので、範囲をずらして測り直します"); continue; }
+      const near = res.slice(Math.max(0, mi - 2), mi + 3), fit = fitBest(near.length >= 5 ? near : res), best = fit ? fit.pos : res[mi].p;   // 最良の近くの 5 点で当てはめる
+      await moveWait(best - step); await moveWait(best);
+      const fin = await roiShot("確認", false);
+      F.done = true; steps();
+      prog("合いました  位置 " + best + (fin.s ? "  HFR " + fin.s.hfr.toFixed(2) : ""), 1);
+      toast("ピントを合わせました(位置 " + best + ")");
+      return;
+    }
+  } catch (e) { if (F.conn) await falp("halt", "PUT").catch(() => {}); toast(e.message, e.message !== "止めました"); prog(e.message, null); }
+  finally { F.auto = null; $("fauto").textContent = "自動で合わせる"; $("flive").disabled = $("fpick").disabled = false; steps(); }
+}
+// 手順の表示: いまの段階を光らせ、することを書く
+function steps(){
+  const fit = F.pts.length ? fitBest() : null;
+  const st = F.done ? 4 : (!camInfo || !F.conn) ? 0 : F.cx == null ? 1 : !fit ? 2 : 3;
+  document.querySelectorAll("#fsteps span").forEach((e, i) => e.className = i < st ? "done" : i === st ? "cur" : "");
+  const H = [
+    "「撮影」の上でカメラを接続し、ここでフォーカサーを選んで「接続」を押してください。",
+    "「② 全体を撮って星を選ぶ」を押してください。丸印の付いた星で測ります(画像を押すと選び直せます)。",
+    F.auto ? "自動で測っています。グラフに点が並び、最良の位置へ動きます。"
+      : F.live ? "+ / − で少しずつ動かし、HFR が小さくなる向き(↓ 良くなった)へ進めます。行き過ぎて大きくなったら戻ります。グラフが U の字になると目安が出ます。"
+      : "「③ ライブ手動で合わせる」で HFR を見ながら手で合わせるか、下の「自動で合わせる」を押してください。",
+    "グラフに最良の目安が出ました。「④ 最良の目安へ」を押すと、そこへ動きます。",
+    "ピントが合いました(HFR がいちばん小さい位置)。「撮影」に戻れます。"];
+  $("fhelp").textContent = H[st];
+}
+// グラフ: 横 = フォーカサーの位置、縦 = HFR。2 次式を当てはめて最良の目安を出す
+function fitBest(pts){
+  pts = pts || F.pts; if (pts.length < 5) return null;
+  const mn = Math.min(...pts.map(p => p.h)), use = pts.filter(p => p.h <= mn * 2);
+  if (new Set(use.map(p => p.p)).size < 3) return null;
+  const mx = use.reduce((a, p) => a + p.p, 0) / use.length, sc = Math.max(1, Math.max(...use.map(p => Math.abs(p.p - mx))));
+  let s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, t0 = 0, t1 = 0, t2 = 0;
+  for (const p of use) { const x = (p.p - mx) / sc, y = p.h; s0++; s1 += x; s2 += x * x; s3 += x ** 3; s4 += x ** 4; t0 += y; t1 += x * y; t2 += x * x * y; }
+  const M = [[s4, s3, s2, t2], [s3, s2, s1, t1], [s2, s1, s0, t0]];
+  for (let i = 0; i < 3; i++) { let p = i; for (let k = i + 1; k < 3; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k; [M[i], M[p]] = [M[p], M[i]];
+    if (Math.abs(M[i][i]) < 1e-12) return null; for (let k = 0; k < 3; k++) if (k !== i) { const f = M[k][i] / M[i][i]; for (let j = i; j < 4; j++) M[k][j] -= f * M[i][j]; } }
+  const a = M[0][3] / M[0][0], b = M[1][3] / M[1][1], c = M[2][3] / M[2][2];
+  if (a <= 0) return null;
+  const xb = -b / (2 * a), pos = Math.round(mx + xb * sc), lo = Math.min(...use.map(p => p.p)), hi = Math.max(...use.map(p => p.p));
+  if (pos < lo || pos > hi) return null;                          // 両側を測っていないときは出さない
+  return {pos, hfr: c - b * b / (4 * a), f: p => { const x = (p - mx) / sc; return a * x * x + b * x + c; }};
+}
+function graph(){
+  const c = $("fgraph"), g = c.getContext("2d"), W = c.width, H = c.height, pts = F.pts;
+  g.clearRect(0, 0, W, H); g.fillStyle = "#8b97b0"; g.font = "11px sans-serif";
+  if (!pts.length) { g.fillText("フォーカサーを動かすと、ここに点が並びます", 10, H / 2); $("fbest").disabled = true; steps(); return; }
+  let x0 = Math.min(...pts.map(p => p.p)), x1 = Math.max(...pts.map(p => p.p)); if (x1 - x0 < 50) { x0 -= 25; x1 += 25; }
+  const hmin = Math.min(...pts.map(p => p.h)), hmax = Math.max(...pts.map(p => p.h)), pad = Math.max(0.1, (hmax - hmin) * 0.12);
+  const y0 = Math.max(0, hmin - pad), y1 = hmax + pad, X = p => 8 + (p - x0) / (x1 - x0) * (W - 16), Y = v => H - 16 - (v - y0) / (y1 - y0) * (H - 28);   // 縦軸は値の範囲に合わせて広げる
+  const best = fitBest();
+  if (best) { g.strokeStyle = "#34d399"; g.beginPath(); let on = false; for (let i = 0; i <= 60; i++) { const p = x0 + (x1 - x0) * i / 60, v = best.f(p); if (v < y1 && v > y0) { on ? g.lineTo(X(p), Y(v)) : g.moveTo(X(p), Y(v)); on = true; } else on = false; } g.stroke();
+    g.fillStyle = "#34d399"; g.fillRect(X(best.pos) - 0.5, 4, 1, H - 20); }
+  pts.forEach((p, i) => { g.fillStyle = i === pts.length - 1 ? "#ff6b6b" : "#5aa9ff"; g.beginPath(); g.arc(X(p.p), Y(p.h), i === pts.length - 1 ? 4 : 2.5, 0, 7); g.fill(); });
+  g.fillStyle = "#8b97b0"; g.fillText(x0, 4, H - 3); g.textAlign = "right"; g.fillText(x1, W - 4, H - 3); g.textAlign = "left";
+  g.fillText("HFR " + y1.toFixed(2), 4, 11); g.fillText(y0.toFixed(2), 4, H - 18);
+  $("fbest").disabled = !best;
+  $("fbest").textContent = best ? "④ 最良の目安へ(" + best.pos + ")" : "④ 最良の目安へ";
+  steps();
+}
+async function focConnect(){
+  readForm();
+  if (F.conn) { F.conn = false; $("fconn").textContent = "接続"; $("fpos").textContent = "-----"; steps(); return; }
+  try {
+    if (!(await falp("connected"))) await falp("connected", "PUT", {Connected: true});
+    F.max = await falp("maxstep").catch(() => 50000) || 50000;
+    F.conn = true; $("fconn").textContent = "切断"; await focStatus(); toast("フォーカサーに接続しました"); steps();
+  } catch (e) { toast(e.message, true); }
+}
+async function focStatus(){
+  if (!F.conn) return;
+  const p = await falp("position").catch(() => null), t = await falp("temperature").catch(() => null), m = await falp("ismoving").catch(() => false);
+  if (p != null) $("fpos").textContent = p; $("ftemp").textContent = t != null ? t.toFixed(1) + "°C" : ""; $("fmov").textContent = m ? "移動中" : "";
+}
+async function focMove(to){
+  if (!F.conn) return toast("フォーカサーに接続してください", true);
+  to = Math.round(Math.max(0, Math.min(F.max, to)));
+  try { await falp("move", "PUT", {Position: to}); $("ftarget").value = to; } catch (e) { toast(e.message, true); }
+}
+document.querySelectorAll(".steps button").forEach(b => b.onclick = async () => {
+  if (!F.conn) return toast("フォーカサーに接続してください", true);
+  const p = await falp("position").catch(() => null); if (p != null) focMove(p + +b.dataset.d);
+});
+$("fconn").onclick = focConnect;
+$("fmove").onclick = () => { const v = $("ftarget").value; if (v !== "") focMove(+v); };
+$("fhalt").onclick = () => falp("halt", "PUT").catch(e => toast(e.message, true));
+$("fpick").onclick = focusPick;
+$("flive").onclick = focusLive;
+$("fbest").onclick = async () => { const b = fitBest(); if (!b) return; try { const st = +$("fstep").value; await moveWait(b.pos - st); await moveWait(b.pos); F.done = true; steps(); toast("最良の目安(" + b.pos + ")へ動かしました"); } catch (e) { toast(e.message, true); } };
+$("fclr").onclick = () => { F.pts = []; F.lastH = null; F.done = false; $("fminv").textContent = ""; $("ftrend").textContent = ""; graph(); };
+$("fauto").onclick = focusAuto;
+setInterval(() => { if (mode === "focus" && F.conn && !F.live && !F.auto && !document.hidden) focStatus(); }, 2000);
+
+// ---------- オートガイド ----------
+// ガイドカメラで星を撮り続け、ずれを測って、望遠鏡へ短い補正(pulseguide)を送る
+//   校正: 西へ・北へ少しずつ動かして、補正 1 ミリ秒で星が画像の上でどちら向きに何画素動くかを測る
+//   ガイド: ずれ(画素)を、西向き・北向きの補正の量に分けて、その強さ(既定 70%)だけ逆向きに送る
+const G_KEEP = 20000;   // ガイドの記録はこの回数まで持つ(2 秒ごとで約 11 時間)  v0.13
+const G = {cam: null, task: null, stop: false, cal: null, x: null, y: null, lock: null, hist: [], lost: 0, scale: null};
+const galp = (prop, method, params, timeout) => alpd("camera", S.gcam, prop, method, params, timeout);
+async function tel(prop, method, params){
+  if (S.gout === "board") return alpAt(location.origin, "telescope", 0, prop, method, params);   // この基板(NS-4000)自身
+  const m = gMnt(); return alpAt("http://" + m.host, "telescope", m.num, prop, method, params);
+}
+async function gConnect(){
+  readForm();
+  if (G.cam) { if (G.task) return toast("止めてから切断してください", true); G.cam = null; $("gconn").textContent = "接続"; gSteps(); return; }
+  if (S.gcam === S.cam && camInfo) return toast("撮影用と同じカメラです。ガイドカメラを選んでください", true);
+  try {
+    if (!(await galp("connected"))) await galp("connected", "PUT", {Connected: true});
+    const g = p => galp(p).catch(() => null);
+    G.cam = {name: await g("name"), w: await g("cameraxsize"), h: await g("cameraysize"), pix: await g("pixelsizex")};
+    await galp("binx", "PUT", {BinX: 1}); await galp("biny", "PUT", {BinY: 1}).catch(() => {});
+    await galp("startx", "PUT", {StartX: 0}); await galp("starty", "PUT", {StartY: 0});
+    await galp("numx", "PUT", {NumX: G.cam.w}); await galp("numy", "PUT", {NumY: G.cam.h});
+    G.scale = 206.265 * G.cam.pix / S.gfl;
+    readForm(); gDest();
+    $("gconn").textContent = "切断"; toast("ガイドカメラに接続しました");
+    try {   // 基板に残っている校正が、別のカメラ・別の画素スケールで測ったものなら消す  v0.13
+      const st = await gbReq("status");
+      const o = gbOut(), otherMount = st.settings.out !== o.out || (o.out === "alpaca" && (st.settings.tel !== o.tel || st.settings.telnum !== o.telnum));
+      if (st.cal.ok && st.state === "idle" && (otherMount || st.settings.camnum !== S.gcam || Math.abs(st.settings.scale - G.scale) / G.scale > 0.02)) {
+        await gbReq("do", {what: "clearcal"}); G.cal = null; gCalInfo();
+        toast(otherMount ? "基板の校正は別のマウントのものなので消しました。校正し直してください" : "基板の校正は別のカメラ(または別の画素スケール " + st.settings.scale.toFixed(2) + "″)のものなので消しました。校正し直してください", true);
+      }
+    } catch (e) {}
+  } catch (e) { G.cam = null; toast(e.message, true); }
+  gSteps();
+}
+async function gShot(label){
+  const img = await expose(S.gexp, true, null, S.gcam);
+  img.meta = {exp: S.gexp, bin: 1, sx: 0, sy: 0, full: true, guide: true};
+  const s = G.x != null ? measure(img, G.x, G.y, 12) : null;   // 近くの明るい星に乗り移らないよう、狭く探す
+  if (s) { img.mark = {x: s.x, y: s.y, r: Math.max(s.hfr, 3)}; G.x = s.x; G.y = s.y; G.lost = 0; gSelDraw(img, s); }
+  if (mode === "guide") show(img, true);
+  if (label) prog(label, null);
+  return {img, s};
+}
+function gPick(img, x, y){
+  if (G.board && G.task) return toast("ガイド・校正を止めてから、星を選び直してください", true);
+  const s = measure(img, x, y);
+  if (!s) return toast("そこに星が見つかりません", true);
+  G.x = s.x; G.y = s.y; img.mark = {x: s.x, y: s.y, r: Math.max(s.hfr, 3)}; draw(); gSelDraw(img, s);
+  $("gsub").textContent = "星を選びました  SN " + Math.round(s.snr) + "  明るさ " + s.peak; gSteps();
+}
+async function gRun(name, fn){
+  if (G.task) { G.stop = true; prog("Stopping…"); return; }
+  readForm(); if (!G.cam) { await gConnect(); if (!G.cam) return; }
+  G.task = name; G.stop = false; gButtons(); gSteps();
+  try { await fn(); } catch (e) { if (e.message !== "止めました") toast(e.message, true); prog(e.message === "止めました" ? "止めました" : "止まりました", null); }
+  finally { G.task = null; G.stop = false; gButtons(); gSteps(); gStat(); }
+}
+const gCheck = () => { if (G.stop) throw new Error("止めました"); };
+// ② ループ撮影(星を選ぶ)
+function gLoop(){
+  return gRun("loop", async () => {
+    for (;;) {
+      gCheck();
+      const {img, s} = await gShot("ループ撮影中");
+      if (G.x == null) { const a = autoStar(img, 40000); if (a) gPick(img, a.x, a.y); }
+      else if (!s) $("gsub").textContent = "星が見つかりません";
+      else $("gsub").textContent = "SN " + Math.round(s.snr) + "  明るさ " + s.peak + (s.peak >= 60000 ? "(飽和。露出を短く)" : "");
+    }
+  });
+}
+// ③ 校正
+async function pulse(dir, ms){ if (ms < 1) return; await tel("pulseguide", "PUT", {Direction: dir, Duration: Math.round(ms)}); }
+async function gMoveMeasure(dir, label){
+  const p0 = {x: G.x, y: G.y}; let n = 0, d = 0;
+  while (n < 25 && d < 25) {
+    gCheck();
+    await pulse(dir, S.gcalms); await sleep(S.gcalms + 150); n++;
+    const {s} = await gShot(label + " " + n + " 回目(" + d.toFixed(1) + " 画素)");
+    if (!s) throw new Error("校正中に星を見失いました");
+    d = Math.hypot(G.x - p0.x, G.y - p0.y);
+  }
+  if (d < 5) throw new Error("星がほとんど動きません。補正の送り先・接続を確かめてください");
+  return {v: [(G.x - p0.x) / (n * S.gcalms), (G.y - p0.y) / (n * S.gcalms)], n, p0};
+}
+async function gBack(dir, n, label, p0){
+  for (let k = 0; k < n; k++) { gCheck(); await pulse(dir, S.gcalms); await sleep(S.gcalms + 100); }
+  G.x = p0.x; G.y = p0.y;                                  // 元の位置のあたりに戻っているはず
+  const {s} = await gShot(label);
+  if (!s) throw new Error("校正で戻したあと、星が見つかりません");
+}
+function gCalibrate(){
+  return gRun("cal", async () => {
+    if (G.x == null) { const {img} = await gShot("星を探しています"); const a = autoStar(img, 40000); if (!a) throw new Error("星が見つかりません。露出を長くしてください"); gPick(img, a.x, a.y); }
+    const w = await gMoveMeasure(3, "校正: 西へ");
+    await gBack(2, w.n, "校正: 東へ戻す", w.p0);
+    const n = await gMoveMeasure(0, "校正: 北へ");
+    await gBack(1, n.n, "校正: 南へ戻す", n.p0);
+    const ang = v => Math.atan2(v[1], v[0]) * 180 / Math.PI, len = v => Math.hypot(v[0], v[1]);
+    let orth = Math.abs(((ang(n.v) - ang(w.v)) % 360 + 360) % 360); if (orth > 180) orth = 360 - orth;
+    G.cal = {vW: w.v, vN: n.v, wAng: ang(w.v), orth: Math.abs(90 - orth), rW: len(w.v) * 1000 * G.scale, rN: len(n.v) * 1000 * G.scale};
+    gCalInfo();
+    prog("校正が終わりました", null);
+    toast(G.cal.orth > 15 ? "校正は終わりましたが、2 つの向きが直角から " + G.cal.orth.toFixed(0) + " 度ずれています" : "校正が終わりました", G.cal.orth > 15);
+  });
+}
+function gCalInfo(){
+  const c = G.cal; if (!c) { $("gcalinfo").textContent = ""; return; }
+  $("gcalinfo").textContent = "校正: 赤経 " + c.rW.toFixed(1) + "\"/秒・赤緯 " + c.rN.toFixed(1) + "\"/秒、カメラの向き " + c.wAng.toFixed(0) + "°、直角からのずれ " + c.orth.toFixed(1) + "°、画素 " + G.scale.toFixed(2) + "\"";
+}
+// ④ ガイド
+function gGuide(){
+  if ((!G.cal || !G.cal.vW) && !G.task) return toast("先に「③ 校正(キャリブレーション)」をしてください(このブラウザで)", true);
+  return gRun("guide", async () => {
+    if (G.x == null) throw new Error("星を選んでください");
+    G.lock = {x: G.x, y: G.y}; G.hist = []; G.lost = 0;
+    const {vW, vN} = G.cal, det = vW[0] * vN[1] - vW[1] * vN[0];
+    if (Math.abs(det) < 1e-9) throw new Error("校正の結果が使えません。校正し直してください");
+    for (;;) {
+      gCheck();
+      const {s} = await gShot(null);
+      if (!s) {
+        G.lost++; $("gsub").textContent = "星を見失いました(" + G.lost + ")";
+        if (G.lost === 5) toast("ガイド星を見失っています(雲・露出・星の選び直しを確かめてください)", true);
+        continue;
+      }
+      const dx = s.x - G.lock.x, dy = s.y - G.lock.y;
+      const a = (dx * vN[1] - dy * vN[0]) / det, b = (vW[0] * dy - vW[1] * dx) / det;   // ずれ = a ミリ秒の西 + b ミリ秒の北
+      const raPx = a * Math.hypot(vW[0], vW[1]), decPx = b * Math.hypot(vN[0], vN[1]);
+      const k = S.gaggr / 100;
+      let ra = Math.abs(raPx) < S.gmin ? 0 : -a * k, dec = Math.abs(decPx) < S.gmin ? 0 : -b * k;
+      ra = Math.max(-S.gmax, Math.min(S.gmax, ra)); dec = Math.max(-S.gmax, Math.min(S.gmax, dec));
+      if (ra) await pulse(ra > 0 ? 3 : 2, Math.abs(ra));          // + = 西、- = 東
+      if (dec) await pulse(dec > 0 ? 0 : 1, Math.abs(dec));       // + = 北、- = 南
+      G.hist.push({t: Date.now(), ra: raPx * G.scale, dec: decPx * G.scale, cra: ra, cdec: dec, snr: s.snr});
+      if (G.hist.length > G_KEEP) G.hist.shift();
+      gGraph(); gStat();
+      $("gsub").textContent = "ずれ 赤経 " + (raPx * G.scale).toFixed(2) + "\" 赤緯 " + (decPx * G.scale).toFixed(2) + "\"  補正 " + Math.round(ra) + " / " + Math.round(dec) + " ms  SN " + Math.round(s.snr);
+      const wait = Math.max(Math.abs(ra), Math.abs(dec));
+      if (wait) await sleep(wait + 50);
+    }
+  });
+}
+function gRms(n){
+  const h = G.hist.slice(-(n || 50)); if (!h.length) return null;
+  const r = k => Math.sqrt(h.reduce((a, p) => a + p[k] * p[k], 0) / h.length);
+  const ra = r("ra"), dec = r("dec");
+  return {ra, dec, tot: Math.hypot(ra, dec), peak: Math.max(...h.map(p => Math.hypot(p.ra, p.dec)))};
+}
+function drawGuide(c, N, bars){
+  const g = c.getContext("2d"), W = c.width, H = c.height, h = G.hist.slice(-N);
+  g.clearRect(0, 0, W, H); g.font = "11px sans-serif";
+  if (!h.length) { g.fillStyle = "#8b97b0"; g.fillText("ガイドを始めると、ずれのグラフが出ます", 10, H / 2); return; }
+  const m = Math.max(2, Math.ceil(Math.max(...h.map(p => Math.max(Math.abs(p.ra), Math.abs(p.dec)))))), Y = v => H / 2 - v / m * (H / 2 - 8), X = i => 4 + i * (W - 8) / (N - 1);
+  g.strokeStyle = "#2a3550"; g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2); g.moveTo(0, Y(1)); g.lineTo(W, Y(1)); g.moveTo(0, Y(-1)); g.lineTo(W, Y(-1)); g.stroke();
+  if (bars) {
+    const mx = Math.max(1, S.gmax);
+    h.forEach((p, i) => {      // 補正の棒(薄く)
+      g.fillStyle = "rgba(90,169,255,.35)"; g.fillRect(X(i) - 1, H / 2, 1.5, -p.cra / mx * (H / 2 - 10) * 0.5);
+      g.fillStyle = "rgba(255,107,107,.35)"; g.fillRect(X(i) + 0.5, H / 2, 1.5, -p.cdec / mx * (H / 2 - 10) * 0.5);
+    });
+  }
+  for (const [k, col] of [["ra", "#5aa9ff"], ["dec", "#ff6b6b"]]) { g.strokeStyle = col; g.lineWidth = 1.5; g.beginPath(); h.forEach((p, i) => i ? g.lineTo(X(i), Y(p[k])) : g.moveTo(X(i), Y(p[k]))); g.stroke(); }
+  g.lineWidth = 1; g.fillStyle = "#8b97b0"; g.fillText("±" + m + "\"", 4, 11);
+  if (bars) { g.fillText("1\"", W - 18, Y(1) - 2); g.fillStyle = "#5aa9ff"; g.fillText("赤経", 40, 11); g.fillStyle = "#ff6b6b"; g.fillText("赤緯", 72, 11); }
+}
+function gGraph(){
+  drawGuide($("ggraph"), 100, true); drawGuide($("gmini"), 60, false);
+  const r = gRms(50);
+  if (!r) { $("grms").textContent = "--"; return; }
+  $("grms").textContent = r.tot.toFixed(2) + "\"";
+  $("grmsd").textContent = "赤経 " + r.ra.toFixed(2) + "\"  赤緯 " + r.dec.toFixed(2) + "\"  最大 " + r.peak.toFixed(1) + "\"(最近 " + Math.min(50, G.hist.length) + " 回)";
+  $("gminiT").innerHTML = '<span style="color:var(--ok)">' + (G.board ? BN + " ガイド中" : "ガイド中") + '</span>  RMS ' + r.tot.toFixed(2) + '"  <span style="color:#5aa9ff">赤経 ' + r.ra.toFixed(2) + '"</span>  <span style="color:#ff6b6b">赤緯 ' + r.dec.toFixed(2) + '"</span>';
+}
+function gStat(){
+  const r = G.task === "guide" ? gRms(50) : null;
+  $("gstat").textContent = G.task === "guide" ? (G.board ? BN + " ガイド中" : "ガイド中") + (r ? " RMS " + r.tot.toFixed(2) + "\"" : "") : G.task === "cal" ? (G.board ? BN + " 校正中" : "校正中")
+    : G.task === "pe" && PE.run ? BN + " PE 測定中 " + ((Date.now() - PE.run.t0) / 1000 / PE.run.P).toFixed(1) + " 周" : "";
+  $("gstat").className = G.task === "guide" ? "gon" : "";
+  $("gminiBox").style.display = G.task === "guide" ? "" : "none";
+}
+function gButtons(){
+  $("gloop").textContent = G.task === "loop" ? "ループを止める" : "② ループ撮影・星を選ぶ";
+  $("gcal").textContent = G.task === "cal" ? "校正を止める" : "③ 校正(キャリブレーション)";
+  $("gguide").textContent = G.task === "guide" ? "ガイドを止める" : "④ ガイド開始";
+  $("gpe").textContent = G.task === "pe" ? "PE の測定を止める" : "周期誤差(PE)を測る";
+  $("gloop").disabled = !!G.task && G.task !== "loop"; $("gcal").disabled = !!G.task && G.task !== "cal"; $("gguide").disabled = !!G.task && G.task !== "guide";
+  $("gpe").disabled = !!G.task && G.task !== "pe";
+}
+function gSteps(){
+  const st = G.board && G.task ? (G.task === "guide" || G.task === "pe" ? 3 : 2) : !G.cam ? 0 : G.x == null ? 1 : !G.cal ? 2 : 3;
+  document.querySelectorAll("#gsteps span").forEach((e, i) => e.className = i < st || (i === 3 && G.task === "guide") ? "done" : i === st ? "cur" : "");
+  const H = [
+    "ガイドカメラを選んで「接続」を押してください(撮影用とは別のカメラ)。カメラは「撮影」の上の「Alpaca デバイス検索」で見つけたものから選べます。",
+    G.task === "loop" ? "明るすぎない星を自動で選びます。画像の星を押すと選び直せます。選べたら止めて「③ 校正(キャリブレーション)」へ。" : "「② ループ撮影・星を選ぶ」を押してください。ガイド星を自動で選びます。",
+    G.task === "cal" ? BN + " 校正中。星を西・北へ少し動かして、補正の効き方を測っています(1〜2 分)。" : "「③ 校正(キャリブレーション)」を押してください。望遠鏡を少し動かして、補正の向きと速さを測ります。向き・場所を大きく変えたら校正し直します。",
+    G.task === "guide" ? BN + " ガイド中" : G.task === "pe" ? BN + " PE 測定中(補正は送りません)。2 周以上たまったら「PE の測定を止める」を押してください" : "「④ ガイド開始」を押してください。または「周期誤差(PE)を測る」で赤道儀の周期誤差を測ります。"];
+  $("ghelp").textContent = H[st]; $("gbox").classList.toggle("busy", !!G.task);
+}
+// ---------- 基板でのガイド(NS-4000 v1.2.13 以降の /api/guide/*) ----------
+// 星はこのブラウザで選び(全体の画像)、校正・ガイドは基板が自分で回す。ブラウザを閉じてもガイドは続く。ここは状態とグラフを見るだけ
+const GB = {poll: null, seq: 0, last: null};
+async function gbReq(path, form){
+  const o = form ? {method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body: new URLSearchParams(form)} : {cache: "no-store"};
+  let r;
+  const ac = new AbortController(), tm = setTimeout(() => ac.abort(), 8000);   // 基板が忙しくて答えないときに待ち続けない  v0.19
+  try { r = await fetch(location.origin + "/api/guide/" + path, Object.assign(o, {signal: ac.signal})); }
+  catch (e) { throw new Error("基板に届きません(このページは " + BN + " の基板から開いてください)"); }
+  finally { clearTimeout(tm); }
+  const j = await r.json().catch(() => null);
+  if (r.status === 404 || !j) throw new Error("この基板は基板でのガイドに対応していません(NS-4000 v1.2.13 以降・NS-5000X v0.8.0 以降が必要です)");
+  if (!r.ok || j.status !== "success") throw new Error(j.message || "HTTP " + r.status);
+  return j.data;
+}
+async function gbSend(){
+  const host = S.host.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  if (/^(localhost|127\.)/i.test(host)) throw new Error("Alpaca サーバーのアドレスには、基板から届くアドレス(例 192.168.1.10:11111)を入れてください");
+  await gbReq("settings", {cam: host, camnum: S.gcam, exp: S.gexp, roi: 48, scale: (G.scale || 3).toFixed(3), aggrra: S.gaggr / 100, aggrdec: S.gaggr / 100,
+                           minmove: S.gmin, maxpulse: S.gmax, calstep: S.gcalms, ...gbOut()});
+  await gbReq("star", {x: G.x.toFixed(2), y: G.y.toFixed(2)});
+}
+// 校正・ガイド・PE を始めるときだけ、マウントが追尾しているか確かめ、止まっていれば追尾を入れる(ページを開いただけでは何もしない。:Q も送らない)  v0.20
+async function gMountReady(){
+  const m = gMnt(), root = m.board ? location.origin : "http://" + m.host;
+  const A = (p, meth, par) => alpAt(root, "telescope", m.num, p, meth, par);
+  try {
+    if (!(await A("connected"))) await A("connected", "PUT", {Connected: true});
+    if (await A("atpark").catch(() => false)) { toast("マウントはパーク中です。パークを解除してから押してください", true); return false; }
+    if (await A("slewing").catch(() => false)) { toast("マウントは動いています(GOTO 中)。止まってから押してください", true); return false; }
+    if (!(await A("tracking"))) { await A("tracking", "PUT", {Tracking: true}); toast("マウントの追尾を始めました"); }
+    return true;
+  } catch (e) {
+    if (!m.board) { toast("マウントの追尾をこのページから確かめられませんでした(" + e.message + ")。追尾していることを確かめてください"); return true; }   // 補正は基板から送るので、続ける
+    toast(BN + " の追尾を確かめられません: " + e.message, true); return false;
+  }
+}
+function gbOut(){   // 補正の送り先(基板の設定)  v0.16
+  const m = gMnt(); if (m.board) return {out: "onstep"};
+  if (/^(localhost|127\.)/i.test(m.host)) throw new Error("マウントのアドレスには、基板から届くアドレスが要ります");
+  return {out: "alpaca", tel: m.host, telnum: m.num};
+}
+async function gbStart(what){
+  readForm();
+  if (G.task) return toast("いまの作業を止めてから押してください", true);
+  try {   // 基板がもう校正・ガイド・PE の測定をしていないか、始める前に確かめる  v0.19
+    const st0 = await gbReq("status"), BZ = {calibrating: "校正", guiding: "ガイド", measuring: "PE の測定"};
+    if (BZ[st0.state]) { gbPollStart(); return toast(BN + " はいま" + BZ[st0.state] + "中です。止めてから押してください", true); }
+  } catch (e) { return toast(e.message, true); }
+  if (!G.cam) { await gConnect(); if (!G.cam) return; }
+  if (G.x == null) return toast("先に「② ループ撮影・星を選ぶ」で星を選んでください", true);
+  if (!(await gMountReady())) return;
+  try {
+    await gbSend();
+    if (what === "guide" || what === "pe") { const st = await gbReq("status"); if (!st.cal.ok) return toast("先に「③ 校正(キャリブレーション)」をしてください(基板で)", true); }
+    await gbReq("do", {what});
+  } catch (e) { return toast(e.message, true); }
+  G.board = true; G.task = what === "guide" ? "guide" : what === "pe" ? "pe" : "cal";
+  if (what === "guide" || what === "pe") { G.hist = []; GB.seq = 0; } else GB.seq = 0;
+  if (what === "pe") { PE.run = {t0: Date.now(), P: S.pePer, cyc: S.peCyc, pts: [], done: false}; PE.view = "p"; GD.auto = true; }
+  gButtons(); gSteps(); gStat(); gbPollStart();
+}
+async function gbStop(){ try { await gbReq("do", {what: "stop"}); prog("Stopping…"); } catch (e) { toast(e.message, true); } }
+function gbPollStart(){ clearInterval(GB.poll); GB.poll = setInterval(gbPoll, 2000); gbPoll(); }
+async function gbPoll(quiet){
+  let st;
+  try { st = await gbReq("status"); } catch (e) { if (!quiet) $("gsub").textContent = e.message; return; }
+  const was = G.task;
+  if (GB.lastFrames != null && st.frames < GB.lastFrames) gbRestarted();   // 回数が減った = 基板が再起動した
+  GB.lastFrames = st.frames;
+  if (!G.scale) G.scale = st.settings.scale;
+  if (st.cal.ok) { G.cal = Object.assign({}, G.cal && G.cal.vW ? G.cal : {}, {board: true, wAng: st.cal.angle, orth: st.cal.offSquare, rW: st.cal.ra, rN: st.cal.dec}); gCalInfo(); }
+  $("gsub").textContent = BN + ": " + st.msg + (st.state === "guiding" ? "  SN " + Math.round(st.last.snr) + (st.refused ? "  断られた補正 " + st.refused : "") + (st.lost ? "  見失い " + st.lost : "") : "");
+  const meas = st.state === "measuring";
+  if (st.state === "guiding" || st.state === "calibrating" || meas) {
+    G.board = true; G.task = st.state === "guiding" ? "guide" : meas ? "pe" : "cal";
+    if (S.gwhere !== "board") { S.gwhere = "board"; $("gwhere").value = "board"; saveCfg(); }   // 基板がガイド中なら「基板」に合わせる
+    if (!GB.poll) gbPollStart();
+    if (st.state === "guiding" || meas) {
+      if (!GB.seq && was !== G.task) G.hist = [];
+      if (meas && (!PE.run || PE.run.done)) { PE.run = {t0: Date.now(), P: S.pePer, cyc: S.peCyc, pts: [], done: false}; PE.view = "p"; }   // ほかの画面で始めた測定
+      if (st.runSeq != null && GB.seq < st.runSeq) { G.hist = []; GB.seq = st.runSeq; }   // この回のガイドだけ(前の回の記録は混ぜない。v1.2.18 以降)
+      const h = await gbReq("hist?since=" + GB.seq + "&max=50").catch(() => null);
+      if (h) {
+        const off = Date.now() - h.now;
+        for (const it of h.items) if (!(it[7] & 1)) {
+          const q = {t: off + it[1], ra: it[2], dec: it[3], cra: it[4], cdec: it[5], snr: it[6], flags: it[7]}; G.hist.push(q);
+          if (meas && PE.run) { if (!PE.run.pts.length) PE.run.t0 = q.t; PE.run.pts.push({t: q.t, ra: q.ra, dec: q.dec}); }
+        }
+        if (meas && PE.run) { peSaveLast(); if (!PE.run.told && (Date.now() - PE.run.t0) / 1000 >= PE.run.P * 2) { PE.run.told = true; toast("PE が 2 周分たまりました。止めてよい長さです(続けるとさらに正確になります)"); } }   // 止めるのは使う人  v0.20
+        GB.seq = h.seq; if (G.hist.length > G_KEEP) G.hist.splice(0, G.hist.length - G_KEEP);
+        gGraph();
+      }
+    }
+    if (mode === "guide" && !GD.open) gbShowFrame(st);   // 全画面が開いているときは、全画面の側だけが画像を読む(基板の負担を減らす)  v0.9.3
+  } else if (G.board) {
+    G.board = false; G.task = null; clearInterval(GB.poll); GB.poll = null; prog("", null); GD.auto = true;
+    if (was === "pe" && PE.run && !PE.run.done) { PE.run.done = true; PE.stopping = false; peSaveLast(); toast("PE の測定が終わりました(" + ((Date.now() - PE.run.t0) / 60000).toFixed(1) + " 分)"); }
+    const AS = {"a GOTO": "GOTO", "park": "パーク", "home": "ホームへの移動"};
+    if (st.autoStop) toast((AS[st.autoStop] || st.autoStop) + "が始まったので、" + BN + " の" + (was === "cal" ? "校正" : was === "pe" ? "PE の測定" : "ガイド") + "を止めました(自動では再開しません)", true);
+    else if (was === "cal") toast(st.cal.ok ? BN + " の校正が終わりました" : BN + " の校正: " + st.msg, !st.cal.ok);
+  }
+  gButtons(); gSteps(); gStat();
+  if ((st.state === "guiding" || st.state === "calibrating" || meas) && GD.auto && !GD.want) { if (!GB.shown) { GB.shown = true; setMode("guide"); } gdOpen(true); }   // 校正・ガイドが始まったら情報画面へ(開いたときにガイド中ならガイドの画面へ)
+  gdFetch(st);
+}
+async function gbRestarted(){
+  const r = await fetch(location.origin + "/api/system/info", {cache: "no-store"}).then(x => x.json()).catch(() => null);
+  const d = r && r.data, R = {"power on": "電源が入った", "software restart": "ソフトでの再起動", "crash (panic)": "異常終了(クラッシュ)", "task watchdog": "見張り役による再起動(固まった)",
+    "interrupt watchdog": "見張り役による再起動(割り込み)", "watchdog": "見張り役による再起動", "brownout (supply voltage dropped)": "電源の電圧が下がった"};
+  const why = d && d.reset ? (R[d.reset] || d.reset) : "不明";
+  const prev = d && d.prev ? "。再起動の前: " + d.prev.uptimeS + " 秒動いていた、空きメモリー " + d.prev.heapFree + "(最低 " + d.prev.heapMin + ")、ガイド " + d.prev.guide + " " + d.prev.guideFrames + " 回" : "";
+  toast("基板が再起動しました(理由: " + why + ")。ガイドは止まっています" + prev, true);
+  $("gsub").textContent = "基板が再起動しました(理由: " + why + ")" + prev;
+}
+async function gbShowFrame(st){
+  const r = await fetch(location.origin + "/api/guide/frame", {cache: "no-store"}).catch(() => null);
+  if (!r || !r.ok) return;
+  const b = await r.arrayBuffer(), hd = new Uint16Array(b, 0, 4), w = hd[0], hh = hd[1];
+  if (!w || !hh) return;
+  const img = {w, h: hh, data: new Uint16Array(b.slice(8, 8 + w * hh * 2)), meta: {exp: S.gexp, guide: true, roi: true}};
+  img.mark = {x: st.star[0] - hd[2], y: st.star[1] - hd[3], r: Math.max(st.last.hfr || 0, 3)};
+  show(img, true);
+}
+
+// ---------- ガイドの全画面(基板でのガイド中。v1.2.17 以降の /api/guide/status・hist・frame・cal) ----------
+const GD = {open: false, want: false, auto: true, st: null, frame: null, cal: null, calKey: ""};
+// want = ガイド情報画面を見たい。出すのはガイドの画面にいるときだけ  v0.11
+function gdOpen(on){ GD.want = on; gdSync(); }
+function gdSync(){
+  const on = GD.want && mode === "guide", was = GD.open; GD.open = on;
+  $("gdash").classList.toggle("on", on); $("view").classList.toggle("gi", on);
+  $("gdBtn").style.display = GD.want ? "none" : "";   // 開いているときは、情報画面の上の「星を選ぶ画面へ」で戻る  v0.18
+  if (on) { gdDraw(); if (!was && GD.st) gdFetch(GD.st); } else if (was && mode === "guide") { sizeCanvas(); if (cur) draw(); }
+}
+async function gdFetch(st){
+  GD.st = st;
+  if (!GD.open) return;
+  const r = await fetch(location.origin + "/api/guide/frame", {cache: "no-store"}).catch(() => null);
+  if (r && r.ok) { const b = await r.arrayBuffer(), h = new Uint16Array(b, 0, 4); if (h[0] && h[1]) GD.frame = {w: h[0], h: h[1], x0: h[2], y0: h[3], d: new Uint16Array(b.slice(8, 8 + h[0] * h[1] * 2))}; }
+  const key = st.cal.ok + ":" + st.cal.ra + ":" + st.cal.dec + ":" + st.state;
+  if (key !== GD.calKey) { GD.calKey = key; GD.cal = await gbReq("cal").catch(() => null); }
+  gdDraw();
+}
+function gdCv(id){ const c = $(id), r = c.getBoundingClientRect(), d = window.devicePixelRatio || 1; c.width = Math.max(10, r.width * d); c.height = Math.max(10, r.height * d); const g = c.getContext("2d"); g.setTransform(d, 0, 0, d, 0, 0); return [g, r.width, r.height]; }
+const gdT = (g, t, x, y, c) => { g.fillStyle = c || "#8b97b0"; g.font = "11px sans-serif"; g.fillText(t, x, y); };
+function gdDraw(){
+  const st = GD.st; if (!GD.open || !st) return;
+  const h = G.hist, r = gRms(50) || {ra: 0, dec: 0, tot: 0, peak: 0};
+  const ST = {guiding: BN + " ガイド中", calibrating: BN + " 校正中", measuring: BN + " PE 測定中", loop: "撮影中", idle: "止まっています"};
+  $("gdState").textContent = "● " + (ST[st.state] || st.state); $("gdState").className = "gdbadge " + (st.state === "guiding" ? "on" : st.state === "calibrating" || st.state === "measuring" ? "cal" : "off");
+  $("gdStop").textContent = {guiding: "ガイドを止める", calibrating: "校正を止める", measuring: "PE の測定を止める"}[st.state] || "止める"; $("gdStop").disabled = !ST[st.state] || st.state === "idle";
+  $("gdash").classList.toggle("pe", PE.view === "p"); $("gdTabG").classList.toggle("on", PE.view !== "p"); $("gdTabP").classList.toggle("on", PE.view === "p");
+  $("gdTot").textContent = r.tot.toFixed(2) + '"'; $("gdRa").textContent = r.ra.toFixed(2) + '"'; $("gdDec").textContent = r.dec.toFixed(2) + '"'; $("gdPk").textContent = r.peak.toFixed(1) + '"';
+  $("gdRate").textContent = st.guideRate != null ? "×" + st.guideRate : "—";
+  $("gdCnt").textContent = st.frames + " / " + st.lost + " / " + st.refused;
+  const dts = h.slice(-20).map((p, i, a) => i ? (p.t - a[i - 1].t) / 1000 : null).filter(v => v && v < 30).sort((a, b) => a - b);
+  $("gdInt").textContent = dts.length ? dts[dts.length >> 1].toFixed(1) + " 秒" : "—"; $("gdIntK").textContent = "間隔(露出 " + st.settings.exp + " 秒)";
+  $("gdMsg").textContent = "LUNA Imaging v" + VERSION + "  ・  " + BN + ": " + st.msg;
+  // 星の数値
+  const L = st.last;
+  $("gdCen").textContent = "(" + st.star[0].toFixed(2) + ", " + st.star[1].toFixed(2) + ")";
+  $("gdBg").textContent = L.bg != null ? L.bg : "—"; $("gdNs").textContent = L.noise != null ? L.noise.toFixed(1) : "—"; $("gdPeak").textContent = (L.peak || 0).toLocaleString();
+  $("gdSn").textContent = Math.round(L.snr || 0).toLocaleString(); $("gdHfr").textContent = (L.hfr || 0).toFixed(2) + " 画素" + (st.settings.scale ? " = " + ((L.hfr || 0) * st.settings.scale).toFixed(1) + "″" : "");
+  $("gdSat").textContent = L.peak >= 60000 ? "飽和" : "なし"; $("gdSat").style.color = L.peak >= 60000 ? "var(--go)" : "var(--ok)";
+  $("gdGraphHd").textContent = "RMS 赤経 " + r.ra.toFixed(2) + "″ / 赤緯 " + r.dec.toFixed(2) + "″";
+  if (PE.view === "p") return peDraw();
+  gdStar(); gdGraph(); gdTarget(); gdCal(); gdTable(); gdAdvice();
+}
+// ガイド星の周辺画像と、星の中心を通る横・縦の断面。目盛りは「中心からの画素」と秒角でそろえる  v0.11
+// f = {w, h, x0, y0, d}(センサー座標の切り出し)、o = {cx, cy(星の中心), lx, ly(基準、無ければ null), bg, sd, peak, hfr, scale("/画素)}
+function starPanel(g, W, H, f, o){
+  g.fillStyle = "#05070c"; g.fillRect(0, 0, W, H);
+  const L = 34, T = 16, PV = Math.min(70, W * 0.16), PH = Math.min(78, H * 0.24), B = 30;
+  const side = Math.max(40, Math.min(W - L - PV - 12, H - T - PH - B - 6)), s = side / Math.max(f.w, f.h);
+  const ix = L, iy = T, iw = f.w * s, ih = f.h * s, rx = ix + iw + 6, by = iy + ih + 6;
+  const bg = o.bg, sd = o.sd || 10, hi = Math.max(bg + 30 * sd, Math.min(o.peak || 1000, bg + 400 * sd));
+  const dp = window.devicePixelRatio || 1, im = g.createImageData(Math.max(1, Math.round(iw * dp)), Math.max(1, Math.round(ih * dp)));
+  for (let py = 0; py < im.height; py++) for (let px = 0; px < im.width; px++) {
+    const x = Math.min(f.w - 1, Math.floor(px / (s * dp))), y = Math.min(f.h - 1, Math.floor(py / (s * dp)));
+    let v = (f.d[y * f.w + x] - bg) / (hi - bg); v = v < 0 ? 0 : v > 1 ? 1 : Math.pow(v, 0.45); const q = Math.round(v * 255), k = (py * im.width + px) * 4;
+    im.data[k] = im.data[k + 1] = im.data[k + 2] = q; im.data[k + 3] = 255;
+  }
+  g.putImageData(im, Math.round(ix * dp), Math.round(iy * dp));
+  const PX = sx => ix + (sx - f.x0 + 0.5) * s, PY = sy => iy + (sy - f.y0 + 0.5) * s;
+  const scx = PX(o.cx), scy = PY(o.cy), mx = f.x0 + f.w / 2, my = f.y0 + f.h / 2;   // 目盛りは切り出しの真ん中から
+  // 目盛り: 左・下 = 中心からの画素、上・右 = 秒角
+  const step = f.w >= 40 ? 12 : f.w >= 20 ? 6 : 4, sc = o.scale || 0;
+  g.font = "10px sans-serif"; g.fillStyle = "#8b97b0"; g.strokeStyle = "#2a3550"; g.lineWidth = 1;
+  for (let v = -Math.floor(f.w / 2 / step) * step; v <= f.w / 2; v += step) {
+    const x = ix + (v + f.w / 2) * s; g.beginPath(); g.moveTo(x, by + PH); g.lineTo(x, by + PH + 3); g.moveTo(x, iy - 3); g.lineTo(x, iy); g.stroke();
+    g.textAlign = "center"; g.fillText(String(v), x, by + PH + 13); if (sc) g.fillText(Math.round(v * sc) + "″", x, iy - 5);
+  }
+  for (let v = -Math.floor(f.h / 2 / step) * step; v <= f.h / 2; v += step) {
+    const y = iy + (v + f.h / 2) * s; g.beginPath(); g.moveTo(ix - 3, y); g.lineTo(ix, y); g.stroke(); g.textAlign = "right"; g.fillText(String(v), ix - 5, y + 3);
+  }
+  g.textAlign = "left";
+  gdT(g, "画素(中心から)" + (sc ? "  上: 秒角" : ""), ix, H - 4);
+  // 中心を通る点線(画像と断面を貫く)
+  g.strokeStyle = "rgba(255,208,138,.45)"; g.setLineDash([3, 3]); g.beginPath();
+  g.moveTo(scx, iy); g.lineTo(scx, by + PH); g.moveTo(ix, scy); g.lineTo(rx + PV, scy); g.stroke(); g.setLineDash([]);
+  // 基準(緑 +)・いまの中心(黄 ○)
+  if (o.lx != null) { const lx = PX(o.lx), ly = PY(o.ly), a = Math.max(6, 2 * s); g.strokeStyle = "#34d399"; g.lineWidth = 1.5; g.beginPath();
+    g.moveTo(lx - 2 * a, ly); g.lineTo(lx - a, ly); g.moveTo(lx + a, ly); g.lineTo(lx + 2 * a, ly); g.moveTo(lx, ly - 2 * a); g.lineTo(lx, ly - a); g.moveTo(lx, ly + a); g.lineTo(lx, ly + 2 * a); g.stroke(); }
+  g.strokeStyle = "#ffd08a"; g.lineWidth = 1.5; g.beginPath(); g.arc(scx, scy, Math.max(3, (o.hfr || 1) * 2.5) * s, 0, 7); g.stroke(); g.lineWidth = 1;
+  // 縮尺の線(10 画素)
+  const nb = f.w >= 30 ? 10 : 5; g.strokeStyle = "#fff"; g.lineWidth = 2; g.beginPath(); g.moveTo(ix + 6, iy + ih - 7); g.lineTo(ix + 6 + nb * s, iy + ih - 7); g.stroke(); g.lineWidth = 1;
+  gdT(g, nb + " 画素" + (sc ? " = " + (nb * sc).toFixed(0) + "″" : ""), ix + 6, iy + ih - 11, "#fff");
+  // 断面(横 = 画像の下、縦 = 画像の右。明るさの目盛りは共通)
+  const row = Math.max(0, Math.min(f.h - 1, Math.round(o.cy - f.y0))), col = Math.max(0, Math.min(f.w - 1, Math.round(o.cx - f.x0)));
+  const hv = [], vv = []; for (let x = 0; x < f.w; x++) hv.push(f.d[row * f.w + x]); for (let y = 0; y < f.h; y++) vv.push(f.d[y * f.w + col]);
+  const lo = bg - 4 * sd, top = Math.max(...hv, ...vv, bg + 6 * sd), K = v => Math.max(0, Math.min(1, (v - lo) / (top - lo)));
+  g.strokeStyle = "#2a3550"; g.strokeRect(ix, by, iw, PH); g.strokeRect(rx, iy, PV, ih);
+  const HY = v => by + PH - 2 - K(v) * (PH - 6), VX = v => rx + 2 + K(v) * (PV - 6);
+  g.fillStyle = "rgba(139,151,176,.18)"; g.fillRect(ix, HY(bg + 3 * sd), iw, HY(bg - 3 * sd) - HY(bg + 3 * sd)); g.fillRect(VX(bg - 3 * sd), iy, VX(bg + 3 * sd) - VX(bg - 3 * sd), ih);
+  g.strokeStyle = "rgba(255,107,107,.7)"; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(ix, HY(bg + 3 * sd)); g.lineTo(ix + iw, HY(bg + 3 * sd)); g.moveTo(VX(bg + 3 * sd), iy); g.lineTo(VX(bg + 3 * sd), iy + ih); g.stroke(); g.setLineDash([]);
+  if (o.hfr) { g.strokeStyle = "rgba(251,191,36,.8)"; g.setLineDash([2, 2]); g.beginPath();
+    for (const d of [-o.hfr, o.hfr]) { const x = PX(o.cx + d); g.moveTo(x, by); g.lineTo(x, by + PH); } g.stroke(); g.setLineDash([]); }
+  g.strokeStyle = "#5aa9ff"; g.lineWidth = 1.5; g.beginPath(); hv.forEach((v, x) => { const X = ix + (x + 0.5) * s; x ? g.lineTo(X, HY(v)) : g.moveTo(X, HY(v)); }); g.stroke();
+  g.beginPath(); vv.forEach((v, y) => { const Y = iy + (y + 0.5) * s; y ? g.lineTo(VX(v), Y) : g.moveTo(VX(v), Y); }); g.stroke(); g.lineWidth = 1;
+  gdT(g, "横断面", ix + 3, by + 11); gdT(g, "しきい値 3σ", ix + iw - 62, HY(bg + 3 * sd) - 3, "#ff8f8f");
+  if (o.hfr) gdT(g, "HFR " + o.hfr.toFixed(2) + " 画素" + (sc ? " = " + (o.hfr * sc).toFixed(1) + "″" : ""), Math.min(PX(o.cx + o.hfr) + 4, ix + iw - 120), by + 23, "#fbbf24");
+  gdT(g, "縦断面", rx + 3, iy + 11);
+}
+function gdStar(){
+  const [g, W, H] = gdCv("gdStarCv"), f = GD.frame, st = GD.st;
+  if (!f) { g.fillStyle = "#05070c"; g.fillRect(0, 0, W, H); gdT(g, "画像を待っています", 10, H / 2); return; }
+  const sc = st.settings.scale || G.scale || 0;
+  $("gdSize").textContent = f.w + "×" + f.h + " 画素" + (sc ? " = " + Math.round(f.w * sc) + "″×" + Math.round(f.h * sc) + "″(" + sc.toFixed(2) + "″/画素)" : "");
+  starPanel(g, W, H, f, {cx: st.star[0], cy: st.star[1], lx: st.lock[0] >= 0 && st.state === "guiding" ? st.lock[0] : null, ly: st.lock[1],
+    bg: st.last.bg || 0, sd: st.last.noise || 10, peak: st.last.peak, hfr: st.last.hfr, scale: sc});
+}
+// 星を選ぶ画面(右のパネル): 選んだ星の周辺画像と断面(ブラウザで撮ったループの画像から)
+function gSelDraw(img, st){
+  const c = $("gsel"); if (!img || !st) { c.style.display = "none"; return; }
+  c.style.display = "block";
+  const N = 48, x0 = Math.max(0, Math.min(img.w - N, Math.round(st.x) - N / 2)), y0 = Math.max(0, Math.min(img.h - N, Math.round(st.y) - N / 2)), w = Math.min(N, img.w), h = Math.min(N, img.h);
+  const d = new Uint16Array(w * h), edge = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = img.data[(y0 + y) * img.w + x0 + x]; d[y * w + x] = v; if (!x || !y || x === w - 1 || y === h - 1) edge.push(v); }
+  edge.sort((a, b) => a - b); const bg = edge[edge.length >> 1], dev = edge.map(v => Math.abs(v - bg)).sort((a, b) => a - b), sd = Math.max(1, 1.4826 * dev[dev.length >> 1]);
+  const [g, W, H] = gdCv("gsel");
+  starPanel(g, W, H, {w, h, x0, y0, d}, {cx: st.x, cy: st.y, lx: null, bg, sd, peak: st.peak, hfr: st.hfr, scale: G.scale || 0});
+}function gdGraph(){
+  const [g, W, H] = gdCv("gdGraphCv"), h = G.hist.slice(-100); if (!h.length) { gdT(g, "ガイドを始めると、ずれのグラフが出ます", 10, H / 2); return; }
+  const m = Math.max(2, Math.ceil(Math.max(...h.map(p => Math.max(Math.abs(p.ra), Math.abs(p.dec)))))), Y = v => H / 2 - v / m * (H / 2 - 14), X = i => 34 + i * (W - 42) / 99, mx = Math.max(1, GD.st.settings.maxpulse);
+  g.strokeStyle = "#2a3550"; g.lineWidth = 1; g.beginPath(); const ticks = m <= 3 ? [-2, -1, 0, 1, 2].filter(v => Math.abs(v) <= m) : [-m, -m / 2, 0, m / 2, m];
+  for (const v of ticks) { g.moveTo(34, Y(v)); g.lineTo(W - 6, Y(v)); } g.stroke(); for (const v of ticks) gdT(g, (v > 0 ? "+" : "") + (+v.toFixed(1)) + '"', 2, Y(v) + 4);
+  h.forEach((p, i) => { g.fillStyle = "rgba(90,169,255,.35)"; g.fillRect(X(i) - 1.5, H / 2, 2, -p.cra / mx * (H / 2 - 14) * 0.6); g.fillStyle = "rgba(255,107,107,.35)"; g.fillRect(X(i) + 0.5, H / 2, 2, -p.cdec / mx * (H / 2 - 14) * 0.6); });
+  for (const [k, c] of [["ra", "#5aa9ff"], ["dec", "#ff6b6b"]]) { g.strokeStyle = c; g.lineWidth = 1.6; g.beginPath(); h.forEach((p, i) => i ? g.lineTo(X(i), Y(p[k])) : g.moveTo(X(i), Y(p[k]))); g.stroke(); }
+  const span = h.length > 1 ? Math.round((h[h.length - 1].t - h[0].t) / 60000) : 0; gdT(g, "← " + span + " 分前", 36, H - 4); gdT(g, "いま →", W - 46, H - 4);
+}
+function gdTarget(){
+  const [g, W, H] = gdCv("gdTgtCv"), h = G.hist.slice(-100), R = Math.min(W, H) / 2 - 14, cx = W / 2, cy = H / 2;
+  const lim = Math.max(2.5, ...h.map(p => Math.hypot(p.ra, p.dec))) , sc = R / Math.min(lim, 6);
+  g.strokeStyle = "#2a3550"; g.beginPath(); g.moveTo(cx - R, cy); g.lineTo(cx + R, cy); g.moveTo(cx, cy - R); g.lineTo(cx, cy + R); g.stroke();
+  for (const [rr, c] of [[1, "#34d399"], [2, "#fbbf24"]]) if (rr * sc < R + 2) { g.strokeStyle = c; g.beginPath(); g.arc(cx, cy, rr * sc, 0, 7); g.stroke(); }
+  h.forEach((p, i) => { const last = i >= h.length - 5; g.fillStyle = last ? "#ff6b6b" : "rgba(90,169,255," + (0.25 + 0.6 * i / h.length) + ")";
+    const x = cx + Math.max(-R, Math.min(R, p.ra * sc)), y = cy - Math.max(-R, Math.min(R, p.dec * sc)); g.beginPath(); g.arc(x, y, last ? 3.5 : 2.2, 0, 7); g.fill(); });
+  gdT(g, "西 →", cx + R - 30, cy - 4); gdT(g, "北 ↑", cx + 4, cy - R + 10); gdT(g, "赤 = 最近 5 回、単位 ″(秒角)", 8, H - 6);
+}
+function gdCal(){
+  const [g, W, H] = gdCv("gdCalCv"), c = GD.cal;
+  if (!c || !c.points || !c.points.length) { gdT(g, c && c.running ? "校正中…" : "まだ校正していません", 10, H / 2); $("gdCalHd").textContent = ""; $("gdCalNote").textContent = ""; return; }
+  const o = c.points[0], pts = c.points.map(p => [p[0], p[1] - o[1], p[2] - o[2]]);
+  const ext = Math.max(5, ...pts.map(p => Math.max(Math.abs(p[1]), Math.abs(p[2])))), sc = (Math.min(W, H) / 2 - 22) / ext, cx = W / 2, cy = H / 2 - 6;
+  const col = {o: "#e6ebf5", w: "#5aa9ff", e: "#8b97b0", b: "#fbbf24", n: "#ff6b6b", s: "#8b97b0"};
+  g.strokeStyle = "#2a3550"; g.beginPath(); g.moveTo(cx - ext * sc, cy); g.lineTo(cx + ext * sc, cy); g.moveTo(cx, cy - ext * sc); g.lineTo(cx, cy + ext * sc); g.stroke();
+  for (const [ph, x, y] of pts) { g.fillStyle = col[ph] || "#fff"; g.beginPath(); g.arc(cx + x * sc, cy + y * sc, 3, 0, 7); g.fill(); }
+  if (c.ok) for (const [v, colr, t] of [[c.vW, "#5aa9ff", "西"], [c.vN, "#ff6b6b", "北"]]) {
+    const L = ext * 0.8, n = Math.hypot(v[0], v[1]) || 1, ex = cx + v[0] / n * L * sc, ey = cy + v[1] / n * L * sc;
+    g.strokeStyle = colr; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(ex, ey); g.stroke(); g.lineWidth = 1; gdT(g, t, ex + 4, ey, colr); }
+  gdT(g, "● 西へ  ● 北へ  ● 赤緯の遊び取り  ● 戻したところ(画像の上の位置、画素)", 6, H - 6);
+  const ex = (m, e) => m.toFixed(1) + '"/秒' + (e != null ? "(本来 " + e.toFixed(1) + ")" : "");
+  $("gdCalHd").textContent = c.ok ? "赤経 " + ex(c.ra, c.expectRa) + "・赤緯 " + ex(c.dec, c.expectDec) + "・向き " + c.angle.toFixed(0) + "°・直角から " + c.offSquare.toFixed(1) + "°" : (c.running ? "校正中" : "校正は終わっていません");
+  $("gdCalNote").textContent = "西 " + c.steps.w + " 回・北 " + c.steps.n + " 回・赤緯の遊び取り " + c.steps.backlash + " 回(1 回 " + c.calstep + " ms)" +
+    (c.guideRate != null && !isNaN(c.guideRate) ? "。校正したときのガイドの速さ ×" + c.guideRate + (c.decDeg != null ? "、赤緯 " + c.decDeg.toFixed(0) + "°" : "") + "。本来の速さ = 速さ ×15.04\"/秒(赤経は ×cos 赤緯)" : "");
+}
+function gdTable(){
+  const tb = $("gdTbl").querySelector("tbody"); tb.textContent = "";
+  for (const p of G.hist.slice(-40).reverse()) {
+    const tr = document.createElement("tr"), f = p.flags || 0, fl = [f & 2 ? "赤経 断られ" : "", f & 4 ? "赤緯 断られ" : "", f & 8 ? "飽和" : ""].filter(Boolean).join(" ");
+    tr.innerHTML = "<td>" + new Date(p.t).toTimeString().slice(0, 8) + "</td><td class=\"ra\">" + p.ra.toFixed(2) + "</td><td class=\"ra\">" + p.cra + "</td><td class=\"de\">" + p.dec.toFixed(2) + "</td><td class=\"de\">" + p.cdec + "</td><td>" + Math.round(p.snr) + "</td><td class=\"f\"></td>";
+    tr.lastChild.textContent = fl; tb.appendChild(tr);
+  }
+}
+// 助言: 最近の補正と校正から、ガイドの速さ・露出などのヒント(決めるのはユーザー)
+function gdAdvice(){
+  const st = GD.st, h = G.hist.slice(-20), mx = st.settings.maxpulse, A = [];
+  if (st.refused && st.refusedLast) A.push(["bad", "マウントが補正を断っています: " + gdJa(st.refusedLast.text) + "(" + (st.refusedLast.axis === "ra" ? "赤経" : "赤緯") + "、" + st.refusedLast.ago + " 秒前)"]);
+  if (/lost/i.test(st.msg)) A.push(["bad", "ガイド星を見失っています。雲・露出・星の選び直しを確かめてください"]);
+  if (st.last.peak >= 60000) A.push(["warn", "ガイド星が飽和しています。露出を短くするか、暗めの星を選んでください"]);
+  else if (st.last.snr && st.last.snr < 10) A.push(["warn", "ガイド星が暗すぎます(SN " + Math.round(st.last.snr) + ")。露出を長くするか、明るい星を選んでください"]);
+  if (h.length >= 8) {
+    const big = h.filter(p => Math.abs(p.cra) >= mx * 0.95 || Math.abs(p.cdec) >= mx * 0.95).length;
+    if (big >= h.length * 0.5) A.push(["warn", "補正がたびたび上限(" + mx + " ms)に届いています。ガイドの速さを上げる(×0.5 → ×1 など)か、極軸・バランスを確かめてください"]);
+    const nz = h.map(p => p.cra).filter(v => v), flips = nz.slice(1).filter((v, i) => Math.sign(v) !== Math.sign(nz[i])).length;
+    const rr = gRms(20);
+    if (nz.length >= 8 && flips >= (nz.length - 1) * 0.7 && rr && rr.ra < 1.5) A.push(["warn", "赤経の補正が行ったり来たりしています。ガイドの速さか補正の強さを下げると、落ち着くことがあります"]);
+  }
+  const c = GD.cal;
+  const rt = gRms(20);
+  if (st.state === "guiding" && rt && h.length >= 5 && rt.tot > 3) A.push(["warn", "ずれが大きい(RMS " + rt.tot.toFixed(1) + "\")です。星の選び直し、校正のやり直し、ガイドの速さ・補正の強さを確かめてください"]);
+  if (c && c.ok && (c.steps.w >= 20 || c.steps.n >= 20)) A.push(["warn", "校正で星があまり動きませんでした(" + Math.max(c.steps.w, c.steps.n) + " 回)。ガイドの速さを上げると、校正が早く正確になります"]);
+  if (c && c.ok && c.expectRa != null && Math.abs(c.ra / c.expectRa - 1) > 0.3) A.push(["warn", "校正の赤経の速さ(" + c.ra.toFixed(1) + "\"/秒)が本来(" + c.expectRa.toFixed(1) + ")から 3 割以上違います。焦点距離・画素の大きさの設定か、校正のやり直しを確かめてください"]);
+  if (c && c.ok && c.offSquare > 15) A.push(["warn", "校正の 2 つの向きが直角から " + c.offSquare.toFixed(0) + "° ずれています。赤緯の遊びが大きいか、校正中に星が流れたかもしれません。校正し直してください"]);
+  if (!A.length) A.push(["ok", st.state === "guiding" ? "補正は落ち着いています。このままで大丈夫です" : "ガイドを始めると、ここに助言が出ます"]);
+  const box = $("gdAdv"); box.textContent = "";
+  for (const [k, t] of A.slice(0, 3)) { const d = document.createElement("div"); d.className = "adv " + k; d.textContent = "助言: " + t; box.appendChild(d); }
+}
+function gdJa(t){
+  return {"motors in standby (start tracking first)": "モーターが待機中です(先に追尾を始めてください)", "mount in motion (GOTO or settling after a GOTO)": "マウントが動いています(GOTO や、その直後の落ち着き待ち)",
+          "mount is parked": "パーク中です", "outside the limits": "限界の外です", "another pulse on this axis is still running": "同じ軸の補正がまだ動いています"}[t] || t;
+}
+
+// ---------- グラフの説明(i のボタン)  v0.12 ----------
+const HELP = {
+  star: ["ガイド星 周辺画像・輝度分布", `
+<p><span class="k">何か</span> ガイドカメラの画像のうち、ガイド星のまわり(48×48 画素)を拡大したものです。下は星の中心を通る横の明るさ(横断面)、右は縦の明るさ(縦断面)です。画像と断面は位置の目盛りがそろっています。</p>
+<p><span class="k">見方</span></p><ul>
+<li>黄の ○ がいまの星の中心、緑の + が基準(ガイドで保ちたい位置)です。○ が + に重なっていれば、ずれていません</li>
+<li>断面の山が 1 つで左右対称、すそが背景(灰の帯)まで下りていれば、ガイドに向いた星です</li>
+<li>山の頂上が平ら → 飽和しています。露出を短くするか、暗めの星を選びます</li>
+<li>山が低く、しきい値 3σ(赤の点線)すれすれ → 暗すぎます。露出を長くするか、明るい星を選びます</li>
+<li>山が 2 つ → 二重星か、近くに別の星があります。選び直します</li>
+<li>HFR(黄の点線)は星の大きさです。急に大きくなったら、雲・ピントのずれ・シーイングの悪化を疑います</li></ul>
+<p><span class="k">単位</span> 下と左は中心からの画素、上は秒角(″)です。秒角は、カメラの画素の大きさとガイド鏡の焦点距離から計算しています。</p>`],
+  tgt: ["ガイド誤差の散布図", `
+<p><span class="k">何か</span> 毎回のガイド誤差を点で打ったものです。横が赤経(右 = 西)、縦が赤緯(上 = 北)、単位は秒角(″)です。最近 100 回分で、赤い点が最近 5 回です。円は 1″(緑)と 2″(黄)です。</p>
+<p><span class="k">見方</span></p><ul>
+<li>点が中心に小さく丸くまとまっていれば順調です</li>
+<li>横に長い → 赤経の問題(ギアの周期誤差・風・補正の強さ)です</li>
+<li>縦に長い → 赤緯の問題(極軸のずれ・赤緯の遊び)です</li>
+<li>中心から片側に寄る → 補正が追いついていません。補正の強さや 1 回の最長を見直します</li>
+<li>目安: 点の広がりが、撮影カメラの 1 画素(秒角)より十分小さければ、星は丸く写ります</li></ul>`],
+  graph: ["ガイド誤差の推移(赤経・赤緯)", `
+<p><span class="k">何か</span> ガイド誤差を時間の順に並べたものです。青が赤経、赤が赤緯、単位は秒角(″)です。薄い棒は、その回に送ったパルスの長さです(上 = 西・北)。タイトルの RMS は、最近 50 回のばらつきの大きさです(小さいほど良い。1″ 以内が目安)。</p>
+<p><span class="k">見方</span></p><ul>
+<li>0 の線のまわりを小さく細かく揺れている → 順調です</li>
+<li>ゆっくりした大きな波 → 赤経のギアの周期誤差です。波の周期がギアの 1 回転に合います</li>
+<li>急な跳ね → 風・ケーブルの引っかかり・雲です</li>
+<li>一方向にじわじわ離れていく → 星の流れに補正が追いついていません</li>
+<li>毎回、上下が入れ替わるジグザグで棒も大きい → 補正が強すぎます。補正の強さを下げます</li>
+<li>棒がいつも上限まで伸びる → ガイドの速さが遅いか、極軸・バランスの問題です</li></ul>`],
+  tbl: ["パルスガイドの記録", `
+<p><span class="k">何か</span> ガイド 1 回ごとの記録です(新しい順)。時刻、赤経・赤緯の誤差(″)、マウントへ送ったパルスの長さ(ms)、星の SN、印です。+ は西・北です。青が赤経、赤が赤緯です。</p>
+<p><span class="k">見方</span></p><ul>
+<li>パルスは、誤差を戻す向き(誤差と逆の符号)に送ります</li>
+<li>パルスが 0 → ずれが小さいので、補正しませんでした(「細かい設定」の「無視するずれ」)</li>
+<li>印の「断られ」→ マウントが補正を受け付けませんでした(GOTO 中・パーク中・追尾していないなど)。続くときは助言の欄に理由が出ます</li>
+<li>印の「飽和」→ 星が飽和しています。中心の位置が不正確になります</li>
+<li>SN が急に下がる → 雲がかかった、星を見失う前触れです</li></ul>`],
+  adv: ["ガイド星の状態と助言", `
+<p><span class="k">何か</span> 最新の画像でのガイド星の数値と、ガイドの様子から出す助言です。</p><ul>
+<li><b>背景</b> 星のまわりの空の明るさ。月明かり・薄明・光害で上がります</li>
+<li><b>雑音 σ</b> 背景のばらつき。星をこれと比べて見つけます</li>
+<li><b>ピーク</b> 星のいちばん明るい画素。65535 近くは飽和です</li>
+<li><b>SN</b> 星の明るさと雑音の比。10 以下は暗すぎ、数十〜数百が扱いやすい星です</li>
+<li><b>HFR</b> 星の光の半分が入る半径(星の大きさ)。画素と秒角で出します</li>
+<li><b>飽和</b> ピークが上限に届いたかどうか</li></ul>
+<p><span class="k">助言</span> 緑 = 順調、黄 = 注意、赤 = すぐ確かめてほしいことです。助言はヒントで、決めるのは使う人です。</p>`],
+  pe: ["周期誤差(PE)の重ね描き", `
+<p><span class="k">何か</span> 赤道儀の追尾の誤差(ピリオディックモーション)です。ガイドの補正を送らずに星のずれ(赤経、秒角)を記録し、ウォームの周期で折り返して、周ごとに色を変えて重ねます。白い線は全部の周の平均です。極軸のずれなどによる一定の流れ(直線)は引いてあります。</p>
+<p><span class="k">見方</span></p><ul>
+<li>周ごとの線がよく重なる → 毎回同じ形の誤差です(ウォーム・ギアの形)。PEC(周期誤差の補正)で減らせる部分です</li>
+<li>周ごとに形が違う → ギアの別の周期・ベルト・風・シーイングの揺れが混ざっています。「周期の成分」で見分けます</li>
+<li>P-P は平均の線の山から谷まで、片振幅はその半分(±)です。赤道儀の比べっこや、調整の前と後の比較に使います</li>
+<li>ガイドなしで撮れる長さの目安: 誤差の傾きが急なところで、撮影カメラの 1 画素(秒角)を超えない時間です</li></ul>
+<p><span class="k">注意</span> 測る間は追尾を止めない・GOTO しないでください(GOTO で測定は止まります)。シーイングの揺れも入るので、2〜3 周以上測ると平均が安定します。</p>`],
+  spec: ["周期の成分", `
+<p><span class="k">何か</span> 測った誤差(流れを引いたもの)に、どの周期の揺れがどれだけ入っているかです。横は周期(秒、対数の目盛り)、縦はその周期の振幅(±秒角)です。</p><ul>
+<li>橙の点線「周期」に山 → ウォームの 1 回転の誤差(偏心・形)です</li>
+<li>「1/2」「1/3」に山 → ウォームの形のゆがみ・軸受けです</li>
+<li>短い周期の山 → モータ・減速ギア・ベルト・マイクロステップの誤差です。ギア比から周期を計算して照らし合わせます</li>
+<li>いちばん強い周期が、入れた周期とずれているときは、周期の値(歯数)を確かめます</li></ul>
+<p>測った長さの 1/1.2 より長い周期は出せません。長い周期を見るには長く測ります。</p>`],
+  penum: ["PE の数値", `<ul>
+<li><b>P-P</b> 平均の線の山から谷まで(秒角)。カタログの「ピリオディックモーション ±○″」は、この半分の片振幅で書かれることが多いです</li>
+<li><b>RMS</b> 流れを引いたあとの、全部の点のばらつき。シーイングの揺れも入ります</li>
+<li><b>赤経の流れ</b> 追尾の速さのずれ(追尾レート)と極軸のずれです</li>
+<li><b>赤緯の流れ</b> ほぼ極軸のずれです。大きいときは極軸を合わせ直すと、ガイドが楽になります</li>
+<li><b>保存</b> このブラウザに保存し、「比べる」で別の日・調整の前と後を重ねられます(最大 12 件)。<b>CSV</b> は生の値(時刻・赤経・赤緯)で、表計算や他のソフトで使えます</li></ul>`],
+  cmp: ["ガイド誤差・再生した PE・測った PE", `
+<p><span class="k">何か</span> ガイド中の記録を、1 周期分の同じ時間の目盛りで並べたものです。</p><ul>
+<li><b>青 = ガイド誤差</b> ガイドしたあとに残ったずれです</li>
+<li><b>橙 = 再生した PE</b> ずれ − それまでに送った補正の合計(パルス × 校正の速さ)。ガイドしなかったら出ていたずれ = 赤道儀そのものの誤差です。ガイドをしながら PE が分かります</li>
+<li><b>白の点線 = 測った PE</b> 「周期誤差(PE)を測る」で測った平均の形を、時刻に合わせて置いたものです(相関がいちばん高い位置へ自動でずらします)</li>
+<li><b>棒</b> 赤経に送ったパルスです</li></ul>
+<p><span class="k">見方</span> 橙が大きく波打っても青が小さければ、ガイドが PE をよく消しています。青が橙と同じ形で遅れて出る → 補正が遅い・弱い(露出を短く・補正を強く)。青が細かくジグザグ → 補正が強すぎます。橙と白が重なれば、測った PE が今夜も同じ = PEC に使えます。</p>
+<p><span class="k">スライダー</span> 過去の 1 周期を選んで見られます。「いまを表示」に印を入れると、最新の 1 周期を追いかけます。</p>`],
+  cal: ["校正", `
+<p><span class="k">何か</span> ガイドの「物差し」です。望遠鏡を西・北へ少しずつ動かし、パルス 1 秒で星が画像の上でどちらへ何秒角動くかを測ります。ガイドはこの値で補正の量を計算するので、校正が狂うとガイド全体が狂います。</p><ul>
+<li><b>赤経・赤緯 ″/秒</b> パルス 1 秒で星が動く量です。本来の値(ガイドの速さ × 15.04″/秒、赤経は × cos 赤緯)と比べ、3 割以上違うときは焦点距離・画素の大きさ・ガイドの速さの設定を確かめます</li>
+<li><b>向き</b> 「西」が画像の上でどちら向きか(カメラの取り付けの角度)です。カメラを回したら校正し直します</li>
+<li><b>直角から</b> 西と北の動きが直角からどれだけずれたか。15° を超えると、赤緯の遊びか校正中の星の流れを疑います</li></ul>
+<p><span class="k">図の見方</span> 点が 2 本のまっすぐな線に並び、間隔がそろっていれば、マウントは素直に動いています。戻した点が出発点の近くに来なければ、遊び(バックラッシュ)が大きいです。望遠鏡の向きや場所を大きく変えたら、校正し直します。</p>`]};
+document.querySelectorAll(".hb").forEach(b => b.onclick = () => { const h = HELP[b.dataset.h]; $("hdT").textContent = h[0]; $("hdB").innerHTML = h[1]; $("hdlg").showModal(); });
+$("hdX").onclick = () => $("hdlg").close();
+$("hdlg").addEventListener("click", e => { const r = $("hdlg").getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) $("hdlg").close(); });   // 外側を押しても閉じる
+
+// ---------- 周期誤差(PE)  v0.13 ----------
+// 測定: 基板が補正を送らずに星のずれ(赤経・赤緯の秒角)を記録する(v1.2.23 の what=pe)。ここで直線の流れを引き、周期で折り返して重ねる。
+// 再生した PE: ガイド中の記録から「ずれ − それまでに送った補正の合計(パルス ms × 校正の速さ)」= 補正しなかったら出ていたずれ
+const PE = {run: null, view: "g", stopping: false, live: true};
+const PE_COL = ["#5aa9ff", "#ffb454", "#7ee787", "#d2a8ff", "#ff7b72", "#79c0ff"];
+function peSaveLast(){ try { localStorage.setItem("li_pe_last", JSON.stringify(PE.run)); } catch (e) {} }
+function peLoadLast(){ try { const r = JSON.parse(localStorage.getItem("li_pe_last") || "null"); if (r && r.pts) { r.done = true; PE.run = r; } } catch (e) {} }
+function peSaved(){ try { return JSON.parse(localStorage.getItem("li_pe_runs") || "[]"); } catch (e) { return []; } }
+function peCmpList(){
+  const sel = $("peCmp"), v = sel.value; sel.textContent = "";
+  const o = document.createElement("option"); o.value = ""; o.textContent = "なし"; sel.appendChild(o);
+  peSaved().forEach((r, i) => { const q = document.createElement("option"); q.value = i; q.textContent = r.name; sel.appendChild(q); });
+  sel.value = [...sel.options].some(o => o.value === v) ? v : "";
+}
+function peFit(pts, k, t0){   // 直線 y = a + b·x(x = 秒)
+  let n = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (const p of pts) { const x = (p.t - t0) / 1000, y = p[k]; n++; sx += x; sy += y; sxx += x * x; sxy += x * y; }
+  const d = n * sxx - sx * sx, b = d ? (n * sxy - sx * sy) / d : 0; return {a: (sy - b * sx) / n, b};
+}
+const PE_NB = 60;
+function peBins(xs, P){   // 位相ごとの平均(x = [位相 秒, 値])、少し滑らかに
+  const s = new Array(PE_NB).fill(0), c = new Array(PE_NB).fill(0);
+  for (const [ph, v] of xs) { const i = Math.min(PE_NB - 1, Math.floor(ph / P * PE_NB)); s[i] += v; c[i]++; }
+  const m = s.map((v, i) => c[i] ? v / c[i] : null);
+  const sm = m.map((v, i) => { let a = 0, n = 0; for (const j of [-1, 0, 1]) { const w = m[(i + j + PE_NB) % PE_NB]; if (w != null) { a += w * (j ? 1 : 2); n += j ? 1 : 2; } } return n ? a / n : null; });
+  return sm;
+}
+function peAnalyze(run){
+  if (!run || run.pts.length < 10) return null;
+  const pts = run.pts, t0 = run.t0, P = run.P, fr = peFit(pts, "ra", t0), fd = peFit(pts, "dec", t0);
+  const res = pts.map(p => { const x = (p.t - t0) / 1000; return {x, ph: ((x % P) + P) % P, cy: Math.floor(x / P), v: p.ra - (fr.a + fr.b * x)}; });
+  const bins = peBins(res.map(r => [r.ph, r.v]), P), ok = bins.filter(v => v != null);
+  const b0 = bins;   // 流れ(直線)を引いた残りなので、平均はほぼ 0。ずらすと周ごとの線と合わなくなる  v0.13
+  const pp = ok.length ? Math.max(...ok) - Math.min(...ok) : 0, rms = Math.sqrt(res.reduce((a, r) => a + r.v * r.v, 0) / res.length);
+  const len = res[res.length - 1].x;
+  // 周期の成分(間隔がそろっていなくても使える、周期ごとの振幅 = 2/n·|Σ v·e^{-iωt}|)
+  const dts = res.slice(1).map((r, i) => r.x - res[i].x).sort((a, b) => a - b), dt = dts[dts.length >> 1] || 2;
+  const pmin = Math.max(4 * dt, 10), pmax = Math.max(pmin * 2, Math.min(len / 1.2, 3 * P)), spec = [];
+  for (let i = 0; i <= 220; i++) {
+    const per = pmin * Math.pow(pmax / pmin, i / 220), w = 2 * Math.PI / per; let c = 0, s = 0;
+    for (const r of res) { c += r.v * Math.cos(w * r.x); s += r.v * Math.sin(w * r.x); }
+    spec.push([per, 2 * Math.hypot(c, s) / res.length]);
+  }
+  let best = spec[0]; for (const q of spec) if (q[1] > best[1]) best = q;
+  return {res, bins: b0, pp, rms, len, fr, fd, spec, best, cyc: Math.max(1, Math.ceil(len / P - 0.02))};
+}
+function peAxes(g, W, H, L, R, T, B, ymax, xt, xl){   // 目盛り(y = ±ymax ″、xt = x の目盛りの位置 0〜1、xl = その文字)
+  const Y = v => T + (B - T) / 2 - v / ymax * (B - T) / 2;
+  g.strokeStyle = "#2a3550"; g.lineWidth = 1; g.beginPath();
+  const st = ymax <= 2 ? 0.5 : ymax <= 5 ? 1 : ymax <= 12 ? 2 : ymax <= 30 ? 5 : 10;
+  for (let v = -Math.floor(ymax / st) * st; v <= ymax + 1e-9; v += st) { g.moveTo(L, Y(v)); g.lineTo(R, Y(v)); }
+  xt.forEach(f => { g.moveTo(L + f * (R - L), T); g.lineTo(L + f * (R - L), B); }); g.stroke();
+  g.strokeStyle = "#3d4a6a"; g.beginPath(); g.moveTo(L, Y(0)); g.lineTo(R, Y(0)); g.stroke();
+  for (let v = -Math.floor(ymax / st) * st; v <= ymax + 1e-9; v += st) gdT(g, (v > 0 ? "+" : "") + (+v.toFixed(1)) + "″", 2, Y(v) + 4);
+  xt.forEach((f, i) => gdT(g, xl[i], Math.min(R - 30, L + f * (R - L) - (i ? 12 : 0)), B + 13));
+  return Y;
+}
+function peDraw(){
+  const run = PE.run, A = peAnalyze(run), cmp = $("peCmp").value !== "" ? peSaved()[+$("peCmp").value] : null;
+  // --- 数値 ---
+  const f = (v, d) => v == null || isNaN(v) ? "--" : v.toFixed(d);
+  $("peP2P").textContent = A ? f(A.pp, 1) + "″" : "--"; $("peAmp").textContent = A ? "±" + f(A.pp / 2, 1) + "″" : "--"; $("peRms").textContent = A ? f(A.rms, 2) + "″" : "--";
+  $("pePerV").textContent = run ? run.P + " 秒" : "--"; $("peLen").textContent = A ? (A.len / 60).toFixed(1) + " 分(" + (A.len / run.P).toFixed(1) + " 周)" : "--";
+  $("peN").textContent = run ? run.pts.length : "--"; $("peDrR").textContent = A ? f(A.fr.b * 60, 2) + "″/分" : "--"; $("peDrD").textContent = A ? f(A.fd.b * 60, 2) + "″/分" : "--";
+  $("peNote").textContent = !run ? "「周期誤差(PE)を測る」で測ると、ここに出ます。" : (run.done ? "測定済み " : "測定中 ") + new Date(run.t0).toLocaleString()
+    + (cmp ? "。比べる: " + cmp.name + "(P-P " + cmp.pp.toFixed(1) + "″" + (cmp.P !== run.P ? "、周期 " + cmp.P + " 秒を位相の割合で重ねています" : "") + ")" : "");
+  // --- 重ね描き ---
+  { const [g, W, H] = gdCv("peCv"), L = 40, R = W - 8, T = 8, B = H - 18;
+    if (!A) { gdT(g, run ? "点を集めています(" + run.pts.length + " 点)…" : "「周期誤差(PE)を測る」で測ると、周期ごとに色を変えて重ねて描きます", 12, H / 2); $("peHd").textContent = ""; }
+    else {
+      const P = run.P, ym = Math.max(2, Math.ceil(Math.max(...A.res.map(r => Math.abs(r.v)), ...(cmp ? cmp.bins.filter(v => v != null).map(Math.abs) : [0])) * 1.1));
+      const Y = peAxes(g, W, H, L, R, T, B, ym, [0, .25, .5, .75, 1], ["0", Math.round(P / 4) + "", Math.round(P / 2) + "", Math.round(P * 3 / 4) + "", P + " 秒"]), X = ph => L + ph / P * (R - L);
+      let cy = -1; g.lineWidth = 1.3;
+      for (const r of A.res) { if (r.cy !== cy) { if (cy >= 0) g.stroke(); cy = r.cy; g.strokeStyle = PE_COL[cy % PE_COL.length]; g.beginPath(); g.moveTo(X(r.ph), Y(r.v)); } else g.lineTo(X(r.ph), Y(r.v)); }
+      g.stroke();
+      const line = (bins, col, w, dash) => { g.strokeStyle = col; g.lineWidth = w; g.setLineDash(dash || []); g.beginPath(); let on = false;
+        bins.forEach((v, i) => { if (v == null) { on = false; return; } const x = L + (i + .5) / PE_NB * (R - L); on ? g.lineTo(x, Y(v)) : g.moveTo(x, Y(v)); on = true; }); g.stroke(); g.setLineDash([]); };
+      if (cmp) line(cmp.bins, "#8b97b0", 2, [6, 4]);
+      line(A.bins, "#ffffff", 2.6);
+      let lx = L + 6; for (let c = 0; c < A.cyc && c < 6; c++) { gdT(g, (c + 1) + " 周目", lx, T + 12, PE_COL[c % PE_COL.length]); lx += 52; } gdT(g, "白 = 平均", lx, T + 12, "#fff"); if (cmp) gdT(g, "灰の点線 = 比べる", lx + 62, T + 12, "#8b97b0");
+      $("peHd").textContent = "P-P " + A.pp.toFixed(1) + "″(±" + (A.pp / 2).toFixed(1) + "″)・流れを引いた値";
+    } }
+  // --- 周期の成分 ---
+  { const [g, W, H] = gdCv("peSpecCv"), L = 34, R = W - 8, T = 10, B = H - 18;
+    if (!A || A.len < 60) { gdT(g, "2〜3 周分を測ると、どの周期の誤差が大きいかが出ます", 10, H / 2); $("peSpecHd").textContent = ""; }
+    else {
+      const sp = A.spec, mx = Math.max(0.5, ...sp.map(q => q[1])) * 1.1, lo = Math.log(sp[0][0]), hi = Math.log(sp[sp.length - 1][0]);
+      const X = per => L + (Math.log(per) - lo) / (hi - lo) * (R - L), Y = a => B - a / mx * (B - T);
+      g.strokeStyle = "#2a3550"; g.lineWidth = 1; g.beginPath(); for (const a of [mx / 2, mx]) { g.moveTo(L, Y(a)); g.lineTo(R, Y(a)); } g.stroke();
+      gdT(g, (mx / 2).toFixed(1) + "″", 2, Y(mx / 2) + 4); gdT(g, "0", 2, B);
+      let lastX = 1e9;
+      for (const [k, lab] of [[1, "周期"], [2, "1/2"], [3, "1/3"], [4, "1/4"]]) { const per = run.P / k; if (per < sp[0][0] || per > sp[sp.length - 1][0] || lastX - X(per) < 26) continue; lastX = X(per);
+        g.strokeStyle = k === 1 ? "#ffb454" : "#6b5a3a"; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X(per), T); g.lineTo(X(per), B); g.stroke(); g.setLineDash([]); gdT(g, lab, X(per) + 2, T + 9, "#ffb454"); }
+      g.strokeStyle = "#5aa9ff"; g.lineWidth = 1.6; g.beginPath(); sp.forEach((q, i) => i ? g.lineTo(X(q[0]), Y(q[1])) : g.moveTo(X(q[0]), Y(q[1]))); g.stroke();
+      for (const per of [30, 60, 120, 300, 600, 1200, 2400]) if (per >= sp[0][0] && per <= sp[sp.length - 1][0]) gdT(g, per + "s", X(per) - 8, B + 13);
+      $("peSpecHd").textContent = "いちばん強い周期 " + Math.round(A.best[0]) + " 秒(振幅 ±" + A.best[1].toFixed(1) + "″)";
+    } }
+  peCmpDraw(A);
+}
+// ガイドの記録から PE を作り直す(ずれ − 送った補正の合計)。断られたパルスは数えない
+function peRebuild(){
+  const h = G.hist; if (h.length < 5) return null;
+  const k = ((G.cal && G.cal.rW) || (GD.st && GD.st.cal && GD.st.cal.ra) || 0) / 1000;   // ″/ms
+  let cum = 0; const out = [];
+  for (const p of h) { out.push({t: p.t, err: p.ra, rec: p.ra - cum, cra: p.cra}); if (!(p.flags & 2)) cum += (p.cra || 0) * k; }
+  const fr = peFit(out.map(o => ({t: o.t, ra: o.rec})), "ra", out[0].t);   // 流れ(極軸のずれなど)は引く
+  out.forEach(o => { o.rec -= fr.a + fr.b * (o.t - out[0].t) / 1000; });
+  return {pts: out, k};
+}
+function peCmpDraw(A){
+  const [g, W, H] = gdCv("peCmpCv"), L = 40, R = W - 8, T = 18, B = H - 18, run = PE.run, P = run ? run.P : S.pePer;
+  const rb = peRebuild();
+  if (!rb) { gdT(g, "ガイドを始めると、ガイド誤差・再生した PE・測った PE を同じ時間の目盛りで並べます", 12, H / 2); $("peCmpHd").textContent = ""; $("peSlT").textContent = ""; return; }
+  const p = rb.pts, t1 = p[0].t, t2 = p[p.length - 1].t, span = (t2 - t1) / 1000, sl = $("peSl");
+  if (PE.live) sl.value = 1000;
+  const w0 = t1 + Math.max(0, span - P) * 1000 * (+sl.value / 1000), w1 = w0 + P * 1000, win = p.filter(q => q.t >= w0 && q.t <= w1);
+  // 測った PE を時刻に合わせる: 位相 = (t − 測定の始め) mod 周期 + ずらし(相関がいちばん高いずらしを自動で探す)
+  let lag = 0, mp = null;
+  if (A && A.bins.some(v => v != null)) {
+    const at = (t, lg) => { const ph = ((((t - run.t0) / 1000 + lg) % P) + P) % P; return A.bins[Math.min(PE_NB - 1, Math.floor(ph / P * PE_NB))]; };
+    if (span >= P / 2) { let best = -1e9; for (let i = 0; i < 60; i++) { const lg = i * P / 60; let c = 0; for (const q of p) { const v = at(q.t, lg); if (v != null) c += v * q.rec; } if (c > best) { best = c; lag = lg; } } }
+    mp = q => at(q.t, lag);
+  }
+  const ym = Math.max(2, Math.ceil(Math.max(...win.map(q => Math.max(Math.abs(q.err), Math.abs(q.rec))), ...(A ? A.bins.filter(v => v != null).map(Math.abs) : [0])) * 1.1));
+  const X = t => L + (t - w0) / (w1 - w0) * (R - L), fm = t => new Date(t).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+  const Y = peAxes(g, W, H, L, R, T, B, ym, [0, .25, .5, .75, 1], [fm(w0), "", Math.round(P / 2) + " 秒", "", fm(w1)]);
+  const mxp = Math.max(1, (GD.st && GD.st.settings.maxpulse) || S.gmax);
+  win.forEach(q => { g.fillStyle = "rgba(90,169,255,.28)"; g.fillRect(X(q.t) - 1, Y(0), 2, -q.cra / mxp * (B - T) / 2 * 0.6); });
+  const ln = (f, col, w, dash) => { g.strokeStyle = col; g.lineWidth = w; g.setLineDash(dash || []); g.beginPath(); let on = false;
+    for (const q of win) { const v = f(q); if (v == null) { on = false; continue; } on ? g.lineTo(X(q.t), Y(v)) : g.moveTo(X(q.t), Y(v)); on = true; } g.stroke(); g.setLineDash([]); };
+  if (mp) ln(mp, "#ffffff", 2, [6, 4]);
+  ln(q => q.rec, "#ffb454", 2);
+  ln(q => q.err, "#5aa9ff", 1.6);
+  gdT(g, "青 = ガイド誤差", L + 4, T - 5, "#5aa9ff"); gdT(g, "橙 = 再生した PE", L + 100, T - 5, "#ffb454"); if (mp) gdT(g, "白の点線 = 測った PE(平均)", L + 212, T - 5, "#fff"); gdT(g, "棒 = 赤経のパルス", L + (mp ? 380 : 212), T - 5, "#8b97b0");
+  const rr = a => Math.sqrt(a.reduce((s, v) => s + v * v, 0) / Math.max(1, a.length)), recs = win.map(q => q.rec);
+  $("peCmpHd").textContent = win.length ? "この 1 周期: ガイド誤差 RMS " + rr(win.map(q => q.err)).toFixed(2) + "″・再生した PE の P-P " + (Math.max(...recs) - Math.min(...recs)).toFixed(1) + "″" + (mp && span >= P / 2 ? "・位相のずらし " + Math.round(lag) + " 秒(自動)" : "") : "";
+  $("peSlT").textContent = span < P ? "記録 " + (span / 60).toFixed(1) + " 分(1 周期 " + (P / 60).toFixed(1) + " 分に満たない)" : fm(w0) + " から 1 周期・記録 " + (span / 60).toFixed(0) + " 分";
+}
+$("gdTabG").onclick = () => { PE.view = "g"; gdDraw(); };
+$("gdTabP").onclick = () => { PE.view = "p"; gdDraw(); };
+$("peSl").oninput = () => { PE.live = false; $("peLive").checked = false; peCmpDraw(peAnalyze(PE.run)); };
+$("peLive").onchange = () => { PE.live = $("peLive").checked; gdDraw(); };
+$("peCmp").onchange = () => gdDraw();
+$("peSave").onclick = () => {
+  const A = peAnalyze(PE.run); if (!A) return toast("保存できる測定がありません", true);
+  const nm = prompt("名前(例: 調整前・ベルト交換後)", new Date(PE.run.t0).toLocaleDateString() + " P-P " + A.pp.toFixed(1) + "″"); if (nm == null) return;
+  const L = peSaved(); L.push({name: nm, t0: PE.run.t0, P: PE.run.P, pp: A.pp, rms: A.rms, bins: A.bins.map(v => v == null ? null : +v.toFixed(3))}); while (L.length > 12) L.shift();
+  try { localStorage.setItem("li_pe_runs", JSON.stringify(L)); } catch (e) { return toast("保存できませんでした", true); }
+  peCmpList(); toast("保存しました。「比べる」で重ねられます");
+};
+$("peDel").onclick = () => { const v = $("peCmp").value; if (v === "") return toast("消す保存を「比べる」で選んでください", true); const L = peSaved(); if (!confirm("「" + L[+v].name + "」を消しますか?")) return; L.splice(+v, 1); try { localStorage.setItem("li_pe_runs", JSON.stringify(L)); } catch (e) {} $("peCmp").value = ""; peCmpList(); gdDraw(); };
+$("peCsv").onclick = () => {
+  const run = PE.run; if (!run || !run.pts.length) return toast("書き出す測定がありません", true);
+  const rows = ["# LUNA Imaging " + VERSION + " PE measurement, period " + run.P + " s, start " + new Date(run.t0).toISOString(), "time_s,ra_arcsec,dec_arcsec"];
+  for (const p of run.pts) rows.push(((p.t - run.t0) / 1000).toFixed(2) + "," + p.ra.toFixed(2) + "," + p.dec.toFixed(2));
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([rows.join("\n") + "\n"], {type: "text/csv"}));
+  a.download = "pe_" + new Date(run.t0).toISOString().slice(0, 16).replace(/[-:T]/g, "") + ".csv"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+};
+$("gdClose").onclick = () => { GD.auto = false; gdOpen(false); };   // 止めるまでは自動で戻さない
+$("gdStop").onclick = () => gbStop();
+$("gdBtn").onclick = () => { GD.auto = true; gdOpen(true); };
+window.addEventListener("resize", () => { if (GD.open) gdDraw(); });   // 情報画面の大きさが変わったら描き直す
+
+$("gconn").onclick = () => { if (GD.want) { GD.auto = false; gdOpen(false); } gConnect(); };   // 接続・ループは星を選ぶ画面で(情報画面が上に重なったままだと、画像が見えず選べない)  v0.12.1
+$("gloop").onclick = () => { if (GD.want) { GD.auto = false; gdOpen(false); } G.task ? (G.stop = true) : gLoop(); };
+$("gcal").onclick = () => G.task ? (G.board ? gbStop() : (G.stop = true)) : (S.gwhere === "board" ? gbStart("calibrate") : gCalibrate());
+$("gguide").onclick = () => G.task ? (G.board ? gbStop() : (G.stop = true)) : (S.gwhere === "board" ? gbStart("guide") : gGuide());
+$("gpe").onclick = () => G.task ? (G.task === "pe" && gbStop()) : gbStart("pe");
+// ガイドカメラ・焦点距離を替えたら、校正(このブラウザと基板)を消し、画素スケールを計算し直す  v0.13
+async function gCamChanged(why){
+  G.cal = null; gCalInfo();
+  try { const st = await gbReq("status"); if (st.cal.ok) { await gbReq("do", {what: "clearcal"}); toast(why + "を替えたので、校正を消しました。「③ 校正(キャリブレーション)」をし直してください"); } } catch (e) {}
+  gSteps();
+}
+let gPrev = {cam: null, fl: null};
+$("gcam").addEventListener("focus", () => { gPrev.cam = $("gcam").value; });
+$("gcam").addEventListener("change", () => {
+  if (G.task) { $("gcam").value = gPrev.cam; return toast("ガイド・校正・PE の測定を止めてから、カメラを替えてください", true); }
+  G.cam = null; G.scale = null; G.x = null; $("gconn").textContent = "接続"; readForm(); gDest(); gCamChanged("ガイドカメラ");
+});
+$("gfl").addEventListener("focus", () => { gPrev.fl = $("gfl").value; });
+$("gfl").addEventListener("change", () => {
+  if (G.task) { $("gfl").value = gPrev.fl; return toast("ガイド・校正・PE の測定を止めてから、焦点距離を替えてください", true); }
+  readForm(); gCamChanged("ガイド鏡の焦点距離");
+});
+let gPrevM = null;
+$("gmount").addEventListener("focus", () => { gPrevM = $("gmount").value; });
+$("gmount").addEventListener("change", () => {
+  if (G.task) { $("gmount").value = gPrevM; return toast("ガイド・校正・PE の測定を止めてから、マウントを替えてください", true); }
+  readForm(); $("gmconn").textContent = "接続"; $("gmInfo").textContent = ""; gDest(); gCamChanged("マウント");
+});
+$("gmconn").onclick = gMntConnect;
+$("gout").onchange = () => { readForm(); $("gtelrow").style.display = S.gout === "alpaca" ? "" : "none"; G.cal = null; gCalInfo(); gSteps(); };
+
+// ---------- 画面の切り替え・夜の赤 ----------
+let mode = "shoot";
+function setMode(m){ mode = m; document.querySelectorAll("#modes button").forEach(b => b.classList.toggle("on", b.dataset.m === m)); document.querySelectorAll("aside section").forEach(s => s.classList.toggle("on", s.dataset.p === m)); if (typeof gdSync === "function") gdSync(); }
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => setMode(b.dataset.m));
+$("red").onclick = () => { document.documentElement.classList.toggle("red"); try { localStorage.setItem("li_red", document.documentElement.classList.contains("red") ? "1" : ""); } catch (e) {} };
+try { if (localStorage.getItem("li_red")) document.documentElement.classList.add("red"); } catch (e) {}
+
+// ---------- 始め ----------
+(async () => {
+  $("exp").value = S.exp; $("count").value = S.count; $("interval").value = S.interval; $("bin").value = S.bin; $("type").value = S.type;
+  $("save").value = S.save; $("keep").value = S.keep; $("fexp").value = S.fexp; $("froi").value = S.froi; $("fstep").value = S.fstep; $("fnum").value = S.fnum;
+  for (const k of ["gexp", "gfl", "gout", "gcalms", "gaggr", "gmin", "gmax", "gwhere", "pePer", "peCyc"]) $(k).value = S[k];
+  $("gtelrow").style.display = S.gout === "alpaca" ? "" : "none"; $("str").value = S.str; $("host").value = S.host; $("origin").textContent = location.origin;
+  const o = document.createElement("option"); o.value = S.cam; o.textContent = "#" + S.cam; $("cam").appendChild(o);
+  const fo = document.createElement("option"); fo.value = S.foc; fo.textContent = "#" + S.foc; $("foc").appendChild(fo); graph();
+  for (const [k, v] of [["gcam", S.gcam], ["gtel", S.gtel]]) { const q = document.createElement("option"); q.value = v; q.textContent = "#" + v; $(k).appendChild(q); }
+  gMntList(); gGraph(); gSteps(); gButtons();
+  $("ver").textContent = "v" + VERSION;
+  try { const si = await fetch(location.origin + "/api/system/info", {cache: "no-store"}).then(x => x.json()); if (/NS-?5000X/i.test((si.data && si.data.version) || "")) { BN = "NS-5000X"; gMntList(); gDest(); } } catch (e) {}   // v0.21
+  gDest();
+  // (preview: on-board guiding is not shown yet) setInterval(() => { if (!GB.poll) gbPoll(true); }, 5000);   // 作業していないように見えるときも 5 秒ごとに基板の状態を確かめる(1 回目が失敗しても気づく)  v0.19
+  // (preview) gbPoll(true);   // 基板から開いたときは、設定に関係なく基板のガイドの様子を見る(ガイド中ならガイドの画面の情報画面を開く)  v0.9.1
+  ["exp", "count", "interval", "bin", "type", "save", "host", "cam", "fexp", "froi", "foc", "fstep", "fnum", "gcam", "gtel", "gexp", "gfl", "gcalms", "gaggr", "gmin", "gmax", "gwhere", "pePer", "peCyc"].forEach(k => $(k).addEventListener("change", readForm));
+  peLoadLast(); peCmpList();
+  $("keep").addEventListener("change", () => { readForm(); drawStrip(); });
+  sizeCanvas();
+  try { db = await idb(); await loadList(); drawStrip(); usage(); if (frames.length) await openFrame(frames[frames.length - 1].id); }
+  catch (e) { toast("This browser cannot store images (" + e.message + ")", true); }
+  if (!S.host) setMode("shoot");
+})();
+</script>
+</body>
+</html>

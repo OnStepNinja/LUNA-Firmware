@@ -511,6 +511,25 @@
    "changes": {
     "en": "Control ASCOM Alpaca devices on your LAN from the board's web page: a focuser (position, move, temperature), a filter wheel and a telescope. After downloading, open http://<board IP>/alpaca_console_en.html, enter the address of your Alpaca server (for example 192.168.1.50:11111) and press \"Detect on network\". [Caution] This moves real equipment. Check that nothing can collide or tangle before you press a button. Camera images are not supported."
    }
+  },
+  {
+   "product": "NS-4000 / NS-5000X",
+   "name": "luna_imaging_en.html",
+   "version": "0.21",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/apps/en/luna_imaging_en.html",
+   "size": 163208,
+   "sha256": "ad577b387cfa6ef2ee716230cc245096eb30faf39e8a767228c5a52635144442",
+   "title": {
+    "en": "LUNA Imaging (preview): capture with an Alpaca camera"
+   },
+   "category": {
+    "en": "Tools"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "changes": {
+    "en": "Preview (prototype). Captures images with an ASCOM Alpaca camera from the board's web page and keeps them in your browser (thumbnails, star count and HFR, save as FITS / PNG). This first preview has the capture functions only; autofocus and on-board autoguiding will follow. Not all functions have been tested on real equipment yet. Would anyone like to try it? After downloading, open http://<board IP>/luna_imaging_en.html and press \"Find Alpaca devices\". Your Alpaca server must allow the board's address by CORS. Feedback is welcome on the Q&A board."
+   }
   }
  ],
  "data": [
