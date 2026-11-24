@@ -536,9 +536,44 @@
      }
     }
    ]
+  },
+  {
+   "group": "OnStep",
+   "name": "ns4000_esp32_circuit_en.txt",
+   "lang": "en",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/data/en/ns4000_esp32_circuit_en.txt",
+   "size": 2322,
+   "sha256": "dfd592d00e938e808c11fcf74e2aaefab0aecacac092cedc0a2b868ba4b5b525",
+   "type": "text",
+   "title": {
+    "en": "NS-4000: basic ESP32 circuit (circuit diagram)"
+   },
+   "category": {
+    "en": "Documents"
+   },
+   "license": "Freeware (apps/common/LICENSE)",
+   "images": [
+    {
+     "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/images/en/ns4000_esp32_circuit_v3.png",
+     "caption": {
+      "en": "Basic ESP32 circuit of the NS-4000 (v3, 2026-11-23)"
+     }
+    }
+   ]
   }
  ],
  "news": [
+  {
+   "date": "2026-11-24",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Imaging (capture) preview released"
+   },
+   "body": {
+    "en": "Added to \"Tools\" in LUNA Store. Capture images with an Alpaca camera from the NS-4000 / NS-5000X board's page alone, without imaging software on a PC (images stay in your browser; save as FITS / PNG). Please tell us your results on the Q&A board. It helps the development. Thank you."
+   }
+  },
   {
    "date": "2026-11-14",
    "level": "info",

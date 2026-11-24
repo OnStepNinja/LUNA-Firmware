@@ -1,0 +1,42 @@
+NS-4000: basic ESP32 circuit (OnStepNinja_NS4000_v3, 2026-11-23)
+
+The circuit around the ESP32 (ESP32-WROOM-32E) on the NS-4000 board. Every part connected to the ESP32 is in it.
+The NS-5000X firmware runs on the same board with the same pins. The circuit diagram is shown above this text.
+The motor drivers and the power supply are not in this diagram.
+
+■ ESP32 pins
+| ESP32 | Signal | Use |
+|---|---|---|
+| GPIO18 | RA_PLS | RA motor step pulse |
+| GPIO0 | RA_DIR | RA motor direction (shared with the BOOT switch) |
+| GPIO27 | DEC_PLS | Dec motor step pulse |
+| GPIO26 | DEC_DIR | Dec motor direction |
+| GPIO22 | RA_CD | RA motor current down (H: current down, L: full power) |
+| GPIO19 | DEC_CD | Dec motor current down (H: current down, L: full power) |
+| GPIO39 (SVN) | SEL | Handbox SEL button |
+| GPIO34 | RR (RA-) | Handbox button (RA -) |
+| GPIO35 | RL (RA+) | Handbox button (RA +) |
+| GPIO32 | DD (DE-) | Handbox button (Dec -) |
+| GPIO33 | DU (DE+) | Handbox button (Dec +) |
+| GPIO25 | TLED | Status LED |
+| GPIO4 | BEEP | Piezo buzzer |
+| GPIO21 | SH | Camera shutter (on / off) |
+| TXD0 / RXD0 | TX1 / RX1 | Serial (USB, RS232C; flashing and commands) |
+| EN | - | RESET switch |
+
+■ How it works
+- Power: 3.3V, smoothed by 47µF (C2) and C1
+- RESET: EN is pulled up to 3.3V by 30kΩ (R2) with 1µF (C3) to GND. The RESET switch pulls EN to GND
+- BOOT: a switch from GPIO0 to GND. Hold it and press RESET to enter the download (flashing) mode
+- Handbox buttons (5): pulled up to 3.3V by 10kΩ x5 (R3 to R7). A pressed button reads L
+- LED: 3.3V -> 4.7kΩ (R1) -> LED -> GPIO25. It is lit when GPIO25 is L (the firmware drives it that way)
+- Buzzer: GPIO4 -> 1kΩ (R8) -> piezo buzzer -> GND
+- Current down: H (current down) while tracking or stopped, L (full power) during a GOTO. The Dec signal (GPIO19) is given from NS-4000 v1.2.24. The NS-5000X has always given both
+
+■ Notes
+- GPIO0 is a boot strapping pin. If the driver input pulls GPIO0 low at power-up, the ESP32 enters the download mode and does not start
+- GPIO34, 35 and 39 are input-only pins without internal pull-ups. The external 10kΩ resistors are needed
+- All signals are 3.3V. Do not connect 5V signals directly
+
+■ Source
+OnStepNinja NS-4000 (firmware based on OnStep, GPL v3): https://github.com/OnStepNinja/OnStepNinja-NS4000
