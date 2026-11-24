@@ -22,7 +22,10 @@
    },
    "license": "Freeware",
    "hw": "base",
-   "color": "gray"
+   "color": "gray",
+   "category": {
+    "en": "LUNA Base"
+   }
   },
   {
    "product": "NS-4000",
@@ -55,6 +58,9 @@
    "color": "blue",
    "variant": {
     "en": "German equatorial"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -88,6 +94,9 @@
    "color": "blue",
    "variant": {
     "en": "German equatorial"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -114,6 +123,9 @@
    "color": "green",
    "variant": {
     "en": "Fork"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -140,6 +152,9 @@
    "color": "green",
    "variant": {
     "en": "Fork"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -166,6 +181,9 @@
    "color": "orange",
    "variant": {
     "en": "Alt-Az"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -192,6 +210,9 @@
    "color": "orange",
    "variant": {
     "en": "Alt-Az"
+   },
+   "category": {
+    "en": "NS-4000/5000"
    }
   },
   {
@@ -223,7 +244,10 @@
     }
    ],
    "hw": "handbox",
-   "color": "teal"
+   "color": "teal",
+   "category": {
+    "en": "Handbox"
+   }
   },
   {
    "product": "LUNA-Observatory",
@@ -245,7 +269,10 @@
    },
    "license": "MIT",
    "hw": "luna",
-   "color": "pink"
+   "color": "pink",
+   "category": {
+    "en": "LUNA"
+   }
   }
  ],
  "hardware": {
@@ -255,6 +282,9 @@
    },
    "note": {
     "en": "Choose the one that matches your mount (German equatorial, fork or alt-azimuth)"
+   },
+   "tab": {
+    "en": "NS-4000/5000"
    }
   },
   "handbox": {
@@ -264,7 +294,10 @@
    "note": {
     "en": "For the handbox board only. Do not install it on an NS-4000 board"
    },
-   "warn": true
+   "warn": true,
+   "tab": {
+    "en": "Handbox"
+   }
   },
   "luna": {
    "name": {
@@ -273,7 +306,10 @@
    "note": {
     "en": "For the LUNA board only. Do not install it on an NS-4000 or NS-5000X board"
    },
-   "warn": true
+   "warn": true,
+   "tab": {
+    "en": "LUNA"
+   }
   },
   "base": {
    "name": {
@@ -281,6 +317,9 @@
    },
    "note": {
     "en": "Runs a program that upgrades LUNA Base (Store) for a short time (about 20 seconds, do not switch off). After the upgrade, please download your firmware again"
+   },
+   "tab": {
+    "en": "LUNA Base"
    }
   }
  },
