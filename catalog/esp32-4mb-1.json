@@ -6,19 +6,19 @@
    "product": "LUNA-BASE-UPDATER",
    "mark": "LUNA Base Updater v",
    "name": "LUNA Base (Store) upgrade",
-   "version": "0.9.2",
+   "version": "0.9.3",
    "lang": "en",
    "layout": "esp32-4mb-1",
    "chip": "esp32",
    "minBase": "0.7.0",
-   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.2_en.bin",
-   "size": 1323088,
-   "sha256": "13f0ed164b87597807644a8aec27073bae1f78731562ecb29b679351632ccdc0",
+   "url": "https://raw.githubusercontent.com/OnStepNinja/LUNA-Firmware/main/bin/LUNA_Base_Updater_v0.9.3_en.bin",
+   "size": 1323104,
+   "sha256": "a3c4d2dc2dd64da76df7b666b25da99a4df8ddf5a873f4f4e32a22e704f9e4fd",
    "title": {
-    "en": "Upgrades LUNA Base to v0.9.2. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
+    "en": "Upgrades LUNA Base to v0.9.3. A program runs for a short time and then LUNA Base comes back. After that, please download your firmware again"
    },
    "changes": {
-    "en": "New in LUNA Base v0.9.2: a \"Q&A\" button next to the LUNA Store title (opens the LUNA Store discussion board in a new tab); links in descriptions and news are now in a brighter, easier-to-read color. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
+    "en": "Fixed in LUNA Base v0.9.3: with a dev server set, LUNA Store sometimes showed only a few tabs (it now reads the dev catalog after the public catalog). While the dev server card is closed, the dev catalog is not read. No USB needed. It takes about 20 seconds (do not switch off). Your Wi-Fi settings and firmware settings are kept. If the page does not change after the last beeps, reload the page"
    },
    "license": "Freeware"
   },
