@@ -603,6 +603,17 @@
  ],
  "news": [
   {
+   "date": "2026-11-25",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Store on the web"
+   },
+   "body": {
+    "en": "You can now see what is in LUNA Store in your browser, without a board: https://onstepninja.github.io/LUNA-Store/ It lists the published firmware, apps and news just like LUNA Store on the board. Apps can be tried in your browser with \"Try it\" (features that need the board will not work). To install, use LUNA Base on your board as before."
+   }
+  },
+  {
    "date": "2026-11-24",
    "level": "info",
    "product": "*",
