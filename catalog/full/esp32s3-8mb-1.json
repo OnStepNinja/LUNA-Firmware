@@ -1,0 +1,147 @@
+{
+ "format": 1,
+ "updated": "2026-11-10",
+ "firmware": [],
+ "hardware": {
+  "ns4000": {
+   "name": {
+    "en": "NS-4000 board (NS-5000X, NS-4000)"
+   },
+   "note": {
+    "en": "Choose the one that matches your mount (German equatorial, fork or alt-azimuth)"
+   },
+   "tab": {
+    "en": "NS-4000/5000"
+   }
+  },
+  "handbox": {
+   "name": {
+    "en": "BLE handbox board"
+   },
+   "note": {
+    "en": "For the handbox board only. Do not install it on an NS-4000 board"
+   },
+   "warn": true,
+   "tab": {
+    "en": "Handbox"
+   }
+  },
+  "luna": {
+   "name": {
+    "en": "LUNA board"
+   },
+   "note": {
+    "en": "For the LUNA board only. Do not install it on an NS-4000 or NS-5000X board"
+   },
+   "warn": true,
+   "tab": {
+    "en": "LUNA"
+   }
+  },
+  "base": {
+   "name": {
+    "en": "Upgrade LUNA Base (Store) itself (no USB)"
+   },
+   "note": {
+    "en": "Runs a program that upgrades LUNA Base (Store) for a short time (about 20 seconds, do not switch off). After the upgrade, please download your firmware again"
+   },
+   "tab": {
+    "en": "LUNA Base"
+   }
+  }
+ },
+ "apps": [],
+ "data": [],
+ "news": [
+  {
+   "date": "2026-11-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base now supports ESP32-S3 boards"
+   },
+   "body": {
+    "en": "LUNA Base can now be installed on ESP32-S3 boards (N8R8 and N16R8). The browser install page https://onstepninja.github.io/LUNA-Firmware/install/ picks the right build for the connected board. Firmware for the S3 will be added to LUNA Store step by step."
+   }
+  },
+  {
+   "date": "2026-11-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Firmware for ESP32-S3 is in preparation"
+   },
+   "body": {
+    "en": "There is no firmware or app for this board (ESP32-S3) in LUNA Store yet. We will announce it here when it is ready. Firmware for ESP32 (such as the NS-4000 board) cannot be installed on this board."
+   }
+  },
+  {
+   "date": "2026-11-25",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Store on the web"
+   },
+   "body": {
+    "en": "You can now see what is in LUNA Store in your browser, without a board: https://onstepninja.github.io/LUNA-Store/ It lists the published firmware, apps and news just like LUNA Store on the board. Apps can be tried in your browser with \"Try it\" (features that need the board will not work). To install, use LUNA Base on your board as before."
+   }
+  },
+  {
+   "date": "2026-11-11",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Install LUNA Base over USB from your web browser"
+   },
+   "body": {
+    "en": "You no longer need Python or esptool to put LUNA Base on a new board (ESP32). Open the install page in Chrome or Edge on a PC, connect the board with USB and press \"Install\" (2 to 3 minutes). The page also explains the Wi-Fi setup after installing. Nothing on the board is erased, so your settings are kept. Install page: https://onstepninja.github.io/LUNA-Firmware/install/ (to open it from here, press this link, then the link on that page: https://github.com/OnStepNinja/LUNA-Firmware/tree/main/install )"
+   }
+  },
+  {
+   "date": "2026-11-10",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Circuits and the LUNA Base guide are in LUNA Store"
+   },
+   "body": {
+    "en": "LUNA Store (Data) now has \"LUNA Base - writing and using\" and the circuit of the \"LUNA Prog & Comm Adapter v2\", a USB-serial adapter for writing, talking to the board and reading logs. The circuit and the build steps of the Wireless BLE Handbox are in the description of its firmware."
+   }
+  }
+ ],
+ "astro": [
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "November Moon: New on the 9th, Full on the 24th"
+   },
+   "body": {
+    "en": "New Moon on Nov 9 at about 16:00 JST (07:00 UT) and Full Moon on Nov 24 at about 23:50 JST (14:50 UT). Computed values, a few minutes of error. The days around New Moon give the darkest skies. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Leonids: best around Nov 17-18"
+   },
+   "body": {
+    "en": "The Leonids usually peak around Nov 17-18, about 15 meteors per hour under good conditions. This year the Moon is near first quarter on the 17th and sets after midnight, so the pre-dawn sky is dark. The radiant in Leo rises after midnight. (Test notice)"
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "Taurids: about Nov 5 (south) and Nov 12 (north)"
+   },
+   "body": {
+    "en": "Only a few meteors per hour, but slow, bright fireballs are a feature. On Nov 5 only a thin crescent rises before dawn, and on Nov 12 the thin Moon sets early in the evening, so both nights are dark. (Test notice)"
+   }
+  }
+ ]
+}

@@ -603,6 +603,17 @@
  ],
  "news": [
   {
+   "date": "2026-11-27",
+   "level": "info",
+   "product": "*",
+   "title": {
+    "en": "LUNA Base now supports ESP32-S3 boards"
+   },
+   "body": {
+    "en": "LUNA Base can now be installed on ESP32-S3 boards (N8R8 and N16R8). The browser install page https://onstepninja.github.io/LUNA-Firmware/install/ picks the right build for the connected board. Firmware for the S3 will be added to LUNA Store step by step."
+   }
+  },
+  {
    "date": "2026-11-25",
    "level": "info",
    "product": "*",
